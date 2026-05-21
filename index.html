@@ -1,66 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Breaker Settings</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <div class="left panel">
-      <h1>Breaker Settings</h1>
+  <main class="app">
+    <aside class="panel left">
+      <div class="logo">Breaker<span>Settings</span></div>
+      <div class="sub">Kompakt engineering version · statisk</div>
 
       <label>Fabrikat</label>
-      <select id="brand">
-        <option>Schneider Electric</option>
-        <option>ABB</option>
-        <option>Siemens</option>
-      </select>
+      <select id="brandSelect"></select>
 
       <label>Serie</label>
-      <select>
-        <option>ComPacT NSX</option>
+      <select id="seriesSelect"></select>
+
+      <label>Bryder</label>
+      <select id="breakerSelect"></select>
+
+      <label>Relæ</label>
+      <select id="relaySelect"></select>
+
+      <label>Ønsket indstillingsstrøm</label>
+      <input id="desiredCurrent" type="number" value="90" />
+
+      <label>Ik min. kA</label>
+      <input id="ikMin" type="number" value="3.1" step="0.1" />
+
+      <label>Ik max. kA</label>
+      <input id="ikMax" type="number" value="14" step="0.1" />
+
+      <label>INC manuel værdi</label>
+      <input id="inc" type="number" value="250" />
+
+      <label>Metode</label>
+      <select id="method">
+        <option>Calculated settings</option>
+        <option>Minimum settings</option>
       </select>
+    </aside>
 
-      <label>Ønsket strøm</label>
-      <input id="desired" type="number" value="90">
-
-      <label>INC</label>
-      <input id="inc" type="number" value="250">
-
-      <button onclick="updateOutput()">Beregn</button>
-    </div>
-
-    <div class="center panel">
-      <div class="card">
-        <img src="assets/nsx.svg" alt="NSX">
+    <section class="panel center">
+      <div class="device-card">
+        <img id="deviceImage" src="assets/breakers/nsx.svg" alt="Bryder" />
         <div>
-          <div class="badge">Mostly verified</div>
-          <h2>Schneider Electric · ComPacT NSX</h2>
-          <p>NSX250B 3P · MicroLogic 2.2 250A</p>
+          <span id="statusBadge" class="badge ok">Mostly verified</span>
+          <h1 id="deviceTitle">Schneider Electric · ComPacT NSX</h1>
+          <p id="deviceSub">NSX250B 3P · MicroLogic 2.2 250A</p>
+          <div class="chips">
+            <span id="chipFrame">Frame: NSX250</span>
+            <span id="chipIcu">Icu: 25 kA</span>
+            <span id="chipPoles">Poler: 3P</span>
+          </div>
         </div>
       </div>
 
-      <h3>Rating plug forslag</h3>
+      <div id="warningBox" class="warning hidden"></div>
 
-      <div class="plug active">
-        <strong>Low setting plug</strong>
-        <small>Io: 40A - 100A</small>
+      <h2>Beregnede indstillinger</h2>
+      <table>
+        <thead>
+          <tr><th>Funktion</th><th>Min - indstilling - max</th><th>Resultat</th></tr>
+        </thead>
+        <tbody id="settingsRows"></tbody>
+      </table>
+
+      <h2>Direkte kataloglinks</h2>
+      <div id="docs" class="docs"></div>
+    </section>
+
+    <aside class="panel right">
+      <h2>Rating plug valg</h2>
+      <div id="plugPanel" class="plug-panel"></div>
+
+      <div class="result-head">
+        <h2>Resultat til dokumentation</h2>
+        <button id="copyBtn">Kopiér</button>
       </div>
 
-      <div class="plug">
-        <strong>Standard plug</strong>
-        <small>Io: 100A - 250A</small>
-      </div>
-    </div>
-
-    <div class="right panel">
-      <h3>Resultat til dokumentation</h3>
-      <pre id="output"></pre>
-    </div>
-  </div>
-
+      <div id="copyNote" class="copy-note hidden">Kopieret</div>
+      <div id="output" class="output"></div>
+    </aside>
+  </main>
   <script src="app.js"></script>
 </body>
 </html>
