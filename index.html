@@ -10,11 +10,13 @@
   <main class="app">
     <aside class="panel left">
       <h1>Breaker<span>Settings</span></h1>
-      <p class="subtitle">Statisk v3.2 · fixed</p>
+      <p class="subtitle">Statisk v3.3 · korrekt valgstruktur</p>
       <label>Fabrikat</label><select id="brand"></select>
       <label>Serie</label><select id="series"></select>
-      <label>Bryder</label><select id="breaker"></select>
+      <label>Bryder</label><select id="frame"></select>
+      <label>Kortslutningsholdbarhed</label><select id="breakingClass"></select>
       <label>Relæ</label><select id="relay"></select>
+      <label>Polantal</label><select id="poles"></select>
       <label>Ønsket indstillingsstrøm</label><input id="desired" type="number" value="90"/>
       <label>Ik min. kA</label><input id="ikmin" type="number" value="3.1" step="0.1"/>
       <label>Ik max. kA</label><input id="ikmax" type="number" value="14" step="0.1"/>
@@ -22,7 +24,7 @@
       <label>Metode</label><select id="method"><option>Calculated settings</option><option>Minimum settings</option></select>
     </aside>
     <section class="panel center">
-      <div class="device-card"><img id="img" alt="Bryder"/><div><span id="status" class="badge ok"></span><h2 id="title"></h2><p id="subtitle2"></p><div class="chips"><span id="frame"></span><span id="icu"></span><span id="in"></span></div></div></div>
+      <div class="device-card"><img id="img" alt="Bryder"/><div><span id="status" class="badge ok"></span><h2 id="title"></h2><p id="subtitle2"></p><div class="chips"><span id="chipFrame"></span><span id="chipClass"></span><span id="chipPoles"></span></div></div></div>
       <div id="warning" class="warning hidden"></div>
       <h3>Beregnede indstillinger</h3>
       <table><thead><tr><th>Funktion</th><th>Min - indstilling - max</th><th>Resultat</th></tr></thead><tbody id="rows"></tbody></table>
