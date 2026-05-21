@@ -1,98 +1,49 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Breaker Settings</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <main class="app">
     <aside class="panel left">
       <h1>Breaker<span>Settings</span></h1>
-      <p class="subtitle">Engineering Edition · statisk v3.0</p>
-
-      <label>Fabrikat</label>
-      <select id="brandSelect"></select>
-
-      <label>Serie</label>
-      <select id="seriesSelect"></select>
-
-      <label>Bryder</label>
-      <select id="breakerSelect"></select>
-
-      <label>Relæ</label>
-      <select id="relaySelect"></select>
-
-      <label>Ønsket indstillingsstrøm</label>
-      <input id="desiredInput" type="number" value="90" />
-
-      <label>Ik min. kA</label>
-      <input id="ikMinInput" type="number" value="3.1" step="0.1" />
-
-      <label>Ik max. kA</label>
-      <input id="ikMaxInput" type="number" value="14" step="0.1" />
-
-      <label>INC manuel værdi</label>
-      <input id="incInput" type="number" value="250" />
-
-      <label>Metode</label>
-      <select id="methodSelect">
-        <option>Calculated settings</option>
-        <option>Minimum settings</option>
-      </select>
+      <p class="subtitle">Statisk v3.1 · full database</p>
+      <label>Fabrikat</label><select id="brandSelect"></select>
+      <label>Serie</label><select id="seriesSelect"></select>
+      <label>Bryder</label><select id="breakerSelect"></select>
+      <label>Relæ</label><select id="relaySelect"></select>
+      <label>Ønsket indstillingsstrøm</label><input id="desiredInput" type="number" value="90"/>
+      <label>Ik min. kA</label><input id="ikMinInput" type="number" value="3.1" step="0.1"/>
+      <label>Ik max. kA</label><input id="ikMaxInput" type="number" value="14" step="0.1"/>
+      <label>INC manuel værdi</label><input id="incInput" type="number" value="250"/>
+      <label>Metode</label><select id="methodSelect"><option>Calculated settings</option><option>Minimum settings</option></select>
     </aside>
 
     <section class="panel center">
       <div class="device-card">
-        <img id="deviceImage" src="" alt="Bryder" />
+        <img id="deviceImage" alt="Bryder"/>
         <div>
-          <span id="verifyBadge" class="badge ok">Mostly verified</span>
-          <h2 id="deviceTitle">Schneider Electric · ComPacT NSX</h2>
-          <p id="deviceSubtitle">NSX250B 3P · MicroLogic 2.2 250A</p>
-          <div class="chips">
-            <span id="chipFrame">Frame: NSX250</span>
-            <span id="chipIcu">Icu: 25 kA</span>
-            <span id="chipPoles">Poler: 3P</span>
-          </div>
+          <span id="verifyBadge" class="badge ok"></span>
+          <h2 id="deviceTitle"></h2>
+          <p id="deviceSubtitle"></p>
+          <div class="chips"><span id="chipFrame"></span><span id="chipIcu"></span><span id="chipPoles"></span></div>
         </div>
       </div>
-
-      <div id="ikWarning" class="warning hidden">
-        OBS: Ik max er højere end bryderens Icu. Er bryderen backupbeskyttet?
-      </div>
-
+      <div id="ikWarning" class="warning hidden"></div>
       <h3>Beregnede indstillinger</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Funktion</th>
-            <th>Min - indstilling - max</th>
-            <th>Resultat</th>
-          </tr>
-        </thead>
-        <tbody id="settingsRows"></tbody>
-      </table>
-
-      <h3>Direkte kataloglinks</h3>
-      <div id="docLinks" class="docs"></div>
-
-      <div id="moduleWarning" class="warning hidden"></div>
+      <table><thead><tr><th>Funktion</th><th>Min - indstilling - max</th><th>Resultat</th></tr></thead><tbody id="settingsRows"></tbody></table>
+      <h3>Direkte kataloglinks</h3><div id="docLinks" class="docs"></div>
     </section>
 
     <aside class="panel right">
-      <h3>Rating plug valg</h3>
-      <div id="plugPanel" class="plugs"></div>
-
-      <div class="result-header">
-        <h3>Resultat til dokumentation</h3>
-        <button id="copyBtn">Kopiér</button>
-      </div>
-
+      <h3>Rating plug valg</h3><div id="plugPanel" class="plugs"></div>
+      <div class="result-header"><h3>Resultat til dokumentation</h3><button id="copyBtn">Kopiér</button></div>
       <pre id="output" class="output"></pre>
     </aside>
   </main>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
