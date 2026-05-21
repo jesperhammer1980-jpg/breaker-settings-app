@@ -10,37 +10,27 @@
   <main class="app">
     <aside class="panel left">
       <h1>Breaker<span>Settings</span></h1>
-      <p class="subtitle">Statisk v3.1 · full database</p>
-      <label>Fabrikat</label><select id="brandSelect"></select>
-      <label>Serie</label><select id="seriesSelect"></select>
-      <label>Bryder</label><select id="breakerSelect"></select>
-      <label>Relæ</label><select id="relaySelect"></select>
-      <label>Ønsket indstillingsstrøm</label><input id="desiredInput" type="number" value="90"/>
-      <label>Ik min. kA</label><input id="ikMinInput" type="number" value="3.1" step="0.1"/>
-      <label>Ik max. kA</label><input id="ikMaxInput" type="number" value="14" step="0.1"/>
-      <label>INC manuel værdi</label><input id="incInput" type="number" value="250"/>
-      <label>Metode</label><select id="methodSelect"><option>Calculated settings</option><option>Minimum settings</option></select>
+      <p class="subtitle">Statisk v3.2 · fixed</p>
+      <label>Fabrikat</label><select id="brand"></select>
+      <label>Serie</label><select id="series"></select>
+      <label>Bryder</label><select id="breaker"></select>
+      <label>Relæ</label><select id="relay"></select>
+      <label>Ønsket indstillingsstrøm</label><input id="desired" type="number" value="90"/>
+      <label>Ik min. kA</label><input id="ikmin" type="number" value="3.1" step="0.1"/>
+      <label>Ik max. kA</label><input id="ikmax" type="number" value="14" step="0.1"/>
+      <label>INC manuel værdi</label><input id="inc" type="number" value="100"/>
+      <label>Metode</label><select id="method"><option>Calculated settings</option><option>Minimum settings</option></select>
     </aside>
-
     <section class="panel center">
-      <div class="device-card">
-        <img id="deviceImage" alt="Bryder"/>
-        <div>
-          <span id="verifyBadge" class="badge ok"></span>
-          <h2 id="deviceTitle"></h2>
-          <p id="deviceSubtitle"></p>
-          <div class="chips"><span id="chipFrame"></span><span id="chipIcu"></span><span id="chipPoles"></span></div>
-        </div>
-      </div>
-      <div id="ikWarning" class="warning hidden"></div>
+      <div class="device-card"><img id="img" alt="Bryder"/><div><span id="status" class="badge ok"></span><h2 id="title"></h2><p id="subtitle2"></p><div class="chips"><span id="frame"></span><span id="icu"></span><span id="in"></span></div></div></div>
+      <div id="warning" class="warning hidden"></div>
       <h3>Beregnede indstillinger</h3>
-      <table><thead><tr><th>Funktion</th><th>Min - indstilling - max</th><th>Resultat</th></tr></thead><tbody id="settingsRows"></tbody></table>
-      <h3>Direkte kataloglinks</h3><div id="docLinks" class="docs"></div>
+      <table><thead><tr><th>Funktion</th><th>Min - indstilling - max</th><th>Resultat</th></tr></thead><tbody id="rows"></tbody></table>
+      <h3>Direkte kataloglinks</h3><div id="docs" class="docs"></div>
     </section>
-
     <aside class="panel right">
-      <h3>Rating plug valg</h3><div id="plugPanel" class="plugs"></div>
-      <div class="result-header"><h3>Resultat til dokumentation</h3><button id="copyBtn">Kopiér</button></div>
+      <div id="plugWrap"><h3>Rating plug valg</h3><div id="plugs" class="plugs"></div></div>
+      <div class="result-header"><h3>Resultat til dokumentation</h3><button id="copy">Kopiér</button></div>
       <pre id="output" class="output"></pre>
     </aside>
   </main>
