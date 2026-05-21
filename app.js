@@ -15,6 +15,10 @@ function fmt(v){return String(v).replace(/\.0$/,"").replace(".",",")}
 function fill(id,vals,cur){$(id).innerHTML=vals.map((v,i)=>`<option value="${i}" ${i===cur?"selected":""}>${v}</option>`).join("")}
 
 function plugList(f){
+  // Important:
+  // ComPacT NS optional C33543/C33544 changes Ir step list only.
+  // It does NOT change Io/rating. Therefore do not show fake Low/High rating plug options for NS.
+  if(S().brand==="Schneider Electric" && S().series==="ComPacT NS") return [];
   if(!f.plugs)return[];
   const base=f.ratings;
   const low=base.map(x=>Math.round(x*.63)).filter((x,i,a)=>x>0&&a.indexOf(x)===i);
@@ -47,11 +51,15 @@ function bestIoIr(io,ir,desired){
 function visibleSettingTypes(s,r,ioBase,desired){
   const all=nsSettingTypes(s,r);
   if(!all.length)return[];
+
+  // Io/rating is fixed here. Optional C33543/C33544 ONLY changes Ir steps.
   const std={...all[0],best:bestIoIr([ioBase],all[0].ir,desired)};
   const out=[std];
+
   for(const opt of all.slice(1)){
     const b=bestIoIr([ioBase],opt.ir,desired);
-    if(b.diff<std.best.diff)out.push({...opt,best:b});
+    // Show optional setting only when it gives a closer Ir result than standard.
+    if(b.diff < std.best.diff) out.push({...opt,best:b});
   }
   return out;
 }
@@ -105,7 +113,7 @@ function render(){
   $("plugWrap").classList.toggle("hidden",!plugs.length);
   $("plugs").innerHTML=plugs.map((p,i)=>{const bc=bestIoIr(p.ioOptions,r.ir,desired);return`<button class="${i===st.plug?"active":""}" data-i="${i}"><strong>${p.name}</strong><span>${p.typeNo}</span><small>Forslag: Io ${fmtA(bc.io)} / Ir ${fmt(bc.ir)} = ${fmtA(bc.val)}</small></button>`}).join("");
   $("settingWrap").classList.toggle("hidden",!settingTypes.length);
-  $("settingTypes").innerHTML=settingTypes.map(p=>`<button class="${p.id===st.settingType?"active":""}" data-setting="${p.id}"><strong>${p.name}</strong><span>${p.typeNo||"Standard"}</span><small>Forslag: Ir ${fmt(p.best.ir)} = ${fmtA(p.best.val)}</small></button>`).join("");
+  $("settingTypes").innerHTML=settingTypes.map(p=>`<button class="${p.id===st.settingType?"active":""}" data-setting="${p.id}"><strong>${p.name}</strong><span>${p.typeNo||"Standard"} · Io ændres ikke</span><small>Forslag: Ir ${fmt(p.best.ir)}xIn = ${fmtA(p.best.val)}</small></button>`).join("");
 
   let rows="";
   if(ioAdj)rows+=`<tr><td>Io</td><td>${rng(io,calc.io,fmtA)}</td><td>${fmtA(calc.io)}</td></tr>`;
@@ -133,7 +141,7 @@ function render(){
   else lines.push(`Isd: ${fmt(isd.f)}xIr = ${fmtA(isd.val)}`);
   lines.push(`Ii: ${ii?fmt(ii.f)+"xIn = "+fmtA(ii.val):"Ikke relevant"}`);
   lines.push(`INC: ${fmtA(st.inc)}`);
-  $("output").textContent=lines.join("\\n");
+  $("output").textContent=lines.join("\n");
 }
 function bind(){
   $("brand").onchange=e=>{st.brand=uniq(DATA.map(x=>x.brand))[+e.target.value];st.series=DATA.find(x=>x.brand===st.brand).series;st.frame=st.cls=st.relay=st.poles=st.plug=0;st.settingType="standard";st.inc=F().ratings[F().ratings.length-1];render()};
