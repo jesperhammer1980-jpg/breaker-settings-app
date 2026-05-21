@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breaker Settings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="left panel">
+      <h1>Breaker Settings</h1>
+
+      <label>Fabrikat</label>
+      <select id="brand">
+        <option>Schneider Electric</option>
+        <option>ABB</option>
+        <option>Siemens</option>
+      </select>
+
+      <label>Serie</label>
+      <select>
+        <option>ComPacT NSX</option>
+      </select>
+
+      <label>Ønsket strøm</label>
+      <input id="desired" type="number" value="90">
+
+      <label>INC</label>
+      <input id="inc" type="number" value="250">
+
+      <button onclick="updateOutput()">Beregn</button>
+    </div>
+
+    <div class="center panel">
+      <div class="card">
+        <img src="assets/nsx.svg" alt="NSX">
+        <div>
+          <div class="badge">Mostly verified</div>
+          <h2>Schneider Electric · ComPacT NSX</h2>
+          <p>NSX250B 3P · MicroLogic 2.2 250A</p>
+        </div>
+      </div>
+
+      <h3>Rating plug forslag</h3>
+
+      <div class="plug active">
+        <strong>Low setting plug</strong>
+        <small>Io: 40A - 100A</small>
+      </div>
+
+      <div class="plug">
+        <strong>Standard plug</strong>
+        <small>Io: 100A - 250A</small>
+      </div>
+    </div>
+
+    <div class="right panel">
+      <h3>Resultat til dokumentation</h3>
+      <pre id="output"></pre>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
