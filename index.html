@@ -1,16 +1,16 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="da">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Breaker Settings</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app">
     <aside class="panel left">
-      <div class="logo">Breaker<span>Settings</span></div>
-      <div class="sub">Kompakt engineering version · statisk</div>
+      <h1>Breaker<span>Settings</span></h1>
+      <p class="subtitle">Engineering Edition · statisk v3.0</p>
 
       <label>Fabrikat</label>
       <select id="brandSelect"></select>
@@ -25,19 +25,19 @@
       <select id="relaySelect"></select>
 
       <label>Ønsket indstillingsstrøm</label>
-      <input id="desiredCurrent" type="number" value="90" />
+      <input id="desiredInput" type="number" value="90" />
 
       <label>Ik min. kA</label>
-      <input id="ikMin" type="number" value="3.1" step="0.1" />
+      <input id="ikMinInput" type="number" value="3.1" step="0.1" />
 
       <label>Ik max. kA</label>
-      <input id="ikMax" type="number" value="14" step="0.1" />
+      <input id="ikMaxInput" type="number" value="14" step="0.1" />
 
       <label>INC manuel værdi</label>
-      <input id="inc" type="number" value="250" />
+      <input id="incInput" type="number" value="250" />
 
       <label>Metode</label>
-      <select id="method">
+      <select id="methodSelect">
         <option>Calculated settings</option>
         <option>Minimum settings</option>
       </select>
@@ -45,11 +45,11 @@
 
     <section class="panel center">
       <div class="device-card">
-        <img id="deviceImage" src="assets/breakers/nsx.svg" alt="Bryder" />
+        <img id="deviceImage" src="" alt="Bryder" />
         <div>
-          <span id="statusBadge" class="badge ok">Mostly verified</span>
-          <h1 id="deviceTitle">Schneider Electric · ComPacT NSX</h1>
-          <p id="deviceSub">NSX250B 3P · MicroLogic 2.2 250A</p>
+          <span id="verifyBadge" class="badge ok">Mostly verified</span>
+          <h2 id="deviceTitle">Schneider Electric · ComPacT NSX</h2>
+          <p id="deviceSubtitle">NSX250B 3P · MicroLogic 2.2 250A</p>
           <div class="chips">
             <span id="chipFrame">Frame: NSX250</span>
             <span id="chipIcu">Icu: 25 kA</span>
@@ -58,33 +58,41 @@
         </div>
       </div>
 
-      <div id="warningBox" class="warning hidden"></div>
+      <div id="ikWarning" class="warning hidden">
+        OBS: Ik max er højere end bryderens Icu. Er bryderen backupbeskyttet?
+      </div>
 
-      <h2>Beregnede indstillinger</h2>
+      <h3>Beregnede indstillinger</h3>
       <table>
         <thead>
-          <tr><th>Funktion</th><th>Min - indstilling - max</th><th>Resultat</th></tr>
+          <tr>
+            <th>Funktion</th>
+            <th>Min - indstilling - max</th>
+            <th>Resultat</th>
+          </tr>
         </thead>
         <tbody id="settingsRows"></tbody>
       </table>
 
-      <h2>Direkte kataloglinks</h2>
-      <div id="docs" class="docs"></div>
+      <h3>Direkte kataloglinks</h3>
+      <div id="docLinks" class="docs"></div>
+
+      <div id="moduleWarning" class="warning hidden"></div>
     </section>
 
     <aside class="panel right">
-      <h2>Rating plug valg</h2>
-      <div id="plugPanel" class="plug-panel"></div>
+      <h3>Rating plug valg</h3>
+      <div id="plugPanel" class="plugs"></div>
 
-      <div class="result-head">
-        <h2>Resultat til dokumentation</h2>
+      <div class="result-header">
+        <h3>Resultat til dokumentation</h3>
         <button id="copyBtn">Kopiér</button>
       </div>
 
-      <div id="copyNote" class="copy-note hidden">Kopieret</div>
-      <div id="output" class="output"></div>
+      <pre id="output" class="output"></pre>
     </aside>
   </main>
+
   <script src="app.js"></script>
 </body>
 </html>
