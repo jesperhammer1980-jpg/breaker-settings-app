@@ -72,6 +72,27 @@ function visibleSettingTypes(s,r,ioBase,desired){
   }
   return out;
 }
+
+function instantTrip(s,f,r,calc){
+  // Conservative display helper. Instant/magnetic trip is always present mechanically/electronically,
+  // but exact settings vary by relay and rating. This returns a documentation-safe value/range.
+  const name = (r.name || "").toLowerCase();
+  const frame = f.frame || "";
+  const inA = f.ratings ? f.ratings[f.ratings.length-1] : 0;
+
+  if(name.includes("tm-d") || name.includes("tm-g")){
+    if(inA >= 200 && inA <= 250) return {label:"Im", text:"5-10xIn", table:"5-10xIn"};
+    return {label:"Im", text:"Fast magnetisk udkobling", table:"Fast magnetisk"};
+  }
+
+  if(r.ii && r.ii.length){
+    // Ii is the instantaneous function for electronic trip units
+    return null; // already handled as Ii
+  }
+
+  return {label:"Instantan", text:"Indbygget instantan udkobling", table:"Indbygget"};
+}
+
 function highestUnder(factors,base,limit){
   if(st && st.method==="Minimum settings" && factors && factors.length){const f=factors[0]; return {f,val:base*f};}
   let best=null;
@@ -87,32 +108,6 @@ function isdStatus(factors,base,limit){
   if(st && st.method!=="Minimum settings" && minVal>limit)return{relevant:true,error:true,minF,minVal,limit,text:`FEJL: Laveste Isd (${fmtA(minVal)}) er højere end Ik min-grænse (${fmtA(limit)})`};
   return{relevant:true,error:false,...highestUnder(factors,base,limit)};
 }
-
-function instantaneousStatus(s,f,r,calc,ikmax,mode){
-  const rating=f.ratings[f.ratings.length-1];
-  // Electronic trip units: existing Ii is the instantaneous pickup.
-  if(r.ii && r.ii.length){
-    const chosen=highestUnder(r.ii,rating,ikmax*1000*.8,mode);
-    if(chosen) return {label:"Ii / instantan", range:r.ii, factor:chosen.f, value:chosen.val, text:`${fmt(chosen.f)}xIn = ${fmtA(chosen.val)}`};
-    const minF=r.ii[0], minVal=rating*minF;
-    return {label:"Ii / instantan", error:true, text:`FEJL: Laveste Ii (${fmtA(minVal)}) er højere end Ik max-grænse (${fmtA(ikmax*1000*.8)})`};
-  }
-  // Thermal-magnetic NSX TM-D: magnetic instantaneous pickup Im.
-  if(s.brand==="Schneider Electric" && s.series==="ComPacT NSX" && r.name.includes("TM-D")){
-    if(rating>=200 && rating<=250){
-      const vals=[5,6,7,8,9,10];
-      const fct=mode==="Minimum settings"?vals[0]:vals[0];
-      return {label:"Im / instantan", range:vals, factor:fct, value:rating*fct, text:`${fmt(fct)}xIn = ${fmtA(rating*fct)}`};
-    }
-    return {label:"Im / instantan", fixed:true, text:"Fast magnetisk udkobling (se katalog)"};
-  }
-  // Generic thermal magnetic or draft brands: show that fixed instantaneous/magnetic protection exists, but value must be verified.
-  if((r.ii||[]).length===0 && (r.isd||[]).length===0){
-    return {label:"Instantan", fixed:true, text:"Fast udkobling / magnetisk beskyttelse (se katalog)"};
-  }
-  return null;
-}
-
 function rng(vals,sel,f){return vals&&vals.length?`${f(vals[0])} - <u>${f(sel)}</u> - ${f(vals[vals.length-1])}`:"Ikke relevant"}
 
 
@@ -155,7 +150,7 @@ function render(){
   const tr=(r.tr&&r.tr.length)?r.tr[0]:null;
   const isd=isdStatus(r.isd,calc.val,parseDk(st.ikmin)*1000*.8);
   const ii=highestUnder(r.ii,f.ratings[f.ratings.length-1],parseDk(st.ikmax)*1000*.8);
-  const breakerName=f.frame+c[0]+" "+poles;
+  const breakerName=f.frame+c[0]+" "+poles; const instant=instantTrip(s,f,r,calc);
 
   ["desired","ikmin","ikmax","inc"].forEach(id=>$(id).value=String(st[id]).replace(".",","));
   $("method").value=st.method;$("img").src=s.image;$("status").textContent=s.status;$("status").className="badge "+s.statusClass;
@@ -177,12 +172,8 @@ function render(){
   if(!isd.relevant)rows+=`<tr><td>Isd</td><td>Ikke relevant</td><td>Ikke relevant / ikke fundet</td></tr>`;
   else if(isd.error)rows+=`<tr><td>Isd</td><td class="statusError">FEJL</td><td class="statusError">${isd.text}</td></tr>`;
   else rows+=`<tr><td>Isd</td><td>${rng(r.isd,isd.f,fmt)}</td><td>${fmt(isd.f)}xIr = ${fmtA(isd.val)}</td></tr>`;
-  if(inst){
-    if(inst.error) rows+=`<tr><td>${inst.label}</td><td class="statusError">FEJL</td><td class="statusError">${inst.text}</td></tr>`;
-    else if(inst.range) rows+=`<tr><td>${inst.label}</td><td>${rng(inst.range,inst.factor,fmt)}</td><td>${inst.text}</td></tr>`;
-    else rows+=`<tr><td>${inst.label}</td><td>Fast</td><td>${inst.text}</td></tr>`;
-  }
-  rows+=`<tr><td>INC</td><td>Manuel værdi</td><td>${fmtA(st.inc)}</td></tr>`;
+  rows+=`<tr><td>Ii</td><td>${ii?rng(r.ii,ii.f,fmt):"Ikke relevant"}</td><td>${ii?fmt(ii.f)+"xIn = "+fmtA(ii.val):"Ikke relevant"}</td></tr>`;
+  if(instant)rows+=`<tr><td>${instant.label}</td><td>Instantan udkobling</td><td>${instant.table}</td></tr>`;rows+=`<tr><td>INC</td><td>Manuel værdi</td><td>${fmtA(st.inc)}</td></tr>`;
   $("rows").innerHTML=rows;
   $("docs").innerHTML=s.docs.map(d=>`<a href="${d[1]}" target="_blank" rel="noreferrer">${d[0]}<span>Åbn</span></a>`).join("");
 
@@ -198,10 +189,7 @@ function render(){
     if(isd.error)lines.push("Isd: FEJL - laveste Isd er højere end Ik min-grænse");
     else lines.push(`Isd: ${fmt(isd.f)}xIr = ${fmtA(isd.val)}`);
   }
-  if(inst){
-    if(inst.error) lines.push(`${inst.label}: FEJL`);
-    else lines.push(`${inst.label}: ${inst.text}`);
-  }
+  if(ii)lines.push(`Ii: ${fmt(ii.f)}xIn = ${fmtA(ii.val)}`);
   lines.push(`INC: ${fmtA(parseDk(st.inc))}`);
   $("output").textContent=lines.join("\n");
   renderStats();
