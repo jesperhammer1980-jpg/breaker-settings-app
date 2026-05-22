@@ -74,23 +74,30 @@ function visibleSettingTypes(s,r,ioBase,desired){
 }
 
 function instantTrip(s,f,r,calc){
-  // Conservative display helper. Instant/magnetic trip is always present mechanically/electronically,
-  // but exact settings vary by relay and rating. This returns a documentation-safe value/range.
   const name = (r.name || "").toLowerCase();
-  const frame = f.frame || "";
   const inA = f.ratings ? f.ratings[f.ratings.length-1] : 0;
 
+  // Electronic relays: Ii is the instantaneous function and is handled separately.
+  if(r.ii && r.ii.length) return null;
+
+  // Thermal-magnetic relays.
+  // NSX/NSXm TM-D/TM-G:
+  // - for many fixed magnetic trip units the instantaneous/magnetic level is factory fixed.
+  // - where exact catalogue value is not encoded yet, show conservative 12-15 x In range instead of vague text.
   if(name.includes("tm-d") || name.includes("tm-g")){
-    if(inA >= 200 && inA <= 250) return {label:"Im", text:"5-10xIn", table:"5-10xIn"};
-    return {label:"Im", text:"Fast magnetisk udkobling", table:"Fast magnetisk"};
+    if(inA >= 200 && inA <= 250){
+      const min = 5 * inA;
+      const max = 10 * inA;
+      return {label:"Im", text:`5-10xIn = ${fmtA(min)}-${fmtA(max)}`, table:`5-10xIn = ${fmtA(min)}-${fmtA(max)}`};
+    }
+    const min = 12 * inA;
+    const max = 15 * inA;
+    return {label:"Im", text:`Fast magnetisk udkobling ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`, table:`ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`};
   }
 
-  if(r.ii && r.ii.length){
-    // Ii is the instantaneous function for electronic trip units
-    return null; // already handled as Ii
-  }
-
-  return {label:"Instantan", text:"Indbygget instantan udkobling", table:"Indbygget"};
+  const min = 12 * inA;
+  const max = 15 * inA;
+  return {label:"Instantan", text:`Indbygget instantan udkobling ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`, table:`ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`};
 }
 
 function highestUnder(factors,base,limit){
@@ -102,6 +109,29 @@ function highestUnder(factors,base,limit){
   }
   return best;
 }
+function bestUnderLimit(factors,base,limit,mode){
+  if(!factors||!factors.length)return null;
+  if(mode==="Minimum settings"){
+    const f=factors[0];
+    return {f,val:base*f};
+  }
+  let best=null;
+  for(const f of factors){
+    const val=base*f;
+    if(val<=limit&&(!best||val>best.val))best={f,val};
+  }
+  return best;
+}
+
+function limitStatus(name,factors,base,limit,mode){
+  if(!factors||!factors.length)return{relevant:false};
+  const minF=factors[0],minVal=base*minF;
+  if(mode!=="Minimum settings" && minVal>limit){
+    return{relevant:true,error:true,minF,minVal,limit,text:`FEJL: Laveste ${name} (${fmtA(minVal)}) er højere end grænse (${fmtA(limit)})`};
+  }
+  return{relevant:true,error:false,...bestUnderLimit(factors,base,limit,mode)};
+}
+
 function isdStatus(factors,base,limit){
   if(!factors||!factors.length)return{relevant:false};
   const minF=factors[0],minVal=base*minF;
@@ -172,7 +202,9 @@ function render(){
   if(!isd.relevant)rows+=`<tr><td>Isd</td><td>Ikke relevant</td><td>Ikke relevant / ikke fundet</td></tr>`;
   else if(isd.error)rows+=`<tr><td>Isd</td><td class="statusError">FEJL</td><td class="statusError">${isd.text}</td></tr>`;
   else rows+=`<tr><td>Isd</td><td>${rng(r.isd,isd.f,fmt)}</td><td>${fmt(isd.f)}xIr = ${fmtA(isd.val)}</td></tr>`;
-  rows+=`<tr><td>Ii</td><td>${ii?rng(r.ii,ii.f,fmt):"Ikke relevant"}</td><td>${ii?fmt(ii.f)+"xIn = "+fmtA(ii.val):"Ikke relevant"}</td></tr>`;
+  if(!ii)rows+=`<tr><td>Ii</td><td>Ikke relevant</td><td>Ikke relevant</td></tr>`;
+  else if(ii.error)rows+=`<tr><td>Ii</td><td class="statusError">FEJL</td><td class="statusError">${ii.text}</td></tr>`;
+  else rows+=`<tr><td>Ii</td><td>${rng(r.ii,ii.f,fmt)}</td><td>${fmt(ii.f)}xIn = ${fmtA(ii.val)}</td></tr>`;
   if(instant)rows+=`<tr><td>${instant.label}</td><td>Instantan udkobling</td><td>${instant.table}</td></tr>`;rows+=`<tr><td>INC</td><td>Manuel værdi</td><td>${fmtA(st.inc)}</td></tr>`;
   $("rows").innerHTML=rows;
   $("docs").innerHTML=s.docs.map(d=>`<a href="${d[1]}" target="_blank" rel="noreferrer">${d[0]}<span>Åbn</span></a>`).join("");
