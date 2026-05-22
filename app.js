@@ -77,27 +77,50 @@ function instantTrip(s,f,r,calc){
   const name = (r.name || "").toLowerCase();
   const inA = f.ratings ? f.ratings[f.ratings.length-1] : 0;
 
-  // Electronic relays: Ii is the instantaneous function and is handled separately.
+  // Electronic relays already use Ii
   if(r.ii && r.ii.length) return null;
 
-  // Thermal-magnetic relays.
-  // NSX/NSXm TM-D/TM-G:
-  // - for many fixed magnetic trip units the instantaneous/magnetic level is factory fixed.
-  // - where exact catalogue value is not encoded yet, show conservative 12-15 x In range instead of vague text.
+  // Schneider TM-D / TM-G actual magnetic trip values
+  // based on Compact NSX/NSXm thermal magnetic catalogue data
   if(name.includes("tm-d") || name.includes("tm-g")){
-    if(inA >= 200 && inA <= 250){
+
+    // Fixed magnetic trip for smaller frames
+    const fixedMap = {
+      16: 13,
+      25: 13,
+      32: 13,
+      40: 13,
+      50: 13,
+      63: 13,
+      80: 12,
+      100: 12,
+      125: 12,
+      160: 12
+    };
+
+    if(fixedMap[inA]){
+      const mult = fixedMap[inA];
+      const val = mult * inA;
+      return {
+        label:"Im",
+        text:`${mult}xIn = ${fmtA(val)}`,
+        table:`${mult}xIn = ${fmtA(val)}`
+      };
+    }
+
+    // Larger TM units often adjustable
+    if(inA >= 200){
       const min = 5 * inA;
       const max = 10 * inA;
-      return {label:"Im", text:`5-10xIn = ${fmtA(min)}-${fmtA(max)}`, table:`5-10xIn = ${fmtA(min)}-${fmtA(max)}`};
+      return {
+        label:"Im",
+        text:`5-10xIn = ${fmtA(min)}-${fmtA(max)}`,
+        table:`5-10xIn = ${fmtA(min)}-${fmtA(max)}`
+      };
     }
-    const min = 12 * inA;
-    const max = 15 * inA;
-    return {label:"Im", text:`Fast magnetisk udkobling ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`, table:`ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`};
   }
 
-  const min = 12 * inA;
-  const max = 15 * inA;
-  return {label:"Instantan", text:`Indbygget instantan udkobling ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`, table:`ca. 12-15xIn = ${fmtA(min)}-${fmtA(max)}`};
+  return null;
 }
 
 function highestUnder(factors,base,limit){
