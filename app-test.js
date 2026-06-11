@@ -12,6 +12,20 @@ const ratios = (inA, values) =>
   values.map((value) => Number((value / inA).toFixed(6)));
 const keyed = (keys, values) =>
   Object.fromEntries(keys.map((key) => [key, values]));
+const ampValues = (start, end) => {
+  const values = [];
+  for (let v = start; v <= end + 0.25; v += v < 50 ? 0.5 : 1) {
+    values.push(Number(v.toFixed(3)));
+  }
+  return values;
+};
+const ampRatios = (inA, start, end) => ratios(inA, ampValues(start, end));
+const ampRatiosStep = (inA, start, end, step = 1) =>
+  ratios(inA, stepValues(start, end, step));
+const settingsByRow = (rows, selector) =>
+  Object.fromEntries(
+    rows.map((row) => [`${row.frame}|${row.inA}`, selector(row)]),
+  );
 
 const ABB_DIP_L = [
   0.4, 0.42, 0.45, 0.47, 0.5, 0.52, 0.55, 0.57, 0.6, 0.62, 0.65, 0.67,
@@ -156,6 +170,184 @@ const SIEMENS_3VA_ETU350_II = {
   ...keyed(SIEMENS_3VA_NOT_DOCUMENTED_KEYS, [NOT_DOCUMENTED]),
   "3VA27 1600": SIEMENS_3VA27_ETU3_II,
 };
+const SIEMENS_3VA_ETU850_RATINGS_BY_FRAME = {
+  "3VA20 100": [25, 40, 63, 100],
+  "3VA21 160": [25, 40, 63, 100, 160],
+  "3VA22 250": [160, 250],
+  "3VA23 400": [250, 400],
+  "3VA24 630": [400, 500, 630],
+  "3VA25 1000": [630, 800, 1000],
+};
+const SIEMENS_3VA_ETU850_ROWS = [
+  {
+    frame: "3VA20 100",
+    inA: 25,
+    ir: [10, 25],
+    trMax: 25,
+    isd: [15, 250],
+    ii: [38, 300],
+  },
+  {
+    frame: "3VA20 100",
+    inA: 40,
+    ir: [16, 40],
+    trMax: 25,
+    isd: [24, 400],
+    ii: [60, 480],
+  },
+  {
+    frame: "3VA20 100",
+    inA: 63,
+    ir: [25, 63],
+    trMax: 25,
+    isd: [38, 630],
+    ii: [95, 756],
+  },
+  {
+    frame: "3VA20 100",
+    inA: 100,
+    ir: [40, 100],
+    trMax: 25,
+    isd: [60, 1000],
+    ii: [150, 1200],
+  },
+  {
+    frame: "3VA21 160",
+    inA: 25,
+    ir: [10, 25],
+    trMax: 25,
+    isd: [15, 250],
+    ii: [38, 300],
+  },
+  {
+    frame: "3VA21 160",
+    inA: 40,
+    ir: [16, 40],
+    trMax: 25,
+    isd: [24, 400],
+    ii: [60, 480],
+  },
+  {
+    frame: "3VA21 160",
+    inA: 63,
+    ir: [25, 63],
+    trMax: 25,
+    isd: [38, 630],
+    ii: [95, 756],
+  },
+  {
+    frame: "3VA21 160",
+    inA: 100,
+    ir: [40, 100],
+    trMax: 25,
+    isd: [60, 1000],
+    ii: [150, 1200],
+  },
+  {
+    frame: "3VA21 160",
+    inA: 160,
+    ir: [63, 160],
+    trMax: 20,
+    isd: [96, 1600],
+    ii: [240, 1600],
+  },
+  {
+    frame: "3VA22 250",
+    inA: 160,
+    ir: [63, 160],
+    trMax: 25,
+    isd: [96, 1600],
+    ii: [240, 1920],
+  },
+  {
+    frame: "3VA22 250",
+    inA: 250,
+    ir: [100, 250],
+    trMax: 15,
+    isd: [150, 2500],
+    ii: [375, 2500],
+  },
+  {
+    frame: "3VA23 400",
+    inA: 250,
+    ir: [100, 250],
+    trMax: 25,
+    isd: [150, 2500],
+    ii: [375, 3000],
+  },
+  {
+    frame: "3VA23 400",
+    inA: 400,
+    ir: [160, 400],
+    trMax: 17,
+    isd: [240, 4000],
+    ii: [600, 4000],
+  },
+  {
+    frame: "3VA24 630",
+    inA: 400,
+    ir: [160, 400],
+    trMax: 25,
+    isd: [240, 4000],
+    ii: [600, 6000],
+  },
+  {
+    frame: "3VA24 630",
+    inA: 500,
+    ir: [200, 500],
+    trMax: 20,
+    isd: [300, 5000],
+    ii: [750, 7000],
+  },
+  {
+    frame: "3VA24 630",
+    inA: 630,
+    ir: [250, 630],
+    trMax: 12,
+    isd: [378, 5670],
+    ii: [945, 5670],
+  },
+  {
+    frame: "3VA25 1000",
+    inA: 630,
+    ir: [250, 630],
+    trMax: 25,
+    isd: [378, 6300],
+    ii: [945, 7560],
+  },
+  {
+    frame: "3VA25 1000",
+    inA: 800,
+    ir: [320, 800],
+    trMax: 25,
+    isd: [480, 8000],
+    ii: [1200, 8000],
+  },
+  {
+    frame: "3VA25 1000",
+    inA: 1000,
+    ir: [400, 1000],
+    trMax: 25,
+    isd: [600, 10000],
+    ii: [1500, 12000],
+  },
+];
+const SIEMENS_3VA_ETU850_IR = settingsByRow(
+  SIEMENS_3VA_ETU850_ROWS,
+  (row) => ampRatios(row.inA, row.ir[0], row.ir[1]),
+);
+const SIEMENS_3VA_ETU850_TR = settingsByRow(
+  SIEMENS_3VA_ETU850_ROWS,
+  (row) => stepValues(0.5, row.trMax, 0.1),
+);
+const SIEMENS_3VA_ETU850_ISD = settingsByRow(
+  SIEMENS_3VA_ETU850_ROWS,
+  (row) => ampRatios(row.inA, row.isd[0], row.isd[1]),
+);
+const SIEMENS_3VA_ETU850_II = settingsByRow(
+  SIEMENS_3VA_ETU850_ROWS,
+  (row) => ampRatiosStep(row.inA, row.ii[0], row.ii[1], 1),
+);
 const SIEMENS_3VA_ETU6_IR = stepValues(0.4, 1, 0.001);
 const SIEMENS_3VA_ETU6_TR = stepValues(0.75, 36, 0.25);
 const SIEMENS_3VA_ETU6_ISD = stepValues(0.6, 10, 0.1);
@@ -1136,6 +1328,19 @@ const DATA = [
           "Siemens 3VA27/3WL10 equipment manual: ETU360 LSIG L/tr/S/I steps and LSIG functions verified for 3VA27.",
       },
       {
+        name: "ETU850 LSI",
+        frames: Object.keys(SIEMENS_3VA_ETU850_RATINGS_BY_FRAME),
+        ratingsByFrame: SIEMENS_3VA_ETU850_RATINGS_BY_FRAME,
+        ir: SIEMENS_3VA_ETU850_IR,
+        tr: SIEMENS_3VA_ETU850_TR,
+        isd: SIEMENS_3VA_ETU850_ISD,
+        isdBase: "In",
+        ii: SIEMENS_3VA_ETU850_II,
+        functions: ["L", "S", "I", "N"],
+        sourceNote:
+          "Siemens 3VA IEC manual 03/2019 A5E03603177010-03, section 3.2.1.2 ETU550/ETU850 parameters table p.133 and setting notes p.134: ETU850 LSI L/tr/S/I ranges verified for 3VA2 sizes 100 A to 1000 A.",
+      },
+      {
         name: "ETU650 LSI",
         frames: ["3VA27 1600"],
         ir: SIEMENS_3VA_ETU6_IR,
@@ -1170,6 +1375,10 @@ const DATA = [
       },
     ],
     docs: [
+      [
+        "Siemens 3VA IEC manual 03/2019",
+        "https://support.industry.siemens.com/cs/attachments/90318775/3VA_manual_molded_case_circuit_breakers_en_en-US.pdf?download=true",
+      ],
       [
         "Siemens LV 10 2025 molded case circuit breakers",
         "https://support.industry.siemens.com/cs/attachments/109750637/02_MoldedCaseCircuitBreakers_LV10_2025_EN_202412200153522186.pdf",
@@ -1807,7 +2016,9 @@ function render() {
       rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
       out.push(lbl.short + ": " + status);
     } else if (!ir.verify) {
-      const isd = under(isdValues, ir.value, ikmin * 1000 * 0.8);
+      const shortBaseName = r.isdBase === "In" ? "In" : lbl.overload;
+      const shortBaseValue = r.isdBase === "In" ? inA : ir.value;
+      const isd = under(isdValues, shortBaseValue, ikmin * 1000 * 0.8);
       if (isd.verify) {
         const status = isd.status || V;
         rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
@@ -1821,10 +2032,10 @@ function render() {
         );
       } else {
         rows.push(
-          `<tr><td>${lbl.short}</td><td>${range(isdValues, isd.factor, fmt)}</td><td>${fmt(isd.factor)} × ${lbl.overload} = ${fmtA(isd.value)}</td></tr>`,
+          `<tr><td>${lbl.short}</td><td>${range(isdValues, isd.factor, fmt)}</td><td>${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}</td></tr>`,
         );
         out.push(
-          `${lbl.short}: ${fmt(isd.factor)} × ${lbl.overload} = ${fmtA(isd.value)}`,
+          `${lbl.short}: ${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}`,
         );
       }
     } else {
