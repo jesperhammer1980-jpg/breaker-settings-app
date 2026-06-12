@@ -26,6 +26,17 @@ const settingsByRow = (rows, selector) =>
   Object.fromEntries(
     rows.map((row) => [`${row.frame}|${row.inA}`, selector(row)]),
   );
+const SCHNEIDER_NSX_MICROLOGIC_IO = {
+  40: ratios(40, [16, 18, 20, 23, 25, 28, 32, 36, 40]),
+  100: ratios(100, [40, 45, 50, 63, 70, 80, 90, 100]),
+  160: ratios(160, [63, 70, 80, 90, 100, 110, 125, 140, 160]),
+  250: ratios(250, [100, 110, 125, 140, 160, 175, 200, 225, 250]),
+  400: ratios(400, [160, 180, 200, 230, 250, 280, 320, 360, 400]),
+  630: ratios(630, [250, 280, 320, 350, 400, 450, 500, 570, 630]),
+};
+const SCHNEIDER_NSX_MICROLOGIC_IR = [
+  0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 1,
+];
 
 const ABB_DIP_L = [
   0.4, 0.42, 0.45, 0.47, 0.5, 0.52, 0.55, 0.57, 0.6, 0.62, 0.65, 0.67,
@@ -480,8 +491,8 @@ const DATA = [
           NSX160: [100, 160],
           NSX250: [250],
         },
-        io: [0.4, 0.5, 0.63, 0.7, 0.8, 0.9, 1],
-        ir: [0.9, 0.93, 0.95, 0.98, 1],
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         iiByRating: { 40: "600A", 100: "1500A", 160: "2400A", 250: "3000A" },
@@ -494,8 +505,8 @@ const DATA = [
           NSX160: [100, 160],
           NSX250: [250],
         },
-        io: [0.4, 0.5, 0.63, 0.7, 0.8, 0.9, 1],
-        ir: [0.9, 0.93, 0.95, 0.98, 1],
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
@@ -508,8 +519,8 @@ const DATA = [
           NSX160: [100, 160],
           NSX250: [250],
         },
-        io: [0.4, 0.5, 0.63, 0.7, 0.8, 0.9, 1],
-        ir: [0.9, 0.93, 0.95, 0.98, 1],
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
@@ -518,8 +529,8 @@ const DATA = [
         name: "MicroLogic 2.3",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
-        io: [0.4, 0.5, 0.63, 0.7, 0.8, 0.9, 1],
-        ir: [0.9, 0.93, 0.95, 0.98, 1],
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         iiByRating: { 400: "4800A", 630: "6930A" },
@@ -528,8 +539,8 @@ const DATA = [
         name: "MicroLogic 5.3 E",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
-        io: [0.4, 0.5, 0.63, 0.7, 0.8, 0.9, 1],
-        ir: [0.9, 0.93, 0.95, 0.98, 1],
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
@@ -538,8 +549,8 @@ const DATA = [
         name: "MicroLogic 6.3 E",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
-        io: [0.4, 0.5, 0.63, 0.7, 0.8, 0.9, 1],
-        ir: [0.9, 0.93, 0.95, 0.98, 1],
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
@@ -1595,13 +1606,38 @@ function best(bases, factors, desired) {
   if (!factors || !factors.length) return null;
   if (!factors.every(isN)) return { verify: true, status: statusText(factors) };
   let out = null;
+  const eps = 0.000001;
   for (const b of bases)
     for (const f of factors) {
-      const value = b * f,
+      const value = Number((b * f).toFixed(6)),
         diff = Math.abs(value - desired),
-        score = diff * 10000 + b;
-      if (!out || score < out.score)
-        out = { base: b, factor: f, value, diff, score };
+        candidate = { base: b, factor: f, value, diff };
+      if (!out) {
+        out = candidate;
+        continue;
+      }
+      if (candidate.diff < out.diff - eps) {
+        out = candidate;
+        continue;
+      }
+      if (Math.abs(candidate.diff - out.diff) <= eps) {
+        const fine = Math.abs(candidate.factor - 1),
+          outFine = Math.abs(out.factor - 1);
+        if (fine < outFine - eps) {
+          out = candidate;
+          continue;
+        }
+        if (Math.abs(fine - outFine) <= eps) {
+          const baseDistance = Math.abs(candidate.base - desired),
+            outBaseDistance = Math.abs(out.base - desired);
+          if (
+            baseDistance < outBaseDistance - eps ||
+            (Math.abs(baseDistance - outBaseDistance) <= eps &&
+              candidate.base < out.base)
+          )
+            out = candidate;
+        }
+      }
     }
   return out;
 }
@@ -1658,6 +1694,11 @@ function labelsFor(s) {
   if (s.brand === "ABB")
     return { overload: "L", short: "S", instant: "I", magnetic: "I" };
   return { overload: "Ir", short: "Isd", instant: "Ii", magnetic: "Ii" };
+}
+function deviceLabel(s) {
+  return s.brand === "Schneider Electric" && s.series === "MasterPact MTZ"
+    ? "Luftafbryder"
+    : "Maksimalafbryder";
 }
 
 const BACKUP_415V = {};
@@ -1940,7 +1981,7 @@ function render() {
     `OBS: Ik max (${fmt(ikmax)} kA) er højere end bryderens Icu (${c[1]} kA). Er bryderen backupbeskyttet?`;
   let rows = [],
     out = [
-      "Maksimalafbryder:",
+      `${deviceLabel(s)}:`,
       name,
       "",
       `${s.brand} / ${s.series}`,
@@ -1948,8 +1989,11 @@ function render() {
       "",
       "Indstilling:",
     ];
-  const hasIo = r.io && r.io.length,
-    bases = hasIo ? r.io.map((x) => x * inA) : [inA];
+  const ioFactors = settingValues(r.io, f, inA),
+    hasIo = ioFactors && ioFactors.length,
+    bases = hasIo
+      ? ioFactors.map((x) => Number((x * inA).toFixed(6)))
+      : [inA];
   const trValues = settingValues(r.tr, f, inA);
   const isdValues = settingValues(r.isd, f, inA);
   const iiValues = settingValues(r.ii, f, inA);
@@ -1970,8 +2014,6 @@ function render() {
     out.push(`Io: ${fmtA(ir.base)}`);
   } else if (hasIo && ir.verify) {
     out.push("Io: " + (ir.status || V));
-  } else {
-    out.push("Io: Ikke relevant");
   }
   const ref = hasIo ? "Io" : "In";
   if (ir.verify) {
@@ -2007,8 +2049,6 @@ function render() {
       );
       out.push("tr: " + tr + "s");
     }
-  } else {
-    out.push("tr: Ikke relevant");
   }
   if (isdValues && isdValues.length) {
     if (!isdValues.every(isN)) {
@@ -2038,11 +2078,7 @@ function render() {
           `${lbl.short}: ${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}`,
         );
       }
-    } else {
-      out.push(`${lbl.short}: Ikke relevant`);
     }
-  } else {
-    out.push(`${lbl.short}: Ikke relevant`);
   }
   let instantWritten = false;
   if (iiValues && iiValues.length) {
@@ -2092,7 +2128,6 @@ function render() {
       instantWritten = true;
     }
   }
-  if (!instantWritten) out.push(`${lbl.instant}: Ikke relevant`);
   rows.push(`<tr><td>INC</td><td>Manuel værdi</td><td>${fmtA(inc)}</td></tr>`);
   out.push("INC: " + fmtA(inc));
   $("rows").innerHTML = rows.join("");
