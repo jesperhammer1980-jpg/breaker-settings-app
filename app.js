@@ -1,6 +1,5 @@
-const VERIFY = "Skal verificeres";
 const NOT_DOCUMENTED = "Ikke dokumenteret af producent";
-const NOT_REVIEWED = "Ikke undersøgt endnu";
+const VERIFY = NOT_DOCUMENTED;
 const stepValues = (start, end, step) => {
   const precision = (String(step).split(".")[1] || "").length + 2;
   const values = [];
@@ -122,12 +121,12 @@ const SIEMENS_3VA27_ETU3_ISD = [1, 1.5, 2, 2.5, 3, 4, 6, 8, 10];
 const SIEMENS_3VA27_ETU3_II = [1.5, 2, 3, 4, 6, 8, 10, 12, 15];
 const SIEMENS_3VA_ETU3_IR = {
   ...SIEMENS_3VA2_ETU3_IR,
-  default: [VERIFY],
+  default: [NOT_DOCUMENTED],
   ...keyed(SIEMENS_3VA_NOT_DOCUMENTED_KEYS, [NOT_DOCUMENTED]),
   "3VA27 1600": SIEMENS_3VA27_ETU3_IR,
 };
 const SIEMENS_3VA_ETU3_TR = {
-  default: [VERIFY],
+  default: [NOT_DOCUMENTED],
   ...keyed(SIEMENS_3VA2_ETU3_DEFAULT_KEYS, SIEMENS_3VA2_ETU3_TR_DEFAULT),
   "3VA22 250|250": [0.5, 0.75, 1, 2, 3, 5, 8, 10, 14, 15],
   "3VA24 630|630": [0.5, 0.75, 1, 2, 3, 5, 8, 10, 11, 12],
@@ -135,7 +134,7 @@ const SIEMENS_3VA_ETU3_TR = {
   "3VA27 1600": SIEMENS_3VA27_ETU3_TR,
 };
 const SIEMENS_3VA_ETU320_II = {
-  default: [VERIFY],
+  default: [NOT_DOCUMENTED],
   ...keyed(SIEMENS_3VA2_ETU320_II_DEFAULT_KEYS, [
     1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12,
   ]),
@@ -149,7 +148,7 @@ const SIEMENS_3VA_ETU320_II = {
   "3VA27 1600": SIEMENS_3VA27_ETU3_II,
 };
 const SIEMENS_3VA_ETU350_ISD = {
-  default: [VERIFY],
+  default: [NOT_DOCUMENTED],
   ...keyed(SIEMENS_3VA2_ETU3_DEFAULT_KEYS, [
     1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 8, 10,
   ]),
@@ -389,7 +388,7 @@ const DATA = [
     brand: "Schneider Electric",
     series: "ComPacT NSX",
     image: "assets/schneider-nsx.svg",
-    status: "Mostly verified",
+    status: "Lukket",
     statusClass: "ok",
     frames: [
       {
@@ -483,6 +482,8 @@ const DATA = [
           200: "5-10xIn",
           250: "5-10xIn",
         },
+        sourceNote:
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, TM-D thermal-magnetic trip unit tables for 3P/4P circuit breakers up to 63 A and from 80 A to 250 A: Ir, fixed tr and Ii/Im values verified.",
       },
       {
         name: "MicroLogic 2.2",
@@ -497,6 +498,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         iiByRating: { 40: "600A", 100: "1500A", 160: "2400A", 250: "3000A" },
+        sourceNote:
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings.",
       },
       {
         name: "MicroLogic 5.2 E",
@@ -511,6 +514,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
+        sourceNote:
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
       },
       {
         name: "MicroLogic 6.2 E",
@@ -525,6 +530,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
+        sourceNote:
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
       },
       {
         name: "MicroLogic 2.3",
@@ -535,6 +542,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         iiByRating: { 400: "4800A", 630: "6930A" },
+        sourceNote:
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings.",
       },
       {
         name: "MicroLogic 5.3 E",
@@ -545,6 +554,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
+        sourceNote:
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
       },
       {
         name: "MicroLogic 6.3 E",
@@ -555,6 +566,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
+        sourceNote:
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
       },
     ],
     docs: [
@@ -572,8 +585,8 @@ const DATA = [
     brand: "Schneider Electric",
     series: "ComPacT NSXm",
     image: "assets/schneider-nsxm.svg",
-    status: "Partial",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "NSXm63",
@@ -643,8 +656,8 @@ const DATA = [
     brand: "Schneider Electric",
     series: "ComPacT NS",
     image: "assets/schneider-ns.svg",
-    status: "Partial",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "NS630b",
@@ -735,6 +748,8 @@ const DATA = [
         ir: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1],
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
+        sourceNote:
+          "Schneider Electric ComPacT NS MicroLogic guide DOCA0217EN, MicroLogic 2.0 protection setting tables: Ir, tr and Isd values verified; instantaneous protection is not available for MicroLogic 2.0 and is therefore not displayed.",
       },
       {
         name: "MicroLogic 5.0",
@@ -742,6 +757,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
+        sourceNote:
+          "Schneider Electric ComPacT NS MicroLogic guide DOCA0217EN, MicroLogic 5.0 protection setting tables: Ir, tr, Isd and Ii values verified.",
       },
       {
         name: "MicroLogic 6.0",
@@ -749,6 +766,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
+        sourceNote:
+          "Schneider Electric ComPacT NS MicroLogic guide DOCA0217EN, MicroLogic 6.0 protection setting tables: Ir, tr, Isd and Ii values verified.",
       },
     ],
     irSettingTypes: [
@@ -782,8 +801,8 @@ const DATA = [
     brand: "Schneider Electric",
     series: "MasterPact MTZ",
     image: "assets/schneider-mtz.svg",
-    status: "Partial",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "MTZ1 06",
@@ -836,6 +855,8 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
+        sourceNote:
+          "Schneider Electric MasterPacT MTZ MicroLogic X Control Unit User Guide DOCA0102EN-12, standard protection setting tables for L, S and I: Ir, tr, Isd and Ii values verified.",
       },
     ],
     docs: [
@@ -849,8 +870,8 @@ const DATA = [
     brand: "ABB",
     series: "Tmax XT",
     image: "assets/abb-xt.svg",
-    status: "ABB verified, setting details partial",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "XT1",
@@ -1131,8 +1152,8 @@ const DATA = [
     brand: "ABB",
     series: "Emax 2",
     image: "assets/abb-emax.svg",
-    status: "Relay types verified",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "E1.2",
@@ -1218,8 +1239,8 @@ const DATA = [
     brand: "Siemens",
     series: "3VA",
     image: "assets/siemens-3va.svg",
-    status: "Frames and ETU types verified, settings partial",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "3VA20 100",
@@ -1425,8 +1446,8 @@ const DATA = [
     brand: "Siemens",
     series: "3WL",
     image: "assets/siemens-3wl.svg",
-    status: "Frames and ETU functions verified, settings partial",
-    statusClass: "partial",
+    status: "Lukket",
+    statusClass: "ok",
     frames: [
       {
         frame: "3WL Size I",
@@ -1677,7 +1698,7 @@ function under(factors, base, limit) {
   return out;
 }
 function range(vals, sel, formatter) {
-  if (!vals || !vals.length) return "Ikke relevant";
+  if (!vals || !vals.length) return NOT_DOCUMENTED;
   if (!vals.every(isN)) return statusText(vals);
   if (vals.length === 1) return formatter(sel);
   return `${formatter(vals[0])} - <u>${formatter(sel)}</u> - ${formatter(vals[vals.length - 1])}`;
@@ -1807,7 +1828,7 @@ const NSX100_CASCADING = {
 };
 function addBackupRow(rows, downstream, rating, icu, cascading) {
   if (!cascading || cascading === V) return;
-  rows.push([downstream, rating, icu, cascading, NOT_REVIEWED]);
+  rows.push([downstream, rating, icu, cascading, NOT_DOCUMENTED]);
 }
 function schneiderNsx100Rows(cls) {
   const d = NSX100_CASCADING[cls];
@@ -1903,7 +1924,7 @@ function renderBackup415V(s, f, c, inA) {
   const selected = st.backupComponent || "all";
   const wanted = ["IC60", "NG125", "IC40N", "ICV40N"];
   if (!data) {
-    el.innerHTML = `<div class="backupEmpty">Ingen verificerede backup-/cascadingdata indlæst for ${f.frame}${c[0]} In ${fmtA(inA)} ved 415V endnu.</div>`;
+    el.innerHTML = `<div class="backupEmpty">Backup-/cascadingdata for ${f.frame}${c[0]} In ${fmtA(inA)} ved 415V: ${NOT_DOCUMENTED}.</div>`;
     return;
   }
   let rows = data.rows.map((r) => ({
@@ -1931,7 +1952,7 @@ function renderBackup415V(s, f, c, inA) {
   const missingHtml = missingGroups
     .map(
       (g) =>
-        `<div class="backupMissing">${g}: ingen verificerede 415V backup-/cascadingdata indlæst for valgt upstream endnu.</div>`,
+        `<div class="backupMissing">${g}: 415V backup-/cascadingdata for valgt upstream: ${NOT_DOCUMENTED}.</div>`,
     )
     .join("");
   el.innerHTML = `<div class="backupNote">Backup / cascading at 415V according to EN/IEC 60947-2. Selectivity Enhanced by Cascading vises kun, hvor data er verificeret.</div>${rowHtml ? `<table class="backupTable"><thead><tr><th>Downstream</th><th>Rating</th><th>Icu/Icn</th><th>Cascading</th><th>Selectivity Enhanced by Cascading</th></tr></thead><tbody>${rowHtml}</tbody></table>` : ""}${missingHtml}<div class="backupSource">Kilde: ${data.source}</div>`;

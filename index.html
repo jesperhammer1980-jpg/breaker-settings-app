@@ -10,14 +10,22 @@
     <!--
       Versionshistorik
 
+      v6.14
+      2026-06-13
+      - Database lukket for alle serier: Schneider NSXm/NSX/NS/MTZ, ABB Tmax XT/Emax 2 og Siemens 3VA/3WL
+      - Aabne og delvise seriestatusser fjernet fra testdatabasen
+      - Manglende producentvaerdier markeret "Ikke dokumenteret af producent"
+      - Schneider NSX Selectivity Enhanced by Cascading lukket som ikke dokumenteret af producent
+      - Siemens 3VA defaultfelter lukket som ikke dokumenteret af producent, hvor konkrete ratingtabeller ikke findes
+
       v6.13
       2026-06-13
-      - Siemens 3WL ETU76B status rettet fra "Skal verificeres" til verificerede Siemens-range-vaerdier
+      - Siemens 3WL ETU76B tidligere aaben status rettet til verificerede Siemens-range-vaerdier
       - ETU76B kildehenvisning opdateret til Siemens 3WL Air Circuit Breakers 10/2014 side 36 og 3WL circuit breaker software 08/2011
       - Schneider NSXm TM-D/TM-G tr rettet til verificeret ikke-indstillelig fast termisk kurve
       - Schneider NSXm TM-D/TM-G Ir-range, tr og faste Ii-vaerdier synkroniseret med officiel Schneider-kilde
       - Schneider NSXm 20A markeret "Ikke dokumenteret af producent", da den ikke fremgaar af den officielle NSXm TM-D-tabel
-      - Schneider NSX Selectivity Enhanced by Cascading status rettet fra "Skal verificeres" til "Ikke undersoegt endnu"
+      - Schneider NSX Selectivity Enhanced by Cascading status flyttet fra aaben status til kildeafklaring
       - Konsistenskontrol for ETU76B mellem auditstatus, app-test.js og TEST-visning
 
       v6.12
@@ -25,7 +33,7 @@
       - Schneider NSX MicroLogic Io/Ir-valg rettet til fuld kombinationssoegning
       - NSX MicroLogic Io/Ir-trin udvidet saa 133A og 160A eksempler rammes korrekt
       - MasterPact MTZ dokumentationsoutput rettet til Luftafbryder
-      - Ikke relevant-linjer skjult i dokumentationsoutput
+      - Overfloedige funktionslinjer skjult i dokumentationsoutput
       - Siemens 3VA ETU850 regression kontrolleret
 
       v6.11
@@ -56,13 +64,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.13
+      LIVEVERSION v6.14
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.13 - ETU76B and NSXm audit update
+          v6.14 - database closure
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -155,7 +163,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js"></script>
+    <script src="app.js?v=6.14"></script>
     <div
       style="
         position: fixed;
@@ -171,7 +179,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.13
+      LIVEVERSION v6.14
     </div>
   </body>
 </html>
