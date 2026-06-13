@@ -805,7 +805,7 @@ const DATA = [
     statusClass: "ok",
     frames: [
       {
-        frame: "MTZ1 06",
+        frame: "MTZ1",
         classes: [
           ["H1", 42],
           ["H2", 50],
@@ -813,18 +813,7 @@ const DATA = [
           ["L1", 150],
         ],
         poles: ["3P", "4P"],
-        ratings: [630],
-      },
-      {
-        frame: "MTZ1 10",
-        classes: [
-          ["H1", 42],
-          ["H2", 50],
-          ["H3", 66],
-          ["L1", 150],
-        ],
-        poles: ["3P", "4P"],
-        ratings: [1000],
+        ratings: [630, 1000, 1600],
       },
       {
         frame: "MTZ2",
