@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.15
+      2026-06-13
+      - ABB Tmax XT backup-/cascadingdata indlaest fra officiel ABB 415V coordination table for XT1-XT4 mod S200/S200M/S200P/S800
+      - Siemens 3VA2 backup-/cascadingdata indlaest fra officielle Siemens 3VA2 tables mod 5SY, 5SL4 og 5SU1
+      - Backup-/cascadingvisning viser nu entydig ingen-data tekst for kombinationer uden producentverificerede data
+      - app-test.js cache-busting opdateret til v6.15
+
       v6.14
       2026-06-13
       - Database lukket for alle serier: Schneider NSXm/NSX/NS/MTZ, ABB Tmax XT/Emax 2 og Siemens 3VA/3WL
@@ -64,13 +71,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.14
+      TEST v6.15
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.14 - database closure
+          TEST v6.15 - ABB/Siemens backup cascading
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -163,7 +170,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.14"></script>
+    <script src="app-test.js?v=6.15"></script>
     <div
       style="
         position: fixed;
@@ -179,7 +186,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.14 - live ikke opdateret
+      TEST v6.15 - live ikke opdateret
     </div>
   </body>
 </html>

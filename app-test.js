@@ -1746,6 +1746,10 @@ function deviceLabel(s) {
 const BACKUP_415V = {};
 const SCHNEIDER_BACKUP_SOURCE =
   "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, cascading table 380-415 V AC, upstream ComPacT NSX100.";
+const ABB_BACKUP_SOURCE =
+  'ABB Electrical installation solutions for buildings - Technical details, 9AKK107991A8329, section "Coordination tables: back-up", p. 1/51 and table "MCCB - MCB @ 415 V", p. 1/81.';
+const SIEMENS_BACKUP_SOURCE =
+  'Siemens SENTRON Back-up protection, 3VA Molded Case Circuit Breakers, Edition 10/2017, tables "1.2) 3VA2 - 5SY", "1.4) 3VA2 - 5SL" and "1.6) 3VA2 - 5SU1", pp. 4, 5, 7 and 9.';
 const NSX100_CASCADING = {
   B: {
     iCV40N: "10",
@@ -1830,6 +1834,22 @@ function addBackupRow(rows, downstream, rating, icu, cascading) {
   if (!cascading || cascading === V) return;
   rows.push([downstream, rating, icu, cascading, NOT_DOCUMENTED]);
 }
+function backupRowsForColumn(tableRows, colIndex) {
+  const rows = [];
+  tableRows.forEach((table) => {
+    table.rows.forEach((row) => {
+      const value = row.values[colIndex];
+      if (value !== null && value !== undefined) {
+        addBackupRow(rows, table.downstream, row.rating, table.icu, String(value));
+      }
+    });
+  });
+  return rows;
+}
+function registerBackupRows(brand, series, frame, cls, rating, source, rows) {
+  if (!rows.length) return;
+  BACKUP_415V[`${brand}|${series}|${frame}|${cls}|${rating}`] = { source, rows };
+}
 function schneiderNsx100Rows(cls) {
   const d = NSX100_CASCADING[cls];
   if (!d) return [];
@@ -1855,6 +1875,260 @@ function schneiderNsx100Rows(cls) {
       source: SCHNEIDER_BACKUP_SOURCE,
       rows: schneiderNsx100Rows(cls),
     };
+  });
+});
+
+const ABB_TMAX_XT_BACKUP_COLUMNS = [
+  { frame: "XT1", cls: "B" },
+  { frame: "XT1", cls: "C" },
+  { frame: "XT1", cls: "N" },
+  { frame: "XT2", cls: "N" },
+  { frame: "XT3", cls: "N" },
+  { frame: "XT4", cls: "N" },
+  { frame: "XT1", cls: "S" },
+  { frame: "XT2", cls: "S" },
+  { frame: "XT3", cls: "S" },
+  { frame: "XT4", cls: "S" },
+  { frame: "XT1", cls: "H" },
+  { frame: "XT2", cls: "H" },
+  { frame: "XT4", cls: "H" },
+  { frame: "XT2", cls: "L" },
+  { frame: "XT4", cls: "L" },
+  { frame: "XT2", cls: "V" },
+  { frame: "XT4", cls: "V" },
+];
+const ABB_TMAX_XT_RATINGS = {
+  XT1: [16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160],
+  XT2: [1.6, 2, 2.5, 3.2, 4, 5, 6.3, 8, 10, 12.5, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160],
+  XT3: [63, 80, 100, 125, 160, 200, 250],
+  XT4: [16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 225, 250],
+};
+const ABB_TMAX_XT_BACKUP_ROWS = [
+  {
+    downstream: "S200 B,C,K,Z",
+    icu: "10",
+    rows: [
+      { rating: "0.5-10", values: [18, 25, 30, 36, 36, 36, 30, 36, 40, 40, 30, 40, 40, 40, 30, 40, 30] },
+    ],
+  },
+  {
+    downstream: "S200M B,C,D,K,Z",
+    icu: "15",
+    rows: [
+      { rating: "0.5-10", values: [18, 25, 30, 36, 36, 36, 30, 50, 40, 40, 30, 50, 40, 50, 30, 50, 30] },
+    ],
+  },
+  {
+    downstream: "S200P B,C,D,K,Z",
+    icu: "15",
+    rows: [
+      { rating: "32-63", values: [18, 25, 30, 36, 25, 36, 30, 50, 25, 40, 30, 50, 40, 50, 30, 50, 30] },
+    ],
+  },
+  {
+    downstream: "S800N B,C,D",
+    icu: "36",
+    rows: [
+      { rating: "6-125", values: [null, null, null, null, null, null, 50, 50, 50, 50, 70, 70, 70, 120, 120, 150, 150] },
+    ],
+  },
+  {
+    downstream: "S800S B,C,D,K",
+    icu: "50",
+    rows: [
+      { rating: "6-125", values: [null, null, null, null, null, null, null, null, null, null, 70, 70, 70, 120, 120, 150, 150] },
+    ],
+  },
+  {
+    downstream: "S800C B,C,D,K",
+    icu: "25",
+    rows: [
+      { rating: "10-125", values: [null, null, 36, 36, 36, 36, 50, 50, 50, 50, 70, 70, 70, 120, 120, 150, 150] },
+    ],
+  },
+];
+ABB_TMAX_XT_BACKUP_COLUMNS.forEach((column, colIndex) => {
+  const rows = backupRowsForColumn(ABB_TMAX_XT_BACKUP_ROWS, colIndex);
+  (ABB_TMAX_XT_RATINGS[column.frame] || []).forEach((rating) => {
+    registerBackupRows("ABB", "Tmax XT", column.frame, column.cls, rating, ABB_BACKUP_SOURCE, rows);
+  });
+});
+
+const SIEMENS_3VA2_BACKUP_COLUMNS = [
+  { frame: "3VA20 100", rating: 25 },
+  { frame: "3VA20 100", rating: 40 },
+  { frame: "3VA20 100", rating: 63 },
+  { frame: "3VA20 100", rating: 100 },
+  { frame: "3VA21 160", rating: 25 },
+  { frame: "3VA21 160", rating: 40 },
+  { frame: "3VA21 160", rating: 63 },
+  { frame: "3VA21 160", rating: 100 },
+  { frame: "3VA21 160", rating: 160 },
+  { frame: "3VA22 250", rating: 160 },
+  { frame: "3VA22 250", rating: 250 },
+];
+const SIEMENS_3VA2_BACKUP_ROWS = [
+  {
+    downstream: "5SY6 B/C",
+    icu: "6/15",
+    rows: [
+      { rating: "0.3", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "0.5", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "1", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "1.6", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "2", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "3", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "4", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "5", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "6", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "8", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "10", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "13", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "15", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "16", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "20", values: [null, 55, 55, 55, null, 55, 55, 55, 55, 40, 40] },
+      { rating: "25", values: [null, 55, 55, 55, null, 55, 55, 55, 55, 40, 40] },
+      { rating: "30", values: [null, null, 55, 55, null, null, 55, 55, 55, 55, 40] },
+      { rating: "32", values: [null, null, 55, 55, null, null, 55, 55, 55, 55, 40] },
+      { rating: "40", values: [null, null, 35, 35, null, null, 35, 35, 35, 25, 25] },
+      { rating: "50", values: [null, null, null, 35, null, null, null, 35, 35, 20, 20] },
+      { rating: "63", values: [null, null, null, 20, null, null, null, 20, 20, 20, 20] },
+    ],
+  },
+  {
+    downstream: "5SY4 B/C",
+    icu: "10/20",
+    rows: [
+      { rating: "0.3", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "0.5", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "1", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "1.6", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "2", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "2.5", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "3", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "3.5", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "4", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "5", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "6", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "8", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "10", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "13", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "15", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "16", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "20", values: [null, 60, 60, 60, null, 60, 60, 60, 60, 45, 45] },
+      { rating: "25", values: [null, 60, 60, 60, null, 60, 60, 60, 60, 45, 45] },
+      { rating: "30", values: [null, null, 60, 60, null, null, 60, 60, 60, 60, 45] },
+      { rating: "32", values: [null, null, 60, 60, null, null, 60, 60, 60, 60, 45] },
+      { rating: "35", values: [null, null, 40, 40, null, null, 40, 40, 40, 30, 30] },
+      { rating: "40", values: [null, null, 40, 40, null, null, 40, 40, 40, 30, 30] },
+      { rating: "45", values: [null, null, null, 40, null, null, null, 40, 40, 25, 25] },
+      { rating: "50", values: [null, null, null, 40, null, null, null, 40, 40, 25, 25] },
+      { rating: "60", values: [null, null, null, 25, null, null, null, 25, 25, 25, 25] },
+      { rating: "63", values: [null, null, null, 25, null, null, null, 25, 25, 25, 25] },
+    ],
+  },
+  {
+    downstream: "5SY7 B/C",
+    icu: "15/30",
+    rows: [
+      { rating: "0.3", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "0.5", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "1", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "1.6", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "2", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "3", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "4", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "6", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "8", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "10", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "13", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "16", values: [65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65] },
+      { rating: "20", values: [null, 65, 65, 65, null, 65, 65, 65, 65, 50, 50] },
+      { rating: "25", values: [null, 65, 65, 65, null, 65, 65, 65, 65, 50, 50] },
+      { rating: "32", values: [null, null, 65, 65, null, null, 65, 65, 65, 65, 50] },
+      { rating: "40", values: [null, null, 45, 45, null, null, 45, 45, 45, 35, 35] },
+      { rating: "50", values: [null, null, null, 45, null, null, null, 45, 45, 30, 30] },
+      { rating: "63", values: [null, null, null, 30, null, null, null, 30, 30, 30, 30] },
+    ],
+  },
+  {
+    downstream: "5SL4 B",
+    icu: "10",
+    rows: [
+      { rating: "1", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "2", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "3", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "4", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "6", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "8", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "10", values: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20] },
+      { rating: "13", values: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10] },
+      { rating: "16", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 30, 30] },
+      { rating: "20", values: [null, 45, 45, 45, null, 45, 45, 45, 45, 40, 40] },
+      { rating: "25", values: [null, 45, 45, 45, null, 45, 45, 45, 45, 45, 40] },
+      { rating: "32", values: [null, null, 45, 45, null, null, 45, 45, 45, 45, 40] },
+      { rating: "40", values: [null, null, 35, 35, null, null, 35, 35, 35, 25, 25] },
+      { rating: "50", values: [null, null, null, 30, null, null, null, 30, 30, 20, 20] },
+      { rating: "63", values: [null, null, null, 20, null, null, null, 20, 20, 20, 20] },
+    ],
+  },
+  {
+    downstream: "5SL4 C",
+    icu: "10",
+    rows: [
+      { rating: "0.3", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "0.5", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "1", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "1.6", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "2", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "3", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "4", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "6", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "8", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "10", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "13", values: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10] },
+      { rating: "16", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 30, 30] },
+      { rating: "20", values: [null, 45, 45, 45, null, 45, 45, 45, 45, 40, 40] },
+      { rating: "25", values: [null, 45, 45, 45, null, 45, 45, 45, 45, 45, 40] },
+      { rating: "32", values: [null, null, 45, 45, null, null, 45, 45, 45, 45, 40] },
+      { rating: "40", values: [null, null, 35, 35, null, null, 35, 35, 35, 25, 25] },
+      { rating: "50", values: [null, null, null, 30, null, null, null, 30, 30, 20, 20] },
+    ],
+  },
+  {
+    downstream: "5SU1..4 B/C",
+    icu: "10/20",
+    rows: [
+      { rating: "6", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "8", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "10", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "13", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "16", values: [60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60] },
+      { rating: "20", values: [null, 60, 60, 60, null, 60, 60, 60, 60, 45, 45] },
+      { rating: "25", values: [null, 60, 60, 60, null, 60, 60, 60, 60, 45, 45] },
+      { rating: "32", values: [null, null, 60, 60, null, null, 60, 60, 60, 60, 45] },
+      { rating: "40", values: [null, null, 40, 40, null, null, 40, 40, 40, 30, 30] },
+    ],
+  },
+  {
+    downstream: "5SU1..3 / 5SU1..6 B/C",
+    icu: "4.5/6/15",
+    rows: [
+      { rating: "6", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "8", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "10", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "13", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "16", values: [55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55] },
+      { rating: "20", values: [null, 55, 55, 55, null, 55, 55, 55, 55, 40, 40] },
+      { rating: "25", values: [null, 55, 55, 55, null, 55, 55, 55, 55, 40, 40] },
+      { rating: "32", values: [null, null, 55, 55, null, null, 55, 55, 55, 55, 40] },
+    ],
+  },
+];
+SIEMENS_3VA2_BACKUP_COLUMNS.forEach((column, colIndex) => {
+  const rows = backupRowsForColumn(SIEMENS_3VA2_BACKUP_ROWS, colIndex);
+  ["M", "H", "C", "L"].forEach((cls) => {
+    registerBackupRows("Siemens", "3VA", column.frame, cls, column.rating, SIEMENS_BACKUP_SOURCE, rows);
   });
 });
 
@@ -1916,15 +2190,21 @@ function renderBackup415V(s, f, c, inA) {
   const el = document.getElementById("backupPanel");
   if (!el) return;
   const select = document.getElementById("backupComponent");
+  const noDataText =
+    "Ingen producentverificerede backup-/cascadingdata indl\u00e6st for denne kombination.";
   if (select) {
     st.backupComponent = select.value || "all";
   }
   const key = `${s.brand}|${s.series}|${f.frame}|${c[0]}|${inA}`;
   const data = BACKUP_415V[key];
-  const selected = st.backupComponent || "all";
-  const wanted = ["IC60", "NG125", "IC40N", "ICV40N"];
+  let selected = st.backupComponent || "all";
+  const wanted = s.brand === "Schneider Electric" ? ["IC60", "NG125", "IC40N", "ICV40N"] : [];
   if (!data) {
-    el.innerHTML = `<div class="backupEmpty">Backup-/cascadingdata for ${f.frame}${c[0]} In ${fmtA(inA)} ved 415V: ${NOT_DOCUMENTED}.</div>`;
+    if (select) {
+      select.value = "all";
+      st.backupComponent = "all";
+    }
+    el.innerHTML = `<div class="backupEmpty">${noDataText}</div>`;
     return;
   }
   let rows = data.rows.map((r) => ({
@@ -1935,7 +2215,20 @@ function renderBackup415V(s, f, c, inA) {
     enhanced: r[4] || V,
     group: componentGroup(r[0]),
   }));
+  const groups = uniq(rows.map((r) => r.group));
+  if (select) {
+    select.innerHTML =
+      `<option value="all">Alle verificerede</option>` +
+      groups.map((g) => `<option value="${g}">${g}</option>`).join("");
+    if (selected !== "all" && !groups.includes(selected)) selected = "all";
+    select.value = selected;
+    st.backupComponent = selected;
+  }
   if (selected !== "all") rows = rows.filter((r) => r.group === selected);
+  if (!rows.length) {
+    el.innerHTML = `<div class="backupEmpty">${noDataText}</div>`;
+    return;
+  }
   const withKa = (value) => {
     const raw = String(value ?? "").trim();
     return raw && raw !== V ? `${raw} kA` : V;
