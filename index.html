@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="da">
   <head>
     <meta charset="utf-8" />
@@ -9,6 +9,13 @@
   <body>
     <!--
       Versionshistorik
+
+      v6.15
+      2026-06-13
+      - ABB Tmax XT backup-/cascadingdata indlaest fra officiel ABB 415V coordination table for XT1-XT4 mod S200/S200M/S200P/S800
+      - Siemens 3VA2 backup-/cascadingdata indlaest fra officielle Siemens 3VA2 tables mod 5SY, 5SL4 og 5SU1
+      - Backup-/cascadingvisning viser nu entydig ingen-data tekst for kombinationer uden producentverificerede data
+      - app.js cache-busting opdateret til v6.15
 
       v6.14
       2026-06-13
@@ -64,13 +71,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.14
+      LIVEVERSION v6.15
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.14 - database closure
+          v6.15 - ABB/Siemens backup cascading
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -81,13 +88,13 @@
         ><select id="frame"></select
         ><label>Kortslutningsholdbarhed</label
         ><select id="cls"></select
-        ><label>RelÃ¦type</label
+        ><label>Relætype</label
         ><select id="relay"></select
-        ><label>RelÃ¦stÃ¸rrelse / In</label
+        ><label>Relæstørrelse / In</label
         ><select id="rating"></select
         ><label>Polantal</label
         ><select id="poles"></select
-        ><label>Ã˜nsket indstillingsstrÃ¸m</label
+        ><label>Ønsket indstillingsstrøm</label
         ><input
           id="desired"
           type="text"
@@ -97,7 +104,7 @@
         ><input id="ikmin" type="text" inputmode="decimal" value="3,1" /><label
           >Ik max. kA</label
         ><input id="ikmax" type="text" inputmode="decimal" value="14" /><label
-          >INC manuel vÃ¦rdi</label
+          >INC manuel værdi</label
         ><input id="inc" type="text" inputmode="decimal" value="160" /><label
           >Metode</label
         ><select id="method">
@@ -106,7 +113,7 @@
         ><a
           class="mailBtn"
           href="mailto:jhj@pro-automatic.dk?subject=Forslag%20til%20BreakerSettings"
-          >Send forslag pÃ¥ mail</a
+          >Send forslag på mail</a
         >
         <div id="stats" class="statsBox"></div>
       </aside>
@@ -158,12 +165,12 @@
         </div>
         <div class="result-header">
           <h3>Resultat til dokumentation</h3>
-          <button id="copy">KopiÃ©r</button>
+          <button id="copy">Kopiér</button>
         </div>
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.14"></script>
+    <script src="app.js?v=6.15"></script>
     <div
       style="
         position: fixed;
@@ -179,8 +186,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.14
+      LIVEVERSION v6.15
     </div>
   </body>
 </html>
-
