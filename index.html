@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.16
+      2026-06-13
+      - MasterPact MTZ framevalg rettet til MTZ1, MTZ2 og MTZ3
+      - MTZ1 06 og MTZ1 10 samlet under MTZ1 med relae-/In-stoerrelser 630A, 1000A og 1600A
+      - MTZ2/MTZ3 og oevrige fabrikantserier kontrolleret for tilsvarende rating-som-frame-opdeling
+      - app.js cache-busting opdateret til v6.16
+
       v6.15
       2026-06-13
       - ABB Tmax XT backup-/cascadingdata indlaest fra officiel ABB 415V coordination table for XT1-XT4 mod S200/S200M/S200P/S800
@@ -71,13 +78,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.15
+      LIVEVERSION v6.16
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.15 - ABB/Siemens backup cascading
+          v6.16 - MTZ frame model
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -170,7 +177,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.15"></script>
+    <script src="app.js?v=6.16"></script>
     <div
       style="
         position: fixed;
@@ -186,7 +193,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.15
+      LIVEVERSION v6.16
     </div>
   </body>
 </html>
