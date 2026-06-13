@@ -10,6 +10,16 @@
     <!--
       Versionshistorik
 
+      v6.13
+      2026-06-13
+      - Siemens 3WL ETU76B status rettet fra "Skal verificeres" til verificerede Siemens-range-vaerdier
+      - ETU76B kildehenvisning opdateret til Siemens 3WL Air Circuit Breakers 10/2014 side 36 og 3WL circuit breaker software 08/2011
+      - Schneider NSXm TM-D/TM-G tr rettet til verificeret ikke-indstillelig fast termisk kurve
+      - Schneider NSXm TM-D/TM-G Ir-range, tr og faste Ii-vaerdier synkroniseret med officiel Schneider-kilde
+      - Schneider NSXm 20A markeret "Ikke dokumenteret af producent", da den ikke fremgaar af den officielle NSXm TM-D-tabel
+      - Schneider NSX Selectivity Enhanced by Cascading status rettet fra "Skal verificeres" til "Ikke undersoegt endnu"
+      - Konsistenskontrol for ETU76B mellem auditstatus, app-test.js og TEST-visning
+
       v6.12
       2026-06-12
       - Schneider NSX MicroLogic Io/Ir-valg rettet til fuld kombinationssoegning
@@ -46,13 +56,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.12
+      TEST v6.13
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.12 - Io/Ir and output fixes
+          TEST v6.13 - ETU76B and NSXm audit update
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -161,7 +171,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.12 - live ikke opdateret
+      TEST v6.13 - live ikke opdateret
     </div>
   </body>
 </html>

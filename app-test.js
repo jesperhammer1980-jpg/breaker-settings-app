@@ -1,5 +1,6 @@
 const VERIFY = "Skal verificeres";
 const NOT_DOCUMENTED = "Ikke dokumenteret af producent";
+const NOT_REVIEWED = "Ikke undersøgt endnu";
 const stepValues = (start, end, step) => {
   const precision = (String(step).split(".")[1] || "").length + 2;
   const values = [];
@@ -606,9 +607,29 @@ const DATA = [
           NSXm63: [16, 20, 25, 32, 40, 50, 63],
           NSXm160: [80, 100, 125, 160],
         },
-        ir: [1],
-        trFixed: "Skal verificeres",
-        imByRating: {},
+        ir: {
+          default: ["0,7 ... 1 x In"],
+          20: [NOT_DOCUMENTED],
+        },
+        tr: {
+          default: ["Ikke indstillelig (fast termisk kurve)"],
+          20: [NOT_DOCUMENTED],
+        },
+        imByRating: {
+          16: "500A",
+          20: NOT_DOCUMENTED,
+          25: "600A",
+          32: "600A",
+          40: "600A",
+          50: "600A",
+          63: "800A",
+          80: "1000A",
+          100: "1250A",
+          125: "1250A",
+          160: "1250A",
+        },
+        sourceNote:
+          "Schneider Electric ComPact NSXm Legacy User Guide DOCA0096EN-02, Circuit Breakers: Thermal Magnetic (TM-D) Protection: Ir is adjustable from 0.7 to 1 x In, tr is non-adjustable, and Ii fixed values are listed by rating. The official NSXm table lists 16, 25, 32, 40, 50, 63, 80, 100, 125, and 160 A; 20 A is therefore marked Ikke dokumenteret af producent. Schneider Electric ComPacT NSX User Guide DOCA0187 thermal-magnetic summary confirms tr is non-adjustable for TM-D and TM-G.",
       },
     ],
     docs: [
@@ -1492,13 +1513,13 @@ const DATA = [
       },
       {
         name: "ETU76B",
-        ir: ["Skal verificeres"],
-        tr: ["Skal verificeres"],
-        isd: ["Skal verificeres"],
-        ii: ["Skal verificeres"],
+        ir: ["0,4 ... 1 x In"],
+        tr: ["2 ... 30 s (I2t), 1 ... 5 s (I4t)"],
+        isd: ["1,25 x In ... 0,8 x Icw"],
+        ii: ["1,5 x In ... 0,8 x Ics"],
         functions: ["L", "N", "S", "I", "G optional"],
         sourceNote:
-          "Siemens 3WL Air Circuit Breakers catalog 10/2014 verifies ETU76B ranges, but exact setting steps for L/tr/S/I are not listed in the available official table.",
+          "Siemens 3WL Air Circuit Breakers catalog 10/2014, function overview page 36: ETU76B Ir/tr/Isd/Ii ranges verified; menu increment table on page 36 defines permissible ETU76B setting step widths. Siemens 3WL circuit breaker software manual 08/2011, pages 21 and 34: ETU55B/ETU76B values are entered directly and checked against these step widths.",
       },
     ],
     docs: [
@@ -1786,7 +1807,7 @@ const NSX100_CASCADING = {
 };
 function addBackupRow(rows, downstream, rating, icu, cascading) {
   if (!cascading || cascading === V) return;
-  rows.push([downstream, rating, icu, cascading, V]);
+  rows.push([downstream, rating, icu, cascading, NOT_REVIEWED]);
 }
 function schneiderNsx100Rows(cls) {
   const d = NSX100_CASCADING[cls];
