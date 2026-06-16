@@ -37,6 +37,48 @@ const SCHNEIDER_NSX_MICROLOGIC_IO = {
 const SCHNEIDER_NSX_MICROLOGIC_IR = [
   0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 1,
 ];
+const SCHNEIDER_NSXM_MICROLOGIC_41_IR = {
+  25: ratios(25, [10, 11, 12, 14, 16, 18, 20, 22, 25]),
+  50: ratios(50, [20, 22, 25, 28, 32, 36, 40, 45, 50]),
+  100: ratios(100, [40, 45, 50, 56, 63, 70, 80, 90, 100]),
+  160: ratios(160, [63, 70, 80, 90, 100, 115, 130, 145, 160]),
+};
+const SCHNEIDER_NSXM_MICROLOGIC_41_II = {
+  25: "375A",
+  50: "750A",
+  100: "1500A",
+  160: "2000A",
+};
+const SCHNEIDER_NSX_VIGI_SENS = {
+  default: ["30 mA", "100 mA", "300 mA", "500 mA", "1 A", "3 A", "5 A", "OFF"],
+  400: ["300 mA", "500 mA", "1 A", "3 A", "5 A", "10 A", "OFF"],
+  630: ["300 mA", "500 mA", "1 A", "3 A", "5 A", "10 A", "OFF"],
+};
+const SCHNEIDER_NSX_VIGI_DELAY = ["0 ms", "60 ms", "150 ms", "500 ms", "1 s"];
+const SCHNEIDER_NSX_VIGIPACT_SENS = [
+  "30 mA",
+  "100 mA",
+  "300 mA",
+  "500 mA",
+  "1 A",
+  "3 A",
+  "10 A",
+  "30 A",
+];
+const SCHNEIDER_NSX_VIGIPACT_DELAY = [
+  "0 ms",
+  "60 ms",
+  "150 ms",
+  "300 ms",
+  "500 ms",
+  "800 ms",
+  "1,2 s",
+  "4 s",
+];
+const SCHNEIDER_NSXM_RCD_SENS = ["30 mA", "100 mA", "300 mA", "500 mA", "1 A"];
+const SCHNEIDER_NSXM_RCD_DELAY = ["0 ms", "60 ms", "150 ms", "500 ms", "1 s"];
+const SCHNEIDER_MTZ_RCD_SENS = ["0,5 ... 30 A (0,1 A trin)"];
+const SCHNEIDER_MTZ_RCD_DELAY = ["0,06 s", "0,15 s", "0,23 s", "0,35 s", "0,80 s"];
 
 const ABB_DIP_L = [
   0.4, 0.42, 0.45, 0.47, 0.5, 0.52, 0.55, 0.57, 0.6, 0.62, 0.65, 0.67,
@@ -60,6 +102,10 @@ const ABB_TOUCH_S = stepValues(0.6, 10, 0.1);
 const ABB_TOUCH_I_XT2_XT5 = stepValues(1.5, 10, 0.1);
 const ABB_TOUCH_I_XT7_EMAX = stepValues(1.5, 15, 0.1);
 const ABB_EMAX2_DIP_TR = [3, 12, 24, 36, 48, 72, 108, 144];
+const ABB_RC_SENS = ["3 A", "5 A", "7 A", "10 A", "20 A", "30 A"];
+const ABB_RC_DELAY = ["0,06 s", "0,1 s", "0,2 s", "0,3 s", "0,4 s", "0,5 s", "0,8 s"];
+const ABB_EMAX2_RC_SENS = ["3 ... 30 A"];
+const ABB_EMAX2_RC_DELAY = ["0,05 ... 0,8 s"];
 
 const SIEMENS_3VA2_ETU3_IR = {
   25: ratios(25, [10, 12, 14, 16, 18, 20, 22, 23, 24, 25]),
@@ -382,6 +428,9 @@ const SIEMENS_3WL_ETU25_II_FIXED = {
   5000: "50000A",
   6300: "50000A",
 };
+const SIEMENS_3VA_RCD820_SENS = ["0,03 ... 30 A (10 trin)"];
+const SIEMENS_3VA_RCD820_TYPES = ["A (0,03-10 A)", "AC (30 A)"];
+const SIEMENS_3VA_RCD820_DELAY = ["0 ... 10000 ms (10 trin)"];
 
 const DATA = [
   {
@@ -490,8 +539,8 @@ const DATA = [
         frames: ["NSX100", "NSX160", "NSX250"],
         ratingsByFrame: {
           NSX100: [40, 100],
-          NSX160: [100, 160],
-          NSX250: [250],
+          NSX160: [40, 100, 160],
+          NSX250: [40, 100, 160, 250],
         },
         io: SCHNEIDER_NSX_MICROLOGIC_IO,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
@@ -502,12 +551,37 @@ const DATA = [
           "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings.",
       },
       {
+        name: "MicroLogic Vigi 4.2",
+        frames: ["NSX100", "NSX160", "NSX250"],
+        ratingsByFrame: {
+          NSX100: [100],
+          NSX160: [100, 160],
+          NSX250: [100, 160, 250],
+        },
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        trFixed: "16s ved 6 x Ir (ikke indstillelig)",
+        isd: ["1,5 ... 10 x Ir"],
+        iiByRating: { 100: "1500A", 160: "2400A", 250: "3000A" },
+        residualCurrent: {
+          kind: "integrated",
+          device: "MicroLogic Vigi 4.2",
+          sensitivities: SCHNEIDER_NSX_VIGI_SENS,
+          types: ["A"],
+          delays: SCHNEIDER_NSX_VIGI_DELAY,
+          sourceNote:
+            "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 4 earth-leakage settings: I\\u0394n pickup values by rating and time-delay values verified.",
+        },
+        sourceNote:
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 4 electronic trip units: Io/Ir, fixed tr, Isd range and fixed Ii values verified. Schneider Electric ComPacT NSX MicroLogic 5/6/7 User Guide DOCA0188EN-03 identifies MicroLogic Vigi 4.2 as NSX100/160/250 distribution trip unit.",
+      },
+      {
         name: "MicroLogic 5.2 E",
         frames: ["NSX100", "NSX160", "NSX250"],
         ratingsByFrame: {
           NSX100: [40, 100],
-          NSX160: [100, 160],
-          NSX250: [250],
+          NSX160: [40, 100, 160],
+          NSX250: [40, 100, 160, 250],
         },
         io: SCHNEIDER_NSX_MICROLOGIC_IO,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
@@ -522,8 +596,8 @@ const DATA = [
         frames: ["NSX100", "NSX160", "NSX250"],
         ratingsByFrame: {
           NSX100: [40, 100],
-          NSX160: [100, 160],
-          NSX250: [250],
+          NSX160: [40, 100, 160],
+          NSX250: [40, 100, 160, 250],
         },
         io: SCHNEIDER_NSX_MICROLOGIC_IO,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
@@ -534,9 +608,34 @@ const DATA = [
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
       },
       {
+        name: "MicroLogic Vigi 7.2 E-AL",
+        frames: ["NSX100", "NSX160", "NSX250"],
+        ratingsByFrame: {
+          NSX100: [100],
+          NSX160: [100, 160],
+          NSX250: [100, 160, 250],
+        },
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
+        isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
+        residualCurrent: {
+          kind: "integrated",
+          device: "MicroLogic Vigi 7.2 E-AL",
+          sensitivities: SCHNEIDER_NSX_VIGI_SENS,
+          types: ["A"],
+          delays: SCHNEIDER_NSX_VIGI_DELAY,
+          sourceNote:
+            "Schneider Electric ComPacT NSX MicroLogic 5/6/7 User Guide DOCA0188EN-03, MicroLogic 7 earth-leakage settings: I\\u0394n pickup values by rating and time-delay values verified.",
+        },
+        sourceNote:
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03/DOCA0188EN-03, distribution MicroLogic Vigi 7.2 E-AL and protection setting tables: Io/Ir, tr, Isd and Ii verified.",
+      },
+      {
         name: "MicroLogic 2.3",
         frames: ["NSX400", "NSX630"],
-        ratingsByFrame: { NSX400: [400], NSX630: [630] },
+        ratingsByFrame: { NSX400: [250, 400], NSX630: [250, 400, 630] },
         io: SCHNEIDER_NSX_MICROLOGIC_IO,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
@@ -544,6 +643,27 @@ const DATA = [
         iiByRating: { 400: "4800A", 630: "6930A" },
         sourceNote:
           "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings.",
+      },
+      {
+        name: "MicroLogic Vigi 4.3",
+        frames: ["NSX400", "NSX630"],
+        ratingsByFrame: { NSX400: [400], NSX630: [630] },
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        trFixed: "16s ved 6 x Ir (ikke indstillelig)",
+        isd: ["1,5 ... 10 x Ir"],
+        iiByRating: { 400: "4800A", 630: "6930A" },
+        residualCurrent: {
+          kind: "integrated",
+          device: "MicroLogic Vigi 4.3",
+          sensitivities: SCHNEIDER_NSX_VIGI_SENS,
+          types: ["A"],
+          delays: SCHNEIDER_NSX_VIGI_DELAY,
+          sourceNote:
+            "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 4 earth-leakage settings: I\\u0394n pickup values by rating and time-delay values verified.",
+        },
+        sourceNote:
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 4 electronic trip units: Io/Ir, fixed tr, Isd range and fixed Ii values verified. Schneider Electric ComPacT NSX MicroLogic 5/6/7 User Guide DOCA0188EN-03 identifies MicroLogic Vigi 4.3 as NSX400/630 distribution trip unit.",
       },
       {
         name: "MicroLogic 5.3 E",
@@ -558,6 +678,27 @@ const DATA = [
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
       },
       {
+        name: "MicroLogic Vigi 7.3 E",
+        frames: ["NSX400", "NSX630"],
+        ratingsByFrame: { NSX400: [400], NSX630: [630] },
+        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
+        isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
+        residualCurrent: {
+          kind: "integrated",
+          device: "MicroLogic Vigi 7.3 E",
+          sensitivities: SCHNEIDER_NSX_VIGI_SENS,
+          types: ["A"],
+          delays: SCHNEIDER_NSX_VIGI_DELAY,
+          sourceNote:
+            "Schneider Electric ComPacT NSX MicroLogic 5/6/7 User Guide DOCA0188EN-03, MicroLogic 7 earth-leakage settings: I\\u0394n pickup values by rating and time-delay values verified.",
+        },
+        sourceNote:
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03/DOCA0188EN-03, distribution MicroLogic Vigi 7.3 E and protection setting tables: Io/Ir, tr, Isd and Ii verified.",
+      },
+      {
         name: "MicroLogic 6.3 E",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
@@ -568,6 +709,28 @@ const DATA = [
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
         sourceNote:
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
+      },
+    ],
+    rcdModules: [
+      {
+        kind: "module",
+        device: "VigiPacT Add-on",
+        frames: ["NSX100", "NSX160", "NSX250", "NSX400", "NSX630"],
+        relayNames: [
+          "TM-D",
+          "MicroLogic 2.2",
+          "MicroLogic 5.2 E",
+          "MicroLogic 6.2 E",
+          "MicroLogic 2.3",
+          "MicroLogic 5.3 E",
+          "MicroLogic 6.3 E",
+        ],
+        excludedClasses: ["R", "HB1", "HB2", "K"],
+        sensitivities: SCHNEIDER_NSX_VIGIPACT_SENS,
+        types: ["A"],
+        delays: SCHNEIDER_NSX_VIGIPACT_DELAY,
+        sourceNote:
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, VigiPacT Add-on: installable on NSX100-630 with magnetic, thermal-magnetic or MicroLogic 2/5/6 trip units, not with R/HB1/HB2/K performance; pickup and delay settings verified.",
       },
     ],
     docs: [
@@ -643,6 +806,28 @@ const DATA = [
         },
         sourceNote:
           "Schneider Electric ComPact NSXm Legacy User Guide DOCA0096EN-02, Circuit Breakers: Thermal Magnetic (TM-D) Protection: Ir is adjustable from 0.7 to 1 x In, tr is non-adjustable, and Ii fixed values are listed by rating. The official NSXm table lists 16, 25, 32, 40, 50, 63, 80, 100, 125, and 160 A; 20 A is therefore marked Ikke dokumenteret af producent. Schneider Electric ComPacT NSX User Guide DOCA0187 thermal-magnetic summary confirms tr is non-adjustable for TM-D and TM-G.",
+      },
+      {
+        name: "MicroLogic 4.1",
+        ratingsByFrame: {
+          NSXm63: [25, 50],
+          NSXm160: [100, 160],
+        },
+        ir: SCHNEIDER_NSXM_MICROLOGIC_41_IR,
+        trFixed: "8s ved 6 x Ir (ikke indstillelig)",
+        isd: ["1,5 ... 10 x Ir"],
+        iiByRating: SCHNEIDER_NSXM_MICROLOGIC_41_II,
+        residualCurrent: {
+          kind: "integrated",
+          device: "ComPacT NSXm MicroLogic 4.1",
+          sensitivities: SCHNEIDER_NSXM_RCD_SENS,
+          types: ["A"],
+          delays: SCHNEIDER_NSXM_RCD_DELAY,
+          sourceNote:
+            "Schneider Electric ComPacT NSXm User Guide DOCA0185/DOCA0096, earth-leakage circuit-breaker settings: I\\u0394n pickup and time-delay values verified.",
+        },
+        sourceNote:
+          "Schneider Electric ComPacT NSXm User Guide DOCA0185EN-01, Earth-Leakage Circuit Breakers: preset Ir values by rating, fixed tr values, Isd range and fixed Ii values verified. Schneider Electric LVPED318033EN page A-210 identifies upstream ComPacT NSXm MicroLogic 4.1.",
       },
     ],
     docs: [
@@ -769,6 +954,15 @@ const DATA = [
         sourceNote:
           "Schneider Electric ComPacT NS MicroLogic guide DOCA0217EN, MicroLogic 6.0 protection setting tables: Ir, tr, Isd and Ii values verified.",
       },
+      {
+        name: "MicroLogic 7.0",
+        ir: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1],
+        tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
+        isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
+        ii: [2, 3, 4, 6, 8, 10, 12, 15],
+        sourceNote:
+          "Schneider Electric ComPacT NS MicroLogic A/E User Guide DOCA0218EN-00, MicroLogic 7.0 A setting and current-protection tables: Ir, tr, Isd and Ii values verified.",
+      },
     ],
     irSettingTypes: [
       {
@@ -794,6 +988,10 @@ const DATA = [
       [
         "ComPacT NS MicroLogic guide",
         "https://www.se.com/ww/en/download/document/DOCA0217EN/",
+      ],
+      [
+        "ComPacT NS MicroLogic A/E",
+        "https://www.productinfo.schneider-electric.com/compactnsmicrologicae/doca0218-compact-ns-micrologic-a-e/",
       ],
     ],
   },
@@ -844,6 +1042,15 @@ const DATA = [
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
+        residualCurrent: {
+          kind: "integrated",
+          device: "MicroLogic 7.0 X med ekstern rektangulaer sensor",
+          sensitivities: SCHNEIDER_MTZ_RCD_SENS,
+          types: ["Earth leakage"],
+          delays: SCHNEIDER_MTZ_RCD_DELAY,
+          sourceNote:
+            "Schneider Electric MasterPacT MTZ MicroLogic X User Guide DOCA0102, MicroLogic 7.0 X IEC earth-leakage protection: I\\u0394n 0.5-30 A in 0.1 A steps and delay settings verified.",
+        },
         sourceNote:
           "Schneider Electric MasterPacT MTZ MicroLogic X Control Unit User Guide DOCA0102EN-12, standard protection setting tables for L, S and I: Ir, tr, Isd and Ii values verified.",
       },
@@ -1096,6 +1303,15 @@ const DATA = [
           XT5: ABB_TOUCH_I_XT2_XT5,
           XT7: ABB_TOUCH_I_XT7_EMAX,
         },
+        residualCurrent: {
+          kind: "integrated",
+          device: "Ekip Touch Rc",
+          sensitivities: ABB_RC_SENS,
+          types: ["Rc"],
+          delays: ABB_RC_DELAY,
+          sourceNote:
+            "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/30 and 3/35: Rc residual-current function with residual-current rating plug and external toroid; I\\u0394n and t\\u0394n values verified.",
+        },
         sourceNote:
           "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/30-3/34 and 3/50. Ekip Touch L/tr/S/I steps verified per frame.",
       },
@@ -1121,6 +1337,15 @@ const DATA = [
           XT4: ABB_TOUCH_I_XT2_XT5,
           XT5: ABB_TOUCH_I_XT2_XT5,
           XT7: ABB_TOUCH_I_XT7_EMAX,
+        },
+        residualCurrent: {
+          kind: "integrated",
+          device: "Ekip Hi-Touch Rc",
+          sensitivities: ABB_RC_SENS,
+          types: ["Rc"],
+          delays: ABB_RC_DELAY,
+          sourceNote:
+            "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/30 and 3/35: Rc residual-current function with residual-current rating plug and external toroid; I\\u0394n and t\\u0394n values verified.",
         },
         sourceNote:
           "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/30-3/34 and 3/50. Ekip Hi-Touch L/tr/S/I steps verified per frame.",
@@ -1204,6 +1429,15 @@ const DATA = [
         tr: stepValues(3, 144, 1),
         isd: ABB_TOUCH_S,
         ii: ABB_TOUCH_I_XT7_EMAX,
+        residualCurrent: {
+          kind: "integrated",
+          device: "Ekip Touch Rc",
+          sensitivities: ABB_EMAX2_RC_SENS,
+          types: ["Rc"],
+          delays: ABB_EMAX2_RC_DELAY,
+          sourceNote:
+            "ABB SACE Emax 2 engineering manual 1SDH001330R1002, Rc protection: external Rc toroid, Rc rating plug, Idn 3-30 A and Tdn 0.05-0.8 s verified.",
+        },
         sourceNote:
           "ABB Emax 2 Ekip Touch/Hi-Touch manual 1SDH001316R1002, standard protections table: L/tr/S/I steps verified.",
       },
@@ -1213,6 +1447,15 @@ const DATA = [
         tr: stepValues(3, 144, 1),
         isd: ABB_TOUCH_S,
         ii: ABB_TOUCH_I_XT7_EMAX,
+        residualCurrent: {
+          kind: "integrated",
+          device: "Ekip Hi-Touch Rc",
+          sensitivities: ABB_EMAX2_RC_SENS,
+          types: ["Rc"],
+          delays: ABB_EMAX2_RC_DELAY,
+          sourceNote:
+            "ABB SACE Emax 2 engineering manual 1SDH001330R1002, Rc protection: external Rc toroid, Rc rating plug, Idn 3-30 A and Tdn 0.05-0.8 s verified.",
+        },
         sourceNote:
           "ABB Emax 2 Ekip Touch/Hi-Touch manual 1SDH001316R1002, standard protections table: L/tr/S/I steps verified.",
       },
@@ -1416,6 +1659,27 @@ const DATA = [
           "Siemens LV 10 2025 and 3VA27/3WL10 equipment manual: ETU660 LSIG L/tr/S/I step ranges verified for 3VA27.",
       },
     ],
+    rcdModules: [
+      {
+        kind: "module",
+        device: "RCD820",
+        frames: [
+          "3VA20 100",
+          "3VA21 160",
+          "3VA22 250",
+          "3VA23 400",
+          "3VA24 630",
+          "3VA25 1000",
+          "3VA26 1250",
+          "3VA27 1600",
+        ],
+        sensitivities: SIEMENS_3VA_RCD820_SENS,
+        types: SIEMENS_3VA_RCD820_TYPES,
+        delays: SIEMENS_3VA_RCD820_DELAY,
+        sourceNote:
+          "Siemens 3VA IEC manual 03/2019, section 4.8 Residual current devices: RCD820 for 3VA2, response current 0.03-30 A in ten steps and delay 0-10000 ms in ten steps verified.",
+      },
+    ],
     docs: [
       [
         "Siemens 3VA IEC manual 03/2019",
@@ -1559,6 +1823,11 @@ let st = {
   method: "Calculated settings",
   irSetting: "standard",
   backupComponent: "all",
+  rcdEnabled: false,
+  rcdDevice: 0,
+  rcdSensitivity: 0,
+  rcdType: 0,
+  rcdDelay: 0,
 };
 const $ = (id) => document.getElementById(id),
   V = VERIFY;
@@ -1636,13 +1905,16 @@ function fillIdx(id, vals, sel) {
 function best(bases, factors, desired) {
   if (!factors || !factors.length) return null;
   if (!factors.every(isN)) return { verify: true, status: statusText(factors) };
-  let out = null;
+  let out = null,
+    lowest = null;
   const eps = 0.000001;
   for (const b of bases)
     for (const f of factors) {
       const value = Number((b * f).toFixed(6)),
-        diff = Math.abs(value - desired),
+        diff = desired - value,
         candidate = { base: b, factor: f, value, diff };
+      if (!lowest || candidate.value < lowest.value) lowest = candidate;
+      if (candidate.value > desired + eps) continue;
       if (!out) {
         out = candidate;
         continue;
@@ -1670,7 +1942,12 @@ function best(bases, factors, desired) {
         }
       }
     }
-  return out;
+  if (out) return out;
+  return {
+    error: true,
+    minValue: lowest ? lowest.value : 0,
+    desired,
+  };
 }
 function under(factors, base, limit) {
   if (!factors || !factors.length) return null;
@@ -1720,6 +1997,86 @@ function settingValues(raw, f, inA, fallback = []) {
     );
   return fallback;
 }
+function resetResidual() {
+  st.rcdEnabled = false;
+  st.rcdDevice = 0;
+  st.rcdSensitivity = 0;
+  st.rcdType = 0;
+  st.rcdDelay = 0;
+}
+function residualValues(raw, f, inA) {
+  return settingValues(raw, f, inA, []).filter((x) => x !== undefined && x !== null);
+}
+function residualModules(s, f, c, r, inA) {
+  return (s.rcdModules || []).filter((m) => {
+    if (m.frames && !m.frames.includes(f.frame)) return false;
+    if (m.relayNames && !m.relayNames.includes(r.name)) return false;
+    if (m.excludedClasses && m.excludedClasses.includes(c[0])) return false;
+    if (m.maxRating && inA > m.maxRating) return false;
+    return true;
+  });
+}
+function residualOptions(s, f, c, r, inA) {
+  const options = [];
+  if (r.residualCurrent) options.push(r.residualCurrent);
+  residualModules(s, f, c, r, inA).forEach((m) => options.push(m));
+  return options;
+}
+function setWrap(id, visible) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle("hidden", !visible);
+}
+function renderResidualControls(s, f, c, r, inA) {
+  const btn = document.getElementById("rcdToggle"),
+    panel = document.getElementById("rcdPanel");
+  if (!btn || !panel) return null;
+  const options = residualOptions(s, f, c, r, inA);
+  const supported = options.length > 0;
+  btn.disabled = !supported;
+  btn.style.opacity = supported ? "1" : "0.45";
+  btn.style.cursor = supported ? "pointer" : "not-allowed";
+  btn.textContent = st.rcdEnabled
+    ? "Fjern fejlstrømsbeskyttelse"
+    : "Tilføj fejlstrømsbeskyttelse";
+  if (!supported) {
+    resetResidual();
+    panel.classList.add("hidden");
+    ["rcdDevice", "rcdSensitivity", "rcdType", "rcdDelay"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = "";
+    });
+    return null;
+  }
+  if (st.rcdDevice >= options.length) st.rcdDevice = 0;
+  panel.classList.toggle("hidden", !st.rcdEnabled);
+  if (!st.rcdEnabled) return null;
+  fillIdx(
+    "rcdDevice",
+    options.map((o) => o.device),
+    st.rcdDevice,
+  );
+  const option = options[st.rcdDevice] || options[0],
+    sensitivities = residualValues(option.sensitivities, f, inA),
+    types = residualValues(option.types, f, inA),
+    delays = residualValues(option.delays, f, inA);
+  if (st.rcdSensitivity >= sensitivities.length) st.rcdSensitivity = 0;
+  if (st.rcdType >= types.length) st.rcdType = 0;
+  if (st.rcdDelay >= delays.length) st.rcdDelay = 0;
+  setWrap("rcdSensitivityWrap", sensitivities.length > 0);
+  setWrap("rcdTypeWrap", types.length > 0);
+  setWrap("rcdDelayWrap", delays.length > 0);
+  fillIdx("rcdSensitivity", sensitivities, st.rcdSensitivity);
+  fillIdx("rcdType", types, st.rcdType);
+  fillIdx("rcdDelay", delays, st.rcdDelay);
+  return {
+    kind: option.kind || "integrated",
+    device: option.device,
+    sensitivity: sensitivities[st.rcdSensitivity],
+    type: types[st.rcdType],
+    delay: delays[st.rcdDelay],
+    sourceNote: option.sourceNote,
+  };
+}
 
 function labelsFor(s) {
   if (s.brand === "ABB")
@@ -1733,95 +2090,2405 @@ function deviceLabel(s) {
 }
 
 const BACKUP_415V = {};
-const SCHNEIDER_BACKUP_SOURCE =
-  "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, cascading table 380-415 V AC, upstream ComPacT NSX100.";
+const SCHNEIDER_BACKUP_415_TABLES = [
+  {
+    "source": "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, p. A-194, table \"Cascading - Upstream: ComPacT NSXm, NSX100 - Ue: 380-415 V AC\".",
+    "columns": [
+      {
+        "series": "ComPacT NSXm",
+        "frames": [
+          "NSXm63",
+          "NSXm160"
+        ],
+        "cls": "E"
+      },
+      {
+        "series": "ComPacT NSXm",
+        "frames": [
+          "NSXm63",
+          "NSXm160"
+        ],
+        "cls": "B"
+      },
+      {
+        "series": "ComPacT NSXm",
+        "frames": [
+          "NSXm63",
+          "NSXm160"
+        ],
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSXm",
+        "frames": [
+          "NSXm63",
+          "NSXm160"
+        ],
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSXm",
+        "frames": [
+          "NSXm63",
+          "NSXm160"
+        ],
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX100",
+        "cls": "B"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX100",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX100",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX100",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX100",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX100",
+        "cls": "L"
+      }
+    ],
+    "rows": [
+      [
+        "iC40",
+        "2-40",
+        "6/4500",
+        [
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          null
+        ]
+      ],
+      [
+        "iC40N",
+        "2-16",
+        "10/6000",
+        [
+          "16",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iCV40N",
+        "6-16",
+        "6000",
+        [
+          "16",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          null
+        ]
+      ],
+      [
+        "iC40H / iCV40H",
+        "6-16",
+        "10000",
+        [
+          "16",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iC60N",
+        "0.5-40",
+        "10",
+        [
+          "16",
+          "20",
+          "25",
+          "30",
+          "30",
+          "20",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "iC60H",
+        "0.5-40",
+        "15",
+        [
+          "16",
+          "25",
+          "36",
+          "36",
+          "36",
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          null
+        ]
+      ],
+      [
+        "iC60L",
+        "0.5-25",
+        "25",
+        [
+          null,
+          null,
+          "36",
+          "36",
+          "36",
+          null,
+          "36",
+          "40",
+          "40",
+          "40",
+          "40"
+        ]
+      ],
+      [
+        "iC60 RCBO 2P/3P 400V",
+        "10-32",
+        "6000",
+        [
+          "16",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iC60 RCBO 2P/3P (PN) 230V",
+        "10-32",
+        "10000",
+        [
+          "16",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iC60N RCBO (VD)",
+        "6-20",
+        "6000",
+        [
+          "16",
+          "20",
+          "25",
+          "30",
+          "30",
+          "20",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "iC60H RCBO (VD)",
+        "6-20",
+        "10000",
+        [
+          "16",
+          "25",
+          "36",
+          "36",
+          "36",
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          "40"
+        ]
+      ],
+      [
+        "iC60H2 RCBO (VD)",
+        "10-20",
+        "10000",
+        [
+          "16",
+          "25",
+          "36",
+          "36",
+          "36",
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          "40"
+        ]
+      ],
+      [
+        "C120N",
+        "63-125",
+        "10",
+        [
+          "16",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          null
+        ]
+      ],
+      [
+        "C120H",
+        "63-125",
+        "15",
+        [
+          "16",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25"
+        ]
+      ],
+      [
+        "NG125N",
+        "10-125",
+        "25",
+        [
+          null,
+          null,
+          "36",
+          "36",
+          "36",
+          null,
+          "36",
+          "36",
+          "36",
+          "50",
+          null
+        ]
+      ],
+      [
+        "NG125H",
+        "10-125",
+        "36",
+        [
+          null,
+          null,
+          null,
+          "40",
+          "50",
+          null,
+          null,
+          "40",
+          "50",
+          "70",
+          "100"
+        ]
+      ],
+      [
+        "NG125L",
+        "10-80",
+        "50",
+        [
+          null,
+          null,
+          null,
+          null,
+          "70",
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSXm E",
+        "16-160",
+        "16",
+        [
+          null,
+          "25",
+          "30",
+          "30",
+          "30",
+          "25",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "NSXm B",
+        "16-160",
+        "25",
+        [
+          null,
+          null,
+          "36",
+          "36",
+          "50",
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          null
+        ]
+      ],
+      [
+        "NSXm F",
+        "16-160",
+        "36",
+        [
+          null,
+          null,
+          null,
+          "50",
+          "70",
+          null,
+          null,
+          "50",
+          "70",
+          "70",
+          "70"
+        ]
+      ],
+      [
+        "NSXm N",
+        "16-160",
+        "50",
+        [
+          null,
+          null,
+          null,
+          null,
+          "70",
+          null,
+          null,
+          null,
+          "70",
+          "70",
+          null
+        ]
+      ],
+      [
+        "NSX100 B",
+        "16-100",
+        "25",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          null
+        ]
+      ],
+      [
+        "NSX100 F",
+        "16-100",
+        "36",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX100 N",
+        "16-100",
+        "50",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX100 H",
+        "16-100",
+        "70",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "100",
+          "150"
+        ]
+      ]
+    ]
+  },
+  {
+    "source": "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, p. A-195, table \"Cascading - Upstream: ComPacT NSX160, NSX250 - Ue: 380-415 V AC\".",
+    "columns": [
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "B"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "L"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "B"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "L"
+      }
+    ],
+    "rows": [
+      [
+        "iC40",
+        "2-40",
+        "6/4500",
+        [
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          "10",
+          null
+        ]
+      ],
+      [
+        "iC40N",
+        "2-16",
+        "10/6000",
+        [
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iCV40N",
+        "6-16",
+        "6000",
+        [
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          null
+        ]
+      ],
+      [
+        "iC40H",
+        "6-16",
+        "10000",
+        [
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iC60N",
+        "0.5-40",
+        "10",
+        [
+          "20",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "20",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "iC60H",
+        "0.5-40",
+        "15",
+        [
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          "40",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          null
+        ]
+      ],
+      [
+        "iC60L",
+        "0.5-25",
+        "25",
+        [
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          "40",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "iC60 RCBO 2P/3P 400V",
+        "10-20",
+        "6000",
+        [
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iC60 RCBO 2P/3P (PN) 230V",
+        "10-20",
+        "10000",
+        [
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20",
+          "20"
+        ]
+      ],
+      [
+        "iC60N RCBO (VD)",
+        "6-20",
+        "6000",
+        [
+          "20",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "20",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "iC60H RCBO (VD)",
+        "6-20",
+        "10000",
+        [
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          "40",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "iC60H2 RCBO (VD)",
+        "6-20",
+        "10000",
+        [
+          "25",
+          "36",
+          "40",
+          "40",
+          "40",
+          "40",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "C120N",
+        "63-125",
+        "10",
+        [
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25"
+        ]
+      ],
+      [
+        "C120H",
+        "63-125",
+        "15",
+        [
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25",
+          "25"
+        ]
+      ],
+      [
+        "NG125N",
+        "10-125",
+        "25",
+        [
+          null,
+          "36",
+          "36",
+          "36",
+          "50",
+          "70",
+          null,
+          "36",
+          "36",
+          "36",
+          "50",
+          "70"
+        ]
+      ],
+      [
+        "NG125H",
+        "10-125",
+        "36",
+        [
+          null,
+          null,
+          "40",
+          "50",
+          "70",
+          "100",
+          null,
+          null,
+          "40",
+          "50",
+          "70",
+          "100"
+        ]
+      ],
+      [
+        "NG125L",
+        "10-80",
+        "50",
+        [
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSXm E",
+        "16-160",
+        "16",
+        [
+          "25",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "25",
+          "25",
+          "30",
+          "30",
+          "30",
+          "30"
+        ]
+      ],
+      [
+        "NSXm B",
+        "16-160",
+        "25",
+        [
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSXm F",
+        "16-160",
+        "36",
+        [
+          null,
+          null,
+          "50",
+          "70",
+          "70",
+          "70",
+          null,
+          null,
+          "50",
+          "70",
+          "70",
+          "70"
+        ]
+      ],
+      [
+        "NSXm N",
+        "16-160",
+        "50",
+        [
+          null,
+          null,
+          null,
+          "70",
+          "70",
+          "70",
+          null,
+          null,
+          null,
+          "70",
+          "70",
+          "70"
+        ]
+      ],
+      [
+        "NSX100 B",
+        "16-100",
+        "25",
+        [
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSX100 F",
+        "16-100",
+        "36",
+        [
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX100 N",
+        "16-100",
+        "50",
+        [
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX100 H",
+        "16-100",
+        "70",
+        [
+          null,
+          null,
+          null,
+          null,
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          null,
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX100 S",
+        "16-100",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "150",
+          null,
+          null,
+          null,
+          null,
+          null,
+          "150"
+        ]
+      ]
+    ]
+  },
+  {
+    "source": "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, p. A-196, table \"Cascading - Upstream: ComPacT NSX160, NSX250, NSX400, NSX630 - Ue: 380-415 V AC\".",
+    "columns": [
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "B"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX160",
+        "cls": "L"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "B"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX250",
+        "cls": "L"
+      }
+    ],
+    "rows": [
+      [
+        "NSX160 B",
+        "16-160",
+        "25",
+        [
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          null
+        ]
+      ],
+      [
+        "NSX160 F",
+        "16-160",
+        "36",
+        [
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX160 N",
+        "16-160",
+        "50",
+        [
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX160 H",
+        "16-160",
+        "70",
+        [
+          null,
+          null,
+          null,
+          null,
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          null,
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX160 S",
+        "16-160",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          "150",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NSX250 B",
+        "16-250",
+        "25",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSX250 F",
+        "16-250",
+        "36",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX250 N",
+        "16-250",
+        "50",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX250 H",
+        "16-250",
+        "70",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX250 S",
+        "16-250",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "150"
+        ]
+      ]
+    ]
+  },
+  {
+    "source": "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, p. A-196, table \"Cascading - Upstream: ComPacT NSX400, NSX630 - Ue: 380-415 V AC\".",
+    "columns": [
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX400",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX400",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX400",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX400",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX400",
+        "cls": "L"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX630",
+        "cls": "F"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX630",
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX630",
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX630",
+        "cls": "S"
+      },
+      {
+        "series": "ComPacT NSX",
+        "frame": "NSX630",
+        "cls": "L"
+      }
+    ],
+    "rows": [
+      [
+        "NSXm E",
+        "16-160",
+        "16",
+        [
+          "25",
+          "30",
+          "30",
+          "30",
+          "30",
+          "25",
+          "30",
+          "30",
+          "30",
+          null
+        ]
+      ],
+      [
+        "NSXm B",
+        "16-160",
+        "25",
+        [
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSXm F",
+        "16-160",
+        "36",
+        [
+          null,
+          "50",
+          "70",
+          "70",
+          "70",
+          null,
+          "50",
+          "70",
+          "70",
+          null
+        ]
+      ],
+      [
+        "NSXm N",
+        "16-160",
+        "50",
+        [
+          null,
+          null,
+          "70",
+          "70",
+          "70",
+          null,
+          null,
+          "70",
+          "70",
+          "70"
+        ]
+      ],
+      [
+        "NSX100 B",
+        "16-100",
+        "25",
+        [
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSX100 F",
+        "16-100",
+        "36",
+        [
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          "50",
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX100 N",
+        "16-100",
+        "50",
+        [
+          null,
+          null,
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX100 H",
+        "16-100",
+        "70",
+        [
+          null,
+          null,
+          null,
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX100 S",
+        "16-100",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          "150",
+          null,
+          null,
+          null,
+          null,
+          "150"
+        ]
+      ],
+      [
+        "NSX160 B",
+        "16-160",
+        "25",
+        [
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSX160 F",
+        "16-160",
+        "36",
+        [
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          "50",
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX160 N",
+        "16-160",
+        "50",
+        [
+          null,
+          null,
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX160 H",
+        "16-160",
+        "70",
+        [
+          null,
+          null,
+          null,
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX160 S",
+        "16-160",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          "150",
+          null,
+          null,
+          null,
+          null,
+          "150"
+        ]
+      ],
+      [
+        "NSX250 B",
+        "16-250",
+        "25",
+        [
+          "36",
+          "36",
+          "50",
+          "50",
+          "50",
+          "36",
+          "36",
+          "50",
+          "50",
+          "50"
+        ]
+      ],
+      [
+        "NSX250 F",
+        "16-250",
+        "36",
+        [
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          "50",
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX250 N",
+        "16-250",
+        "50",
+        [
+          null,
+          null,
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX250 H",
+        "16-250",
+        "70",
+        [
+          null,
+          null,
+          null,
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX250 S",
+        "16-250",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          "150",
+          null,
+          null,
+          null,
+          null,
+          "150"
+        ]
+      ],
+      [
+        "NSX400 F",
+        "250-400",
+        "36",
+        [
+          null,
+          "50",
+          "70",
+          "100",
+          "150",
+          null,
+          "50",
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX400 N",
+        "250-400",
+        "50",
+        [
+          null,
+          null,
+          "70",
+          "100",
+          "150",
+          null,
+          null,
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX400 H",
+        "250-400",
+        "70",
+        [
+          null,
+          null,
+          null,
+          "100",
+          "150",
+          null,
+          null,
+          null,
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX400 S",
+        "250-400",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          "150",
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NSX630 F",
+        "250-630",
+        "36",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "50",
+          "70",
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX630 N",
+        "250-630",
+        "50",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "70",
+          "100",
+          "150"
+        ]
+      ],
+      [
+        "NSX630 H",
+        "250-630",
+        "70",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "100",
+          null
+        ]
+      ],
+      [
+        "NSX630 S",
+        "250-630",
+        "100",
+        [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          "150"
+        ]
+      ]
+    ]
+  },
+  {
+    "source": "Schneider Electric LVPED318033EN Selectivity, Cascading and Coordination Guide 2025, p. A-197, table \"Cascading - Upstream: ComPacT NS630b-1600, ComPacT NS1600-3200, MasterPacT MTZ - Ue: 380-415 V AC\".",
+    "columns": [
+      {
+        "series": "ComPacT NS",
+        "frames": [
+          "NS630b",
+          "NS800",
+          "NS1000",
+          "NS1250",
+          "NS1600"
+        ],
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NS",
+        "frames": [
+          "NS630b",
+          "NS800",
+          "NS1000",
+          "NS1250",
+          "NS1600"
+        ],
+        "cls": "H"
+      },
+      {
+        "series": "ComPacT NS",
+        "frames": [
+          "NS630b",
+          "NS800",
+          "NS1000",
+          "NS1250",
+          "NS1600"
+        ],
+        "cls": "L"
+      },
+      {
+        "series": "ComPacT NS",
+        "frames": [
+          "NS630b",
+          "NS800",
+          "NS1000",
+          "NS1250",
+          "NS1600"
+        ],
+        "cls": "LB"
+      },
+      {
+        "series": "ComPacT NS",
+        "frames": [
+          "NS2000",
+          "NS2500",
+          "NS3200"
+        ],
+        "cls": "N"
+      },
+      {
+        "series": "ComPacT NS",
+        "frames": [
+          "NS2000",
+          "NS2500",
+          "NS3200"
+        ],
+        "cls": "H"
+      },
+      {
+        "series": "MasterPact MTZ",
+        "frame": "MTZ1",
+        "cls": "L1"
+      },
+      {
+        "series": "MasterPact MTZ",
+        "frame": "MTZ2",
+        "cls": "L1"
+      }
+    ],
+    "rows": [
+      [
+        "NSX100 B",
+        "16-100",
+        "25",
+        [
+          "50",
+          "50",
+          "50",
+          "50",
+          null,
+          null,
+          "50",
+          null
+        ]
+      ],
+      [
+        "NSX100 F",
+        "16-100",
+        "36",
+        [
+          "50",
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX100 N",
+        "16-100",
+        "50",
+        [
+          null,
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX100 H",
+        "16-100",
+        "70",
+        [
+          null,
+          null,
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX100 S",
+        "16-100",
+        "100",
+        [
+          null,
+          null,
+          "150",
+          "200",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX100 L",
+        "16-100",
+        "150",
+        [
+          null,
+          null,
+          null,
+          "200",
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NSX160 B",
+        "16-160",
+        "25",
+        [
+          "50",
+          "50",
+          "50",
+          "50",
+          null,
+          null,
+          "50",
+          null
+        ]
+      ],
+      [
+        "NSX160 F",
+        "16-160",
+        "36",
+        [
+          "50",
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX160 N",
+        "16-160",
+        "50",
+        [
+          null,
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX160 H",
+        "16-160",
+        "70",
+        [
+          null,
+          null,
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX160 S",
+        "16-160",
+        "100",
+        [
+          null,
+          null,
+          "150",
+          "200",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX160 L",
+        "16-160",
+        "150",
+        [
+          null,
+          null,
+          null,
+          "200",
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NSX250 B",
+        "16-250",
+        "25",
+        [
+          "50",
+          "50",
+          "50",
+          "50",
+          null,
+          null,
+          "50",
+          null
+        ]
+      ],
+      [
+        "NSX250 F",
+        "16-250",
+        "36",
+        [
+          "50",
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX250 N",
+        "16-250",
+        "50",
+        [
+          null,
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX250 H",
+        "16-250",
+        "70",
+        [
+          null,
+          null,
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX250 S",
+        "16-250",
+        "100",
+        [
+          null,
+          null,
+          "150",
+          "200",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX250 L",
+        "16-250",
+        "150",
+        [
+          null,
+          null,
+          null,
+          "200",
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NSX400 F",
+        "250-400",
+        "36",
+        [
+          "50",
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX400 N",
+        "250-400",
+        "50",
+        [
+          null,
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX400 H",
+        "250-400",
+        "70",
+        [
+          null,
+          null,
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX400 S",
+        "250-400",
+        "100",
+        [
+          null,
+          null,
+          "150",
+          "200",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX400 L",
+        "250-400",
+        "150",
+        [
+          null,
+          null,
+          null,
+          "200",
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NSX630 F",
+        "250-630",
+        "36",
+        [
+          "50",
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX630 N",
+        "250-630",
+        "50",
+        [
+          null,
+          "70",
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX630 H",
+        "250-630",
+        "70",
+        [
+          null,
+          null,
+          "150",
+          "150",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX630 S",
+        "250-630",
+        "100",
+        [
+          null,
+          null,
+          "150",
+          "200",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ],
+      [
+        "NSX630 L",
+        "250-630",
+        "150",
+        [
+          null,
+          null,
+          null,
+          "200",
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      [
+        "NS630b-1600 N",
+        "630-1600",
+        "50",
+        [
+          null,
+          "70",
+          "150",
+          "200",
+          "70",
+          "70",
+          "150",
+          null
+        ]
+      ],
+      [
+        "NS630b-1600 H",
+        "630-1600",
+        "70",
+        [
+          null,
+          null,
+          "150",
+          "200",
+          null,
+          null,
+          "150",
+          null
+        ]
+      ]
+    ]
+  }
+];
 const ABB_BACKUP_SOURCE =
   'ABB Electrical installation solutions for buildings - Technical details, 9AKK107991A8329, section "Coordination tables: back-up", p. 1/51 and table "MCCB - MCB @ 415 V", p. 1/81.';
 const SIEMENS_BACKUP_SOURCE =
   'Siemens SENTRON Back-up protection, 3VA Molded Case Circuit Breakers, Edition 10/2017, tables "1.2) 3VA2 - 5SY", "1.4) 3VA2 - 5SL" and "1.6) 3VA2 - 5SU1", pp. 4, 5, 7 and 9.';
-const NSX100_CASCADING = {
-  B: {
-    iCV40N: "10",
-    iC40N16: "20",
-    iC40N40: "16",
-    iC60N: "20",
-    iC60H: "25",
-    iC60L25: V,
-    iC60L40: "25",
-    iC60L63: "25",
-    NG125N: V,
-    NG125H: V,
-    NG125L: V,
-  },
-  F: {
-    iCV40N: "10",
-    iC40N16: "20",
-    iC40N40: "16",
-    iC60N: "25",
-    iC60H: "36",
-    iC60L25: "36",
-    iC60L40: "36",
-    iC60L63: "36",
-    NG125N: "36",
-    NG125H: V,
-    NG125L: V,
-  },
-  N: {
-    iCV40N: "10",
-    iC40N16: "20",
-    iC40N40: "16",
-    iC60N: "30",
-    iC60H: "40",
-    iC60L25: "40",
-    iC60L40: "40",
-    iC60L63: "40",
-    NG125N: "36",
-    NG125H: "40",
-    NG125L: V,
-  },
-  H: {
-    iCV40N: "10",
-    iC40N16: "20",
-    iC40N40: "16",
-    iC60N: "30",
-    iC60H: "40",
-    iC60L25: "40",
-    iC60L40: "40",
-    iC60L63: "40",
-    NG125N: "36",
-    NG125H: "50",
-    NG125L: "70",
-  },
-  S: {
-    iCV40N: "10",
-    iC40N16: "20",
-    iC40N40: "16",
-    iC60N: "30",
-    iC60H: "40",
-    iC60L25: "40",
-    iC60L40: "40",
-    iC60L63: "40",
-    NG125N: "50",
-    NG125H: "70",
-    NG125L: "100",
-  },
-  L: {
-    iCV40N: "10",
-    iC40N16: "20",
-    iC40N40: "16",
-    iC60N: "30",
-    iC60H: "40",
-    iC60L25: "40",
-    iC60L40: "40",
-    iC60L63: "40",
-    NG125N: "70",
-    NG125H: "100",
-    NG125L: "150",
-  },
-};
-function addBackupRow(rows, downstream, rating, icu, cascading) {
+function addBackupRow(rows, downstream, rating, icu, cascading, enhanced = NOT_DOCUMENTED) {
   if (!cascading || cascading === V) return;
-  rows.push([downstream, rating, icu, cascading, NOT_DOCUMENTED]);
+  rows.push([downstream, rating, icu, cascading, enhanced]);
 }
 function backupRowsForColumn(tableRows, colIndex) {
   const rows = [];
@@ -1837,35 +4504,69 @@ function backupRowsForColumn(tableRows, colIndex) {
 }
 function registerBackupRows(brand, series, frame, cls, rating, source, rows) {
   if (!rows.length) return;
-  BACKUP_415V[`${brand}|${series}|${frame}|${cls}|${rating}`] = { source, rows };
+  const key = `${brand}|${series}|${frame}|${cls}|${rating}`;
+  if (!BACKUP_415V[key]) {
+    BACKUP_415V[key] = { source, rows: [] };
+  } else if (!BACKUP_415V[key].source.includes(source)) {
+    BACKUP_415V[key].source += `; ${source}`;
+  }
+  BACKUP_415V[key].rows.push(...rows);
 }
-function schneiderNsx100Rows(cls) {
-  const d = NSX100_CASCADING[cls];
-  if (!d) return [];
-  const rows = [];
-  addBackupRow(rows, "iCV40N", "6-40", "6", d.iCV40N);
-  addBackupRow(rows, "iC40N", "2-16", "6/10", d.iC40N16);
-  addBackupRow(rows, "iC40N", "20-40", "6/10", d.iC40N40);
-  addBackupRow(rows, "iC60N", "0,5-40", "10", d.iC60N);
-  addBackupRow(rows, "iC60N", "50-63", "10", d.iC60N);
-  addBackupRow(rows, "iC60H", "0,5-40", "15", d.iC60H);
-  addBackupRow(rows, "iC60H", "50-63", "15", d.iC60H);
-  addBackupRow(rows, "iC60L", "0,5-25", "25", d.iC60L25);
-  addBackupRow(rows, "iC60L", "32-40", "20", d.iC60L40);
-  addBackupRow(rows, "iC60L", "50-63", "15", d.iC60L63);
-  addBackupRow(rows, "NG125N", "1-125", "25", d.NG125N);
-  addBackupRow(rows, "NG125H", "1-125", "36", d.NG125H);
-  addBackupRow(rows, "NG125L", "1-80", "50", d.NG125L);
-  return rows;
+function schneiderSeries(series) {
+  return DATA.find(
+    (item) => item.brand === "Schneider Electric" && item.series === series,
+  );
 }
-["B", "F", "N", "H", "S", "L"].forEach((cls) => {
-  [16, 25, 40, 63, 80, 100].forEach((rt) => {
-    BACKUP_415V[`Schneider Electric|ComPacT NSX|NSX100|${cls}|${rt}`] = {
-      source: SCHNEIDER_BACKUP_SOURCE,
-      rows: schneiderNsx100Rows(cls),
-    };
+function schneiderRatings(column, frame) {
+  const series = schneiderSeries(column.series),
+    found = series && series.frames.find((item) => item.frame === frame);
+  if (!found) return [];
+  const relayRatings = series.relays.flatMap((relay) =>
+    relay.ratingsByFrame && relay.ratingsByFrame[frame]
+      ? relay.ratingsByFrame[frame]
+      : [],
+  );
+  return uniq([...found.ratings, ...relayRatings]).sort((a, b) => Number(a) - Number(b));
+}
+function normalizeSchneiderIcuIcn(value) {
+  const raw = String(value ?? "").trim();
+  if (raw === "4500") return "4,5";
+  if (raw === "6000") return "6";
+  if (raw === "10000") return "10";
+  return raw.replace(/4500/g, "4,5").replace(/6000/g, "6");
+}
+function registerSchneiderBackupTable(table) {
+  const rowsByColumn = table.columns.map(() => []);
+  table.rows.forEach(([downstream, rating, icu, values]) => {
+    values.forEach((value, colIndex) => {
+      if (value === null || value === undefined || value === V) return;
+      addBackupRow(
+        rowsByColumn[colIndex],
+        downstream,
+        rating,
+        normalizeSchneiderIcuIcn(icu),
+        String(value).trim(),
+      );
+    });
   });
-});
+  table.columns.forEach((column, colIndex) => {
+    const frames = column.frames || [column.frame];
+    frames.forEach((frame) => {
+      schneiderRatings(column, frame).forEach((rating) => {
+        registerBackupRows(
+          "Schneider Electric",
+          column.series,
+          frame,
+          column.cls,
+          rating,
+          table.source,
+          rowsByColumn[colIndex],
+        );
+      });
+    });
+  });
+}
+SCHNEIDER_BACKUP_415_TABLES.forEach(registerSchneiderBackupTable);
 
 const ABB_TMAX_XT_BACKUP_COLUMNS = [
   { frame: "XT1", cls: "B" },
@@ -2140,6 +4841,7 @@ function nsIrOptions(s, r, bases, desired) {
   if (!s.irSettingTypes || !r.name.includes("MicroLogic")) return [];
   const standard = s.irSettingTypes[0];
   const stdBest = best(bases, standard.ir, desired);
+  if (!stdBest || stdBest.error) return [];
   const visible = [{ ...standard, best: stdBest }];
   if (st.method !== "Minimum settings") {
     for (const opt of s.irSettingTypes.slice(1)) {
@@ -2169,25 +4871,29 @@ function renderIrSettings(options) {
 }
 function componentGroup(name) {
   const n = String(name || "").toUpperCase();
-  if (n.includes("IC60")) return "IC60";
+  if (n.includes("IC40") || n.includes("ICV40")) return "iC40/iCV40";
+  if (n.includes("IC60")) return "iC60";
   if (n.includes("NG125")) return "NG125";
-  if (n.includes("IC40N")) return "IC40N";
-  if (n.includes("ICV40N")) return "ICV40N";
-  return n;
+  if (n.includes("C120")) return "C120";
+  if (n.includes("NSXM")) return "ComPacT NSXm";
+  if (n.includes("NSX")) return "ComPacT NSX";
+  if (n.includes("NS630") || n.includes("NS800") || n.includes("NS1000") || n.includes("NS1600"))
+    return "ComPacT NS";
+  return name;
 }
 function renderBackup415V(s, f, c, inA) {
   const el = document.getElementById("backupPanel");
   if (!el) return;
   const select = document.getElementById("backupComponent");
   const noDataText =
-    "Ingen producentverificerede backup-/cascadingdata indl\u00e6st for denne kombination.";
+    "Ingen producentverificerede backup-/cascadingdata indl\u00e6st for denne kombination";
   if (select) {
     st.backupComponent = select.value || "all";
   }
   const key = `${s.brand}|${s.series}|${f.frame}|${c[0]}|${inA}`;
   const data = BACKUP_415V[key];
   let selected = st.backupComponent || "all";
-  const wanted = s.brand === "Schneider Electric" ? ["IC60", "NG125", "IC40N", "ICV40N"] : [];
+  const wanted = [];
   if (!data) {
     if (select) {
       select.value = "all";
@@ -2220,12 +4926,14 @@ function renderBackup415V(s, f, c, inA) {
   }
   const withKa = (value) => {
     const raw = String(value ?? "").trim();
-    return raw && raw !== V ? `${raw} kA` : V;
+    if (!raw || raw === V || raw === NOT_DOCUMENTED) return V;
+    return raw.toLowerCase().includes("ka") ? raw : `${raw} kA`;
   };
+  const withAmpere = (value) => `${String(value).replace(/\./g, ",")}A`;
   const rowHtml = rows
     .map(
       (r) =>
-        `<tr><td>${r.downstream}</td><td>${r.rating}A</td><td>${withKa(r.icu)}</td><td>${withKa(r.cascading)}</td><td>${r.enhanced}</td></tr>`,
+        `<tr><td>${r.downstream}</td><td>${withAmpere(r.rating)}</td><td>${withKa(r.icu)}</td><td>${withKa(r.cascading)}</td><td>${withKa(r.enhanced)}</td></tr>`,
     )
     .join("");
   const missingGroups = (selected === "all" ? wanted : [selected]).filter(
@@ -2303,6 +5011,9 @@ function render() {
   $("warning").classList.toggle("hidden", ikmax <= c[1]);
   $("warning").textContent =
     `OBS: Ik max (${fmt(ikmax)} kA) er højere end bryderens Icu (${c[1]} kA). Er bryderen backupbeskyttet?`;
+  $("requestWarning").classList.add("hidden");
+  $("requestWarning").textContent = "";
+  const residual = renderResidualControls(s, f, c, r, inA);
   let rows = [],
     out = [
       `${deviceLabel(s)}:`,
@@ -2331,7 +5042,7 @@ function render() {
     irFactors = chosen.ir;
     ir = best(bases, irFactors, desired);
   }
-  if (hasIo && !ir.verify) {
+  if (hasIo && !ir.verify && !ir.error) {
     rows.push(
       `<tr><td>Io</td><td>${range(bases, ir.base, fmtA)}</td><td>${fmtA(ir.base)}</td></tr>`,
     );
@@ -2344,6 +5055,14 @@ function render() {
     const status = ir.status || V;
     rows.push(`<tr><td>${lbl.overload}</td><td>${status}</td><td>${status}</td></tr>`);
     out.push(lbl.overload + ": " + status);
+  } else if (ir.error) {
+    const msg = `Ønsket indstillingsstrøm ${fmtA(desired)} er lavere end lavest mulige ${lbl.overload} ${fmtA(ir.minValue)} for valgt relæstørrelse.`;
+    $("requestWarning").classList.remove("hidden");
+    $("requestWarning").textContent = msg;
+    rows.push(
+      `<tr><td>${lbl.overload}</td><td class="statusError">FEJL</td><td class="statusError">${msg}</td></tr>`,
+    );
+    out.push(`${lbl.overload}: FEJL - ${msg}`);
   } else {
     const min = Math.min(...bases) * Math.min(...irFactors);
     const msg =
@@ -2358,6 +5077,7 @@ function render() {
     out.push(`${lbl.overload}: ${fmt(ir.factor)} × ${ref} = ${fmtA(ir.value)}`);
     if (msg) out.push("Bemærk: " + msg);
   }
+  const overloadOk = ir && !ir.verify && !ir.error;
   if (r.trFixed) {
     rows.push(`<tr><td>tr</td><td>Fast</td><td>${r.trFixed}</td></tr>`);
     out.push("tr: " + r.trFixed);
@@ -2379,7 +5099,7 @@ function render() {
       const status = statusText(isdValues);
       rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
       out.push(lbl.short + ": " + status);
-    } else if (!ir.verify) {
+    } else if (overloadOk) {
       const shortBaseName = r.isdBase === "In" ? "In" : lbl.overload;
       const shortBaseValue = r.isdBase === "In" ? inA : ir.value;
       const isd = under(isdValues, shortBaseValue, ikmin * 1000 * 0.8);
@@ -2452,6 +5172,29 @@ function render() {
       instantWritten = true;
     }
   }
+  if (residual) {
+    const kind = residual.kind === "module" ? "Separat modul" : "Integreret i relæ";
+    rows.push(
+      `<tr><td>Fejlstrøm</td><td>${kind}</td><td>${residual.device}</td></tr>`,
+    );
+    out.push("", "Fejlstrømsbeskyttelse:", `Modul eller relætype: ${residual.device}`);
+    if (residual.sensitivity) {
+      rows.push(
+        `<tr><td>IΔn</td><td>Følsomhed</td><td>${residual.sensitivity}</td></tr>`,
+      );
+      out.push(`Følsomhed: ${residual.sensitivity}`);
+    }
+    if (residual.type) {
+      rows.push(`<tr><td>Type</td><td>Fejlstrøm</td><td>${residual.type}</td></tr>`);
+      out.push(`Type: ${residual.type}`);
+    }
+    if (residual.delay) {
+      rows.push(
+        `<tr><td>Δt</td><td>Forsinkelse</td><td>${residual.delay}</td></tr>`,
+      );
+      out.push(`Forsinkelse: ${residual.delay}`);
+    }
+  }
   rows.push(`<tr><td>INC</td><td>Manuel værdi</td><td>${fmtA(inc)}</td></tr>`);
   out.push("INC: " + fmtA(inc));
   $("rows").innerHTML = rows.join("");
@@ -2473,6 +5216,7 @@ function reset(prevPole) {
   const idx = F().poles.indexOf(prevPole);
   st.poles = idx >= 0 ? idx : 0;
   st.inc = String(F().ratings[F().ratings.length - 1]);
+  resetResidual();
 }
 function bind() {
   $("brand").onchange = (e) => {
@@ -2494,6 +5238,7 @@ function bind() {
     st.cls = 0;
     st.relay = "";
     st.rating = 0;
+    resetResidual();
     const idx = F().poles.indexOf(oldPole);
     st.poles = idx >= 0 ? idx : 0;
     st.inc = String(F().ratings[F().ratings.length - 1]);
@@ -2506,6 +5251,7 @@ function bind() {
   $("relay").onchange = (e) => {
     st.relay = e.target.value;
     st.rating = 0;
+    resetResidual();
     render();
   };
   $("rating").onchange = (e) => {
@@ -2540,6 +5286,38 @@ function bind() {
         render();
       }
     };
+  const rcdToggle = document.getElementById("rcdToggle");
+  if (rcdToggle)
+    rcdToggle.onclick = () => {
+      if (rcdToggle.disabled) return;
+      st.rcdEnabled = !st.rcdEnabled;
+      if (!st.rcdEnabled) {
+        st.rcdDevice = 0;
+        st.rcdSensitivity = 0;
+        st.rcdType = 0;
+        st.rcdDelay = 0;
+      }
+      render();
+    };
+  const rcdFields = {
+    rcdDevice: "rcdDevice",
+    rcdSensitivity: "rcdSensitivity",
+    rcdType: "rcdType",
+    rcdDelay: "rcdDelay",
+  };
+  Object.keys(rcdFields).forEach((id) => {
+    const el = document.getElementById(id);
+    if (el)
+      el.onchange = (e) => {
+        st[rcdFields[id]] = +e.target.value;
+        if (id === "rcdDevice") {
+          st.rcdSensitivity = 0;
+          st.rcdType = 0;
+          st.rcdDelay = 0;
+        }
+        render();
+      };
+  });
   $("copy").onclick = async () => {
     await navigator.clipboard.writeText($("output").textContent);
     stats("copy");
