@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BreakerSettings admin stats</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, Arial, sans-serif;
+        background: #071018;
+        color: #edf5f0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #071018;
+      }
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 22px;
+      }
+      header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      h1 span,
+      h2,
+      th {
+        color: #34f36a;
+      }
+      p {
+        color: #adc0c9;
+      }
+      .pill {
+        border: 1px solid rgba(52, 243, 106, 0.35);
+        border-radius: 999px;
+        padding: 7px 11px;
+        color: #9ff5b7;
+        background: rgba(52, 243, 106, 0.08);
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+      section {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        background: #0b1722;
+        padding: 14px;
+      }
+      .metric {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        padding: 8px 0;
+      }
+      .metric:last-child {
+        border-bottom: 0;
+      }
+      .label {
+        color: #91b0bf;
+        font-size: 11px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+      .value {
+        font-size: 24px;
+        font-weight: 900;
+        margin-top: 3px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+      }
+      td,
+      th {
+        text-align: left;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        vertical-align: top;
+      }
+      .note {
+        margin-top: 16px;
+        border: 1px solid rgba(255, 190, 70, 0.3);
+        background: rgba(255, 190, 70, 0.08);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: #ffe3a7;
+        line-height: 1.55;
+      }
+      .error {
+        color: #ffb3b3;
+        font-weight: 800;
+      }
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 640px) {
+        header {
+          display: block;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>Breaker<span>Settings</span> statistik</h1>
+          <p>Anonym teststatistik for TEST v6.20.</p>
+        </div>
+        <div class="pill" id="storage">Indlæser</div>
+      </header>
+      <div id="content" class="grid"></div>
+      <div class="note">
+        Der gemmes kun hændelsestællere, anonymt brugerestimat og valgte
+        tekniske kategorier. Navn, email, telefon, IP-adresse og user-agent
+        gemmes ikke af appens statistik.
+      </div>
+    </main>
+    <script>
+      const periods = [
+        ["today", "I dag"],
+        ["last7", "Sidste 7 dage"],
+        ["last30", "Sidste 30 dage"],
+        ["total", "Total"],
+      ];
+      const labels = {
+        brand: "Fabrikat",
+        series: "Serie",
+        frame: "Frame",
+        relay: "Relætype",
+        rcd: "RCD/fejlstrøm",
+      };
+      const content = document.getElementById("content");
+      const storage = document.getElementById("storage");
+
+      function topLine(rows) {
+        if (!rows || !rows.length) return "-";
+        return rows.map((row) => `${row.value} (${row.count})`).join("<br />");
+      }
+
+      function section(id, title, data) {
+        const counters = data.counters || {};
+        const top = data.top || {};
+        return `<section>
+          <h2>${title}</h2>
+          <div class="metric"><div class="label">Totale besøg</div><div class="value">${counters.visits || 0}</div></div>
+          <div class="metric"><div class="label">Unikke brugere, anonymt estimat</div><div class="value">${data.uniqueUsers || 0}</div></div>
+          <div class="metric"><div class="label">Beregninger</div><div class="value">${counters.calculations || 0}</div></div>
+          <div class="metric"><div class="label">Kopieringer/dokumentationer</div><div class="value">${counters.documentations || 0}</div></div>
+          <table>
+            <thead><tr><th>Mest brugte</th><th>Top</th></tr></thead>
+            <tbody>
+              ${Object.keys(labels)
+                .map((key) => `<tr><td>${labels[key]}</td><td>${topLine(top[key])}</td></tr>`)
+                .join("")}
+            </tbody>
+          </table>
+        </section>`;
+      }
+
+      async function loadStats() {
+        try {
+          const response = await fetch(`/api/stats?ts=${Date.now()}`, {
+            cache: "no-store",
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          storage.textContent = data.storage || "ukendt lager";
+          content.innerHTML = periods
+            .map(([id, title]) => section(id, title, data.periods[id] || {}))
+            .join("");
+        } catch (error) {
+          storage.textContent = "fejl";
+          content.innerHTML = `<section class="error">Statistik kunne ikke indlæses: ${error.message}</section>`;
+        }
+      }
+
+      loadStats();
+    </script>
+  </body>
+</html>

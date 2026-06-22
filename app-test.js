@@ -5094,20 +5094,101 @@ function renderSelectors() {
   fillIdx("rating", ratings().map(fmtA), st.rating);
   fillIdx("poles", F().poles, st.poles);
 }
-function stats(type) {
-  const raw = localStorage.getItem("breakerStats"),
-    s = raw
-      ? JSON.parse(raw)
-      : { visits: 0, calculations: 0, copies: 0, series: {} };
-  if (type === "visit") s.visits++;
-  if (type === "calc") s.calculations++;
-  if (type === "copy") s.copies++;
-  s.series[S().series] = (s.series[S().series] || 0) + 1;
-  localStorage.setItem("breakerStats", JSON.stringify(s));
-  const top = Object.entries(s.series).sort((a, b) => b[1] - a[1])[0];
-  $("stats").innerHTML =
-    `<strong>Brug af appen</strong><br>Besøg: ${s.visits}<br>Beregninger: ${s.calculations}<br>Kopieringer: ${s.copies}<br>Mest brugte serie: ${top ? top[0] : "-"}`;
-}
+const usageStats = (() => {
+  const endpoint = "/api/stats";
+  const idKey = "breakerSettingsAnonymousStatsId";
+  let initialized = false;
+  let lastCalculationSignature = "";
+
+  function anonymousId() {
+    try {
+      let id = localStorage.getItem(idKey);
+      if (!id) {
+        const browserCrypto = globalThis.crypto;
+        id =
+          browserCrypto && browserCrypto.randomUUID
+            ? browserCrypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        localStorage.setItem(idKey, id);
+      }
+      return id;
+    } catch (_) {
+      return "";
+    }
+  }
+
+  function selection() {
+    const s = S(),
+      f = F(),
+      r = R();
+    return {
+      brand: s.brand,
+      series: s.series,
+      frame: f.frame,
+      relay: r.name,
+      rcd: st.rcdEnabled ? "ja" : "nej",
+    };
+  }
+
+  function calculationSignature() {
+    return JSON.stringify({
+      ...selection(),
+      rating: rating(),
+      poles: P(),
+      desired: st.desired,
+      ikmin: st.ikmin,
+      ikmax: st.ikmax,
+      inc: st.inc,
+      method: st.method,
+      irSetting: st.irSetting,
+      backupComponent: st.backupComponent,
+      rcdDevice: st.rcdDevice,
+      rcdSensitivity: st.rcdSensitivity,
+      rcdType: st.rcdType,
+      rcdDelay: st.rcdDelay,
+    });
+  }
+
+  function post(type) {
+    const payload = JSON.stringify({
+      type,
+      version: "v6.20-test",
+      anonymousId: anonymousId(),
+      selection: selection(),
+    });
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: "application/json" });
+        if (navigator.sendBeacon(endpoint, blob)) return;
+      }
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
+  function trackCalculation() {
+    const signature = calculationSignature();
+    if (!initialized) {
+      initialized = true;
+      lastCalculationSignature = signature;
+      return;
+    }
+    if (signature !== lastCalculationSignature) {
+      lastCalculationSignature = signature;
+      post("calculation");
+    }
+  }
+
+  return {
+    trackVisit: () => post("visit"),
+    trackCalculation,
+    trackDocumentation: () => post("documentation"),
+  };
+})();
 function render() {
   renderSelectors();
   const s = S(),
@@ -5331,7 +5412,7 @@ function render() {
     .join("");
   $("output").textContent = out.join("\n");
   renderBackup415V(s, f, c, inA);
-  stats();
+  usageStats.trackCalculation();
 }
 function reset(prevPole) {
   st.frame = 0;
@@ -5445,11 +5526,11 @@ function bind() {
   });
   $("copy").onclick = async () => {
     await navigator.clipboard.writeText($("output").textContent);
-    stats("copy");
+    usageStats.trackDocumentation();
     $("copy").textContent = "Kopieret";
     setTimeout(() => ($("copy").textContent = "Kopiér"), 1200);
   };
 }
-stats("visit");
+usageStats.trackVisit();
 bind();
 render();

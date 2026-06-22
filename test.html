@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.20
+      2026-06-22
+      - Anonym brugsstatistik tilfoejet i TEST via /api/stats
+      - Skjult statistikside tilfoejet paa /admin-stats
+      - Besoeg, anonymt brugerestimat, beregninger, dokumentationskopieringer og mest brugte tekniske valg registreres uden persondata
+      - app-test.js cache-busting opdateret til v6.20
+
       v6.19
       2026-06-22
       - Siemens 3WA tilfoejet som luftafbryder/ACB-serie i TEST
@@ -100,13 +107,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.19
+      TEST v6.20
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.19 - Siemens 3WA ACB test data
+          TEST v6.20 - anonym brugsstatistik
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -159,7 +166,7 @@
           href="mailto:jhj@pro-automatic.dk?subject=Forslag%20til%20BreakerSettings"
           >Send forslag på mail</a
         >
-        <div id="stats" class="statsBox"></div>
+        <div id="stats" class="statsBox hidden" aria-hidden="true"></div>
       </aside>
       <section class="panel center">
         <div class="device-card">
@@ -214,7 +221,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.19"></script>
+    <script src="app-test.js?v=6.20"></script>
     <div
       style="
         position: fixed;
@@ -230,7 +237,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.19 - live ikke opdateret
+      TEST v6.20 - live ikke opdateret
     </div>
   </body>
 </html>
