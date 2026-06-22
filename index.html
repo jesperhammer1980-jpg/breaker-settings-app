@@ -10,6 +10,28 @@
     <!--
       Versionshistorik
 
+      v6.19
+      2026-06-22
+      - Siemens 3WA tilfoejet som luftafbryder/ACB-serie
+      - 3WA11, 3WA12 og 3WA13 frames, Icu/Ics-klasser og option-plug In-vaerdier indlaest fra officiel Siemens 3WA1 equipment manual
+      - ETU300 LSI/LSIG og ETU600 LSI/LSIG/LSIG Hi-Z Ir, tr, Isd og Ii rotary-switch settings verificeret mod Siemens-manualen
+      - 3WA backup-/cascadingdata ikke indlaest, da ingen producentverificeret 415V backup-/cascadingtabel er fundet i de gennemgaaede 3WA-kilder
+      - app.js cache-busting opdateret til v6.19
+
+      v6.18
+      2026-06-16
+      - Indstillingsstroem-regel rettet saa appen aldrig foreslaar en vaerdi over oensket stroem
+      - Fejlstroemsbeskyttelse tilfoejet for dokumenterede Schneider, ABB og Siemens kombinationer
+      - Backup-/cascading ingen-data tekst rettet til aftalt formulering
+      - app.js cache-busting opdateret til v6.18
+
+      v6.17
+      2026-06-13
+      - Schneider backup-/cascadingdata indlaest fra officiel LVPED318033EN 2025 side A-194 til A-197 for NSXm, NSX, NS og MTZ
+      - Schneider relae-/trip-unit-listen suppleret med MicroLogic 4.1, MicroLogic Vigi 4.2/4.3, MicroLogic Vigi 7.2/7.3 og MicroLogic 7.0
+      - Schneider relae- og In-filtrering kontrolleret pr. frame
+      - app.js cache-busting opdateret til v6.17
+
       v6.16
       2026-06-13
       - MasterPact MTZ framevalg rettet til MTZ1, MTZ2 og MTZ3
@@ -78,13 +100,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.16
+      LIVEVERSION v6.19
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.16 - MTZ frame model
+          v6.19 - Siemens 3WA ACB data
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -117,6 +139,21 @@
         ><select id="method">
           <option>Calculated settings</option>
           <option>Minimum settings</option></select
+        ><button id="rcdToggle" class="mailBtn" type="button">
+          Tilføj fejlstrømsbeskyttelse</button
+        ><div id="rcdPanel" class="statsBox hidden">
+          <label>Modul/relætype</label
+          ><select id="rcdDevice"></select
+          ><div id="rcdSensitivityWrap">
+            <label>Følsomhed</label><select id="rcdSensitivity"></select>
+          </div>
+          <div id="rcdTypeWrap">
+            <label>Type</label><select id="rcdType"></select>
+          </div>
+          <div id="rcdDelayWrap">
+            <label>Forsinkelse</label><select id="rcdDelay"></select>
+          </div>
+        </div
         ><a
           class="mailBtn"
           href="mailto:jhj@pro-automatic.dk?subject=Forslag%20til%20BreakerSettings"
@@ -177,7 +214,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.16"></script>
+    <script src="app.js?v=6.19"></script>
     <div
       style="
         position: fixed;
@@ -193,7 +230,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.16
+      LIVEVERSION v6.19
     </div>
   </body>
 </html>
