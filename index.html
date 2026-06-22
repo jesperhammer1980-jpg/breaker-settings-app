@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.20
+      2026-06-22
+      - Anonym brugsstatistik tilfoejet via /api/stats
+      - Skjult statistikside tilfoejet paa /admin-stats
+      - Besoeg, anonymt brugerestimat, beregninger, dokumentationskopieringer og mest brugte tekniske valg registreres uden persondata
+      - app.js cache-busting opdateret til v6.20
+
       v6.19
       2026-06-22
       - Siemens 3WA tilfoejet som luftafbryder/ACB-serie
@@ -100,13 +107,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.19
+      LIVEVERSION v6.20
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.19 - Siemens 3WA ACB data
+          v6.20 - anonym brugsstatistik
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -214,7 +221,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.19"></script>
+    <script src="app.js?v=6.20"></script>
     <div
       style="
         position: fixed;
@@ -230,7 +237,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.19
+      LIVEVERSION v6.20
     </div>
   </body>
 </html>
