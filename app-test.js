@@ -431,6 +431,23 @@ const SIEMENS_3WL_ETU25_II_FIXED = {
 const SIEMENS_3VA_RCD820_SENS = ["0,03 ... 30 A (10 trin)"];
 const SIEMENS_3VA_RCD820_TYPES = ["A (0,03-10 A)", "AC (30 A)"];
 const SIEMENS_3VA_RCD820_DELAY = ["0 ... 10000 ms (10 trin)"];
+const SIEMENS_3WA_ETU300_IR = [
+  0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1,
+];
+const SIEMENS_3WA_ETU300_TR = [0.75, 1, 2, 5, 8, 10, 14, 17, 21, 25];
+const SIEMENS_3WA_ETU300_ISD = [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+const SIEMENS_3WA_ETU300_II = [1.5, 2, 3, 4, 5, 6, 8, 10, 12, 15];
+const SIEMENS_3WA_ETU600_IR = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1];
+const SIEMENS_3WA_ETU600_TR = [1, 2, 5, 8, 10, 14, 17, 21, 25];
+const SIEMENS_3WA_ETU600_ISD = [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+const SIEMENS_3WA_ETU600_II = [1.5, 2, 3, 4, 6, 8, 10, 12, 15];
+const SIEMENS_3WA_RATINGS_BY_FRAME = {
+  "3WA11 Size 1": [250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500],
+  "3WA12 Size 2": [
+    250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000,
+  ],
+  "3WA13 Size 3": [800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6300],
+};
 
 const DATA = [
   {
@@ -1697,6 +1714,113 @@ const DATA = [
   },
   {
     brand: "Siemens",
+    series: "3WA",
+    image: "assets/siemens-3wl.svg",
+    status: "Lukket",
+    statusClass: "ok",
+    frames: [
+      {
+        frame: "3WA11 Size 1",
+        classes: [
+          ["N", 55],
+          ["S", 66],
+          ["M", 85],
+        ],
+        poles: ["3P", "4P"],
+        ratings: SIEMENS_3WA_RATINGS_BY_FRAME["3WA11 Size 1"],
+      },
+      {
+        frame: "3WA12 Size 2",
+        classes: [
+          ["S", 66],
+          ["M", 85],
+          ["H", 100],
+          ["C", 130],
+        ],
+        poles: ["3P", "4P"],
+        ratings: SIEMENS_3WA_RATINGS_BY_FRAME["3WA12 Size 2"],
+      },
+      {
+        frame: "3WA13 Size 3",
+        classes: [
+          ["H", 100],
+          ["C", 150],
+          ["E", 130],
+        ],
+        poles: ["3P", "4P"],
+        ratings: SIEMENS_3WA_RATINGS_BY_FRAME["3WA13 Size 3"],
+      },
+    ],
+    relays: [
+      {
+        name: "ETU300 LSI",
+        ratingsByFrame: SIEMENS_3WA_RATINGS_BY_FRAME,
+        ir: SIEMENS_3WA_ETU300_IR,
+        tr: SIEMENS_3WA_ETU300_TR,
+        isd: SIEMENS_3WA_ETU300_ISD,
+        ii: SIEMENS_3WA_ETU300_II,
+        functions: ["L", "S", "I"],
+        sourceNote:
+          "Siemens 3WA1 air circuit breaker Equipment Manual 05/2023, p. 47 option plug In table and p. 85 ETU300 LSI/LSIG setting range table: Ir, tr, Isd and Ii rotary-switch settings verified. Isd OFF and ETU300 LSIG ground-fault settings are documented but not represented as L/S/I setting suggestions.",
+      },
+      {
+        name: "ETU300 LSIG",
+        ratingsByFrame: SIEMENS_3WA_RATINGS_BY_FRAME,
+        ir: SIEMENS_3WA_ETU300_IR,
+        tr: SIEMENS_3WA_ETU300_TR,
+        isd: SIEMENS_3WA_ETU300_ISD,
+        ii: SIEMENS_3WA_ETU300_II,
+        functions: ["L", "S", "I", "G"],
+        sourceNote:
+          "Siemens 3WA1 air circuit breaker Equipment Manual 05/2023, p. 47 option plug In table and p. 85 ETU300 LSI/LSIG setting range table: Ir, tr, Isd and Ii rotary-switch settings verified. ETU300 LSIG ground-fault protection is documented as residual GF with Ig 0.2 x In, min. 100 A, max. 1200 A and tg 0.2 s.",
+      },
+      {
+        name: "ETU600 LSI",
+        ratingsByFrame: SIEMENS_3WA_RATINGS_BY_FRAME,
+        ir: SIEMENS_3WA_ETU600_IR,
+        tr: SIEMENS_3WA_ETU600_TR,
+        isd: SIEMENS_3WA_ETU600_ISD,
+        ii: SIEMENS_3WA_ETU600_II,
+        functions: ["L", "S", "I"],
+        sourceNote:
+          "Siemens 3WA1 air circuit breaker Equipment Manual 05/2023, p. 47 option plug In table and p. 115 ETU600 setting range table: Ir, tr, Isd and Ii rotary-switch settings verified. Wider e.SET ranges are documented on the same page but are not interpolated in the database.",
+      },
+      {
+        name: "ETU600 LSIG",
+        ratingsByFrame: SIEMENS_3WA_RATINGS_BY_FRAME,
+        ir: SIEMENS_3WA_ETU600_IR,
+        tr: SIEMENS_3WA_ETU600_TR,
+        isd: SIEMENS_3WA_ETU600_ISD,
+        ii: SIEMENS_3WA_ETU600_II,
+        functions: ["L", "S", "I", "G"],
+        sourceNote:
+          "Siemens 3WA1 air circuit breaker Equipment Manual 05/2023, p. 47 option plug In table, p. 115 ETU600 L/S/I setting range table and p. 116 ETU600 LSIG ground-fault table: Ir, tr, Isd, Ii and GF availability verified. GF Ig ranges are documented by size but not shown as residual-current/RCD module.",
+      },
+      {
+        name: "ETU600 LSIG Hi-Z",
+        ratingsByFrame: SIEMENS_3WA_RATINGS_BY_FRAME,
+        ir: SIEMENS_3WA_ETU600_IR,
+        tr: SIEMENS_3WA_ETU600_TR,
+        isd: SIEMENS_3WA_ETU600_ISD,
+        ii: SIEMENS_3WA_ETU600_II,
+        functions: ["L", "S", "I", "G", "Hi-Z"],
+        sourceNote:
+          "Siemens 3WA1 air circuit breaker Equipment Manual 05/2023, p. 47 option plug In table, p. 115 ETU600 L/S/I setting range table and pp. 116-117 ETU600 LSIG Hi-Z ground-fault table: Ir, tr, Isd, Ii and GF Hi-Z availability verified. REF/UREF settings depend on external CT and shunt data and are not interpolated.",
+      },
+    ],
+    docs: [
+      [
+        "Siemens 3WA1 air circuit breaker Equipment Manual",
+        "https://cache.industry.siemens.com/dl/files/061/109763061/att_1144447/v3/MAN_92310000002-07_en_en-US.pdf",
+      ],
+      [
+        "Siemens SENTRON 3WA air circuit breaker",
+        "https://www.siemens.com/en-us/products/sentron/3wa-air-circuit-breakers/",
+      ],
+    ],
+  },
+  {
+    brand: "Siemens",
     series: "3WL",
     image: "assets/siemens-3wl.svg",
     status: "Lukket",
@@ -2084,7 +2208,8 @@ function labelsFor(s) {
   return { overload: "Ir", short: "Isd", instant: "Ii", magnetic: "Ii" };
 }
 function deviceLabel(s) {
-  return s.brand === "Schneider Electric" && s.series === "MasterPact MTZ"
+  return (s.brand === "Schneider Electric" && s.series === "MasterPact MTZ") ||
+    (s.brand === "Siemens" && (s.series === "3WA" || s.series === "3WL"))
     ? "Luftafbryder"
     : "Maksimalafbryder";
 }

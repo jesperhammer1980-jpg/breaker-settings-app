@@ -10,6 +10,14 @@
     <!--
       Versionshistorik
 
+      v6.19
+      2026-06-22
+      - Siemens 3WA tilfoejet som luftafbryder/ACB-serie i TEST
+      - 3WA11, 3WA12 og 3WA13 frames, Icu/Ics-klasser og option-plug In-vaerdier indlaest fra officiel Siemens 3WA1 equipment manual
+      - ETU300 LSI/LSIG og ETU600 LSI/LSIG/LSIG Hi-Z Ir, tr, Isd og Ii rotary-switch settings verificeret mod Siemens-manualen
+      - 3WA backup-/cascadingdata ikke indlaest, da ingen producentverificeret 415V backup-/cascadingtabel er fundet i de gennemgaaede 3WA-kilder
+      - app-test.js cache-busting opdateret til v6.19
+
       v6.18
       2026-06-16
       - Indstillingsstroem-regel rettet saa appen aldrig foreslaar en vaerdi over oensket stroem
@@ -92,13 +100,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.18
+      TEST v6.19
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.18 - RCD support and setting-current guard
+          TEST v6.19 - Siemens 3WA ACB test data
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -206,7 +214,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.18"></script>
+    <script src="app-test.js?v=6.19"></script>
     <div
       style="
         position: fixed;
@@ -222,7 +230,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.18 - live ikke opdateret
+      TEST v6.19 - live ikke opdateret
     </div>
   </body>
 </html>
