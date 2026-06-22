@@ -130,6 +130,7 @@
         </div>
         <div class="pill" id="storage">Indlæser</div>
       </header>
+      <div id="storageNote" class="note" hidden></div>
       <div id="content" class="grid"></div>
       <div class="note">
         Der gemmes kun hændelsestællere, anonymt brugerestimat og valgte
@@ -153,6 +154,7 @@
       };
       const content = document.getElementById("content");
       const storage = document.getElementById("storage");
+      const storageNote = document.getElementById("storageNote");
 
       function topLine(rows) {
         if (!rows || !rows.length) return "-";
@@ -187,6 +189,14 @@
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           storage.textContent = data.storage || "ukendt lager";
+          if (data.storage === "memory-fallback") {
+            storageNote.hidden = false;
+            storageNote.textContent =
+              "Vercel KV/Upstash Redis er ikke konfigureret. Statistikken vises fra midlertidigt serverless memory-fallback og kan nulstilles ved ny deployment eller kold start.";
+          } else {
+            storageNote.hidden = true;
+            storageNote.textContent = "";
+          }
           content.innerHTML = periods
             .map(([id, title]) => section(id, title, data.periods[id] || {}))
             .join("");
