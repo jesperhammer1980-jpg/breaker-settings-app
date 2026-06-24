@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.21
+      2026-06-24
+      - Relae-dropdowns sorteret med elektroniske relaeer foerst og termisk-magnetiske relaeer nederst
+      - Schneider NSX400/NSX630 MicroLogic 2.3 manglende Ii for 250A rettet fra officiel Schneider Ii-tabel
+      - Fejlstroemsbeskyttelse viser nu tydelig status for ikke valgt/aktiv/ikke understoettet
+      - app.js cache-busting opdateret til v6.21
+
       v6.20
       2026-06-22
       - Anonym brugsstatistik tilfoejet via /api/stats
@@ -107,13 +114,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.20
+      LIVEVERSION v6.21
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.20 - anonym brugsstatistik
+          v6.21 - relaeorden og fejlstroemsstatus
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -148,6 +155,7 @@
           <option>Minimum settings</option></select
         ><button id="rcdToggle" class="mailBtn" type="button">
           Tilføj fejlstrømsbeskyttelse</button
+        ><div id="rcdStatus" class="statsBox"></div
         ><div id="rcdPanel" class="statsBox hidden">
           <label>Modul/relætype</label
           ><select id="rcdDevice"></select
@@ -221,7 +229,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.20"></script>
+    <script src="app.js?v=6.21"></script>
     <div
       style="
         position: fixed;
@@ -237,7 +245,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.20
+      LIVEVERSION v6.21
     </div>
   </body>
 </html>
