@@ -657,9 +657,9 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
-        iiByRating: { 400: "4800A", 630: "6930A" },
+        iiByRating: { 250: "3000A", 400: "4800A", 630: "6930A" },
         sourceNote:
-          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings.",
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables and instantaneous protection pickup Ii table: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings, including Ii 3000A for In 250A, 4800A for In 400A and 6930A for In 630A.",
       },
       {
         name: "MicroLogic Vigi 4.3",
@@ -1988,9 +1988,31 @@ function C() {
 function P() {
   return F().poles[st.poles] || F().poles[0];
 }
+function relayDisplayRank(relay) {
+  const name = relay.name || "";
+  if (/^(TM-D|TM-G|TM-D \/ TM-G|TMD|TMA|Thermal-magnetic)/i.test(name))
+    return 900;
+  if (/^Ekip Hi-Touch/i.test(name)) return 122;
+  if (/^Ekip Touch/i.test(name)) return 121;
+  if (/^Ekip Dip/i.test(name)) return 120;
+  const microLogic = name.match(/^MicroLogic(?: Vigi)?\s+(\d+(?:\.\d+)?)/i);
+  if (microLogic) return 100 + Number(microLogic[1]);
+  if (/^MicroLogic X/i.test(name)) return 100;
+  const etu = name.match(/^ETU(\d+)/i);
+  if (etu) return 100 + Number(etu[1]) / 10;
+  return 500;
+}
 function relays() {
   const f = F().frame;
-  return S().relays.filter((r) => !r.frames || r.frames.includes(f));
+  return S()
+    .relays.filter((r) => !r.frames || r.frames.includes(f))
+    .map((relay, index) => ({ relay, index }))
+    .sort((a, b) => {
+      const rank = relayDisplayRank(a.relay) - relayDisplayRank(b.relay);
+      if (rank) return rank;
+      return a.index - b.index;
+    })
+    .map((item) => item.relay);
 }
 function R() {
   const list = relays();
@@ -2152,7 +2174,8 @@ function setWrap(id, visible) {
 }
 function renderResidualControls(s, f, c, r, inA) {
   const btn = document.getElementById("rcdToggle"),
-    panel = document.getElementById("rcdPanel");
+    panel = document.getElementById("rcdPanel"),
+    status = document.getElementById("rcdStatus");
   if (!btn || !panel) return null;
   const options = residualOptions(s, f, c, r, inA);
   const supported = options.length > 0;
@@ -2162,6 +2185,12 @@ function renderResidualControls(s, f, c, r, inA) {
   btn.textContent = st.rcdEnabled
     ? "Fjern fejlstrømsbeskyttelse"
     : "Tilføj fejlstrømsbeskyttelse";
+  if (status) {
+    status.classList.remove("hidden");
+    status.innerHTML = supported
+      ? `<strong>Fejlstrømsbeskyttelse</strong><br>${st.rcdEnabled ? "Fejlstrømsbeskyttelse aktiv" : "Fejlstrømsbeskyttelse ikke valgt"}`
+      : "<strong>Fejlstrømsbeskyttelse</strong><br>Ikke understøttet for valgt bryder/relæ";
+  }
   if (!supported) {
     resetResidual();
     panel.classList.add("hidden");
@@ -5152,7 +5181,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.20-test",
+      version: "v6.21-test",
       anonymousId: anonymousId(),
       selection: selection(),
     });
