@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.22
+      2026-06-25
+      - ABB Tmax XT XT1-XT4 fejlstroemslogik rettet mod officielle ABB RC Inst/RC Sel-data
+      - XT3 TMD kan nu vaelge RC Inst og RC Sel med dokumenterede indstillinger
+      - ABB Ekip Touch Rc og Ekip Hi-Touch Rc behandles som integreret fejlstroemsbeskyttelse uden separat modulknap
+      - app.js cache-busting opdateret til v6.22
+
       v6.21
       2026-06-24
       - Relae-dropdowns sorteret med elektroniske relaeer foerst og termisk-magnetiske relaeer nederst
@@ -114,13 +121,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.21
+      LIVEVERSION v6.22
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.21 - relaeorden og fejlstroemsstatus
+          v6.22 - ABB Tmax XT fejlstroem
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -174,7 +181,7 @@
           href="mailto:jhj@pro-automatic.dk?subject=Forslag%20til%20BreakerSettings"
           >Send forslag på mail</a
         >
-        <div id="stats" class="statsBox"></div>
+        <div id="stats" class="statsBox hidden" aria-hidden="true"></div>
       </aside>
       <section class="panel center">
         <div class="device-card">
@@ -229,7 +236,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.21"></script>
+    <script src="app.js?v=6.22"></script>
     <div
       style="
         position: fixed;
@@ -245,7 +252,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.21
+      LIVEVERSION v6.22
     </div>
   </body>
 </html>
