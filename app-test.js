@@ -104,6 +104,29 @@ const ABB_TOUCH_I_XT7_EMAX = stepValues(1.5, 15, 0.1);
 const ABB_EMAX2_DIP_TR = [3, 12, 24, 36, 48, 72, 108, 144];
 const ABB_RC_SENS = ["3 A", "5 A", "7 A", "10 A", "20 A", "30 A"];
 const ABB_RC_DELAY = ["0,06 s", "0,1 s", "0,2 s", "0,3 s", "0,4 s", "0,5 s", "0,8 s"];
+const ABB_XT_RC_INST_SENS = ["0,03 A", "0,1 A", "0,3 A", "0,5 A", "1 A", "3 A"];
+const ABB_XT_RC_SEL_SENS = [
+  "0,03 A",
+  "0,05 A",
+  "0,1 A",
+  "0,3 A",
+  "0,5 A",
+  "1 A",
+  "3 A",
+  "5 A",
+  "10 A",
+];
+const ABB_XT_RC_INST_DELAY = ["Instantaneous"];
+const ABB_XT_RC_SEL_DELAY = [
+  "Instantaneous",
+  "0,1 s",
+  "0,2 s",
+  "0,3 s",
+  "0,5 s",
+  "1 s",
+  "2 s",
+  "3 s",
+];
 const ABB_EMAX2_RC_SENS = ["3 ... 30 A"];
 const ABB_EMAX2_RC_DELAY = ["0,05 ... 0,8 s"];
 
@@ -1368,6 +1391,52 @@ const DATA = [
           "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/30-3/34 and 3/50. Ekip Hi-Touch L/tr/S/I steps verified per frame.",
       },
     ],
+    rcdModules: [
+      {
+        kind: "module",
+        device: "RC Sel 200 XT1",
+        frames: ["XT1"],
+        relayNames: ["TMD"],
+        sensitivities: ABB_XT_RC_SEL_SENS,
+        types: ["A", "AC"],
+        delays: ABB_XT_RC_SEL_DELAY,
+        sourceNote:
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Sel 200 for XT1 verified; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A, instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings and Type A/AC operation verified.",
+      },
+      {
+        kind: "module",
+        device: "RC Inst XT1-XT3",
+        frames: ["XT1", "XT3"],
+        relayNames: ["TMD"],
+        sensitivities: ABB_XT_RC_INST_SENS,
+        types: ["A", "AC"],
+        delays: ABB_XT_RC_INST_DELAY,
+        sourceNote:
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Inst for XT1 and XT3 verified; thresholds 0.03, 0.1, 0.3, 0.5, 1 and 3 A, instantaneous timing and Type A/AC operation verified.",
+      },
+      {
+        kind: "module",
+        device: "RC Sel XT1-XT3",
+        frames: ["XT1", "XT3"],
+        relayNames: ["TMD"],
+        sensitivities: ABB_XT_RC_SEL_SENS,
+        types: ["A", "AC"],
+        delays: ABB_XT_RC_SEL_DELAY,
+        sourceNote:
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Sel for XT1 and XT3 verified; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A, instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings and Type A/AC operation verified.",
+      },
+      {
+        kind: "module",
+        device: "RC Sel XT2-XT4",
+        frames: ["XT2", "XT4"],
+        relayNames: ["TMD", "TMA"],
+        sensitivities: ABB_XT_RC_SEL_SENS,
+        types: ["A", "AC"],
+        delays: ABB_XT_RC_SEL_DELAY,
+        sourceNote:
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Sel for XT2 and XT4 verified; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A, instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings and Type A/AC operation verified.",
+      },
+    ],
     docs: [
       [
         "ABB Tmax XT",
@@ -1952,6 +2021,7 @@ let st = {
   rcdSensitivity: 0,
   rcdType: 0,
   rcdDelay: 0,
+  rcdIntegratedAuto: false,
 };
 const $ = (id) => document.getElementById(id),
   V = VERIFY;
@@ -2149,6 +2219,7 @@ function resetResidual() {
   st.rcdSensitivity = 0;
   st.rcdType = 0;
   st.rcdDelay = 0;
+  st.rcdIntegratedAuto = false;
 }
 function residualValues(raw, f, inA) {
   return settingValues(raw, f, inA, []).filter((x) => x !== undefined && x !== null);
@@ -2179,6 +2250,49 @@ function renderResidualControls(s, f, c, r, inA) {
   if (!btn || !panel) return null;
   const options = residualOptions(s, f, c, r, inA);
   const supported = options.length > 0;
+  const integratedAuto =
+    s.brand === "ABB" &&
+    s.series === "Tmax XT" &&
+    r.residualCurrent &&
+    r.residualCurrent.kind === "integrated";
+  if (integratedAuto && supported) {
+    const option = options[0],
+      sensitivities = residualValues(option.sensitivities, f, inA),
+      types = residualValues(option.types, f, inA),
+      delays = residualValues(option.delays, f, inA);
+    st.rcdEnabled = true;
+    st.rcdIntegratedAuto = true;
+    st.rcdDevice = 0;
+    if (st.rcdSensitivity >= sensitivities.length) st.rcdSensitivity = 0;
+    if (st.rcdType >= types.length) st.rcdType = 0;
+    if (st.rcdDelay >= delays.length) st.rcdDelay = 0;
+    btn.disabled = true;
+    btn.style.opacity = "0.45";
+    btn.style.cursor = "not-allowed";
+    btn.textContent = "Fejlstrømsbeskyttelse integreret i relæ";
+    if (status) {
+      status.classList.remove("hidden");
+      status.innerHTML =
+        "<strong>Fejlstrømsbeskyttelse</strong><br>Fejlstrømsbeskyttelse integreret i valgt relæ";
+    }
+    panel.classList.remove("hidden");
+    setWrap("rcdSensitivityWrap", sensitivities.length > 0);
+    setWrap("rcdTypeWrap", types.length > 0);
+    setWrap("rcdDelayWrap", delays.length > 0);
+    fillIdx("rcdDevice", [option.device], 0);
+    fillIdx("rcdSensitivity", sensitivities, st.rcdSensitivity);
+    fillIdx("rcdType", types, st.rcdType);
+    fillIdx("rcdDelay", delays, st.rcdDelay);
+    return {
+      kind: option.kind || "integrated",
+      device: option.device,
+      sensitivity: sensitivities[st.rcdSensitivity],
+      type: types[st.rcdType],
+      delay: delays[st.rcdDelay],
+      sourceNote: option.sourceNote,
+    };
+  }
+  if (st.rcdIntegratedAuto) resetResidual();
   btn.disabled = !supported;
   btn.style.opacity = supported ? "1" : "0.45";
   btn.style.cursor = supported ? "pointer" : "not-allowed";
@@ -5181,7 +5295,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.21-test",
+      version: "v6.22-test",
       anonymousId: anonymousId(),
       selection: selection(),
     });
