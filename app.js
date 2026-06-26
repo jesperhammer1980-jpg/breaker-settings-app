@@ -116,6 +116,7 @@ const ABB_XT_RC_SEL_SENS = [
   "5 A",
   "10 A",
 ];
+const ABB_XT_RC_B_SENS = ["0,03 A", "0,05 A", "0,1 A", "0,3 A", "0,5 A", "1 A"];
 const ABB_XT_RC_INST_DELAY = ["Instantaneous"];
 const ABB_XT_RC_SEL_DELAY = [
   "Instantaneous",
@@ -127,6 +128,7 @@ const ABB_XT_RC_SEL_DELAY = [
   "2 s",
   "3 s",
 ];
+const ABB_XT_RC_B_DELAY = ["0 s", "0,1 s", "0,2 s", "0,3 s", "0,5 s", "1 s", "2 s", "3 s"];
 const ABB_EMAX2_RC_SENS = ["3 ... 30 A"];
 const ABB_EMAX2_RC_DELAY = ["0,05 ... 0,8 s"];
 
@@ -1398,10 +1400,10 @@ const DATA = [
         frames: ["XT1"],
         relayNames: ["TMD"],
         sensitivities: ABB_XT_RC_SEL_SENS,
-        types: ["A", "AC"],
+        types: ["A"],
         delays: ABB_XT_RC_SEL_DELAY,
         sourceNote:
-          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Sel 200 for XT1 verified; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A, instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings and Type A/AC operation verified.",
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0201, pp. 3/28-3/32, table Residual current releases and table Electrical characteristic - Residual current devices: RC Sel 200 for XT1 verified as Type A; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A and instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings verified. No separate Type AC variant is documented.",
       },
       {
         kind: "module",
@@ -1409,10 +1411,10 @@ const DATA = [
         frames: ["XT1", "XT3"],
         relayNames: ["TMD"],
         sensitivities: ABB_XT_RC_INST_SENS,
-        types: ["A", "AC"],
+        types: ["A"],
         delays: ABB_XT_RC_INST_DELAY,
         sourceNote:
-          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Inst for XT1 and XT3 verified; thresholds 0.03, 0.1, 0.3, 0.5, 1 and 3 A, instantaneous timing and Type A/AC operation verified.",
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0201, pp. 3/28-3/32, table Residual current releases and table Electrical characteristic - Residual current devices: RC Inst for XT1 and XT3 verified as Type A; thresholds 0.03, 0.1, 0.3, 0.5, 1 and 3 A and instantaneous timing verified. No separate Type AC variant is documented.",
       },
       {
         kind: "module",
@@ -1420,10 +1422,21 @@ const DATA = [
         frames: ["XT1", "XT3"],
         relayNames: ["TMD"],
         sensitivities: ABB_XT_RC_SEL_SENS,
-        types: ["A", "AC"],
+        types: ["A"],
         delays: ABB_XT_RC_SEL_DELAY,
         sourceNote:
-          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Sel for XT1 and XT3 verified; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A, instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings and Type A/AC operation verified.",
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0201, pp. 3/28-3/32, table Residual current releases and table Electrical characteristic - Residual current devices: RC Sel for XT1 and XT3 verified as Type A; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A and instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings verified. No separate Type AC variant is documented.",
+      },
+      {
+        kind: "module",
+        device: "RC B Type XT3",
+        frames: ["XT3"],
+        relayNames: ["TMD"],
+        sensitivities: ABB_XT_RC_B_SENS,
+        types: ["B"],
+        delays: ABB_XT_RC_B_DELAY,
+        sourceNote:
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0201, pp. 3/28-3/32, table Residual current releases and table Electrical characteristic - Residual current devices: RC B Type for XT3 verified as Type B; thresholds 0.03, 0.05, 0.1, 0.3, 0.5 and 1 A, non-trip time settings 0/0.1/0.2/0.3/0.5/1/2/3 s and fault-frequency settings 400/700/1000 Hz verified.",
       },
       {
         kind: "module",
@@ -1431,10 +1444,10 @@ const DATA = [
         frames: ["XT2", "XT4"],
         relayNames: ["TMD", "TMA"],
         sensitivities: ABB_XT_RC_SEL_SENS,
-        types: ["A", "AC"],
+        types: ["A"],
         delays: ABB_XT_RC_SEL_DELAY,
         sourceNote:
-          "ABB SACE Tmax XT technical catalogue 1SDC210033D0203, pp. 3/28-3/32, Residual current releases: RC Sel for XT2 and XT4 verified; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A, instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings and Type A/AC operation verified.",
+          "ABB SACE Tmax XT technical catalogue 1SDC210033D0201, pp. 3/28-3/32, table Residual current releases and table Electrical characteristic - Residual current devices: RC Sel for XT2 and XT4 verified as Type A; thresholds 0.03, 0.05, 0.1, 0.3, 0.5, 1, 3, 5 and 10 A and instantaneous/0.1/0.2/0.3/0.5/1/2/3 s non-trip settings verified. No separate Type AC variant is documented.",
       },
     ],
     docs: [
@@ -5295,7 +5308,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.22-live",
+      version: "v6.23-live",
       anonymousId: anonymousId(),
       selection: selection(),
     });

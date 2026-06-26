@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.23
+      2026-06-26
+      - ABB Tmax XT XT1-XT4 RC-moduler gennemgaaet mod ABB SACE Tmax XT katalog 1SDC210033D0201 side 3/28-3/32
+      - XT3 TMD suppleret med RC B Type XT3 som dokumenteret Type B-modul
+      - RC Inst og RC Sel rettet til Type A-valg uden separat Type AC-valg
+      - app.js cache-busting opdateret til v6.23
+
       v6.22
       2026-06-25
       - ABB Tmax XT XT1-XT4 fejlstroemslogik rettet mod officielle ABB RC Inst/RC Sel-data
@@ -121,13 +128,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.22
+      LIVEVERSION v6.23
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.22 - ABB Tmax XT fejlstroem
+          v6.23 - ABB Tmax XT RC Type A/B
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -236,7 +243,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.22"></script>
+    <script src="app.js?v=6.23"></script>
     <div
       style="
         position: fixed;
@@ -252,7 +259,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.22
+      LIVEVERSION v6.23
     </div>
   </body>
 </html>
