@@ -5308,7 +5308,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.23-test",
+      version: "v6.24-test",
       anonymousId: anonymousId(),
       selection: selection(),
     });
@@ -5398,12 +5398,17 @@ function render() {
   let ir = best(bases, irFactors, desired);
   const irOpts = nsIrOptions(s, r, bases, desired);
   renderIrSettings(irOpts);
+  let relayPlugLabel = "";
   if (irOpts.length) {
     if (!irOpts.find((o) => o.id === st.irSetting)) st.irSetting = "standard";
     const chosen = irOpts.find((o) => o.id === st.irSetting) || irOpts[0];
+    if (chosen.id !== "standard")
+      relayPlugLabel =
+        chosen.id === "lower" ? "Low setting plug" : `${chosen.name} plug`;
     irFactors = chosen.ir;
     ir = best(bases, irFactors, desired);
   }
+  out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
   if (hasIo && !ir.verify && !ir.error) {
     rows.push(
       `<tr><td>Io</td><td>${range(bases, ir.base, fmtA)}</td><td>${fmtA(ir.base)}</td></tr>`,
