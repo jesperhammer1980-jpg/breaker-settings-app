@@ -2034,7 +2034,6 @@ let st = {
   rcdSensitivity: 0,
   rcdType: 0,
   rcdDelay: 0,
-  rcdIntegratedAuto: false,
 };
 const $ = (id) => document.getElementById(id),
   V = VERIFY;
@@ -2232,7 +2231,6 @@ function resetResidual() {
   st.rcdSensitivity = 0;
   st.rcdType = 0;
   st.rcdDelay = 0;
-  st.rcdIntegratedAuto = false;
 }
 function residualValues(raw, f, inA) {
   return settingValues(raw, f, inA, []).filter((x) => x !== undefined && x !== null);
@@ -2263,59 +2261,30 @@ function renderResidualControls(s, f, c, r, inA) {
   if (!btn || !panel) return null;
   const options = residualOptions(s, f, c, r, inA);
   const supported = options.length > 0;
-  const integratedAuto =
-    s.brand === "ABB" &&
-    s.series === "Tmax XT" &&
-    r.residualCurrent &&
-    r.residualCurrent.kind === "integrated";
-  if (integratedAuto && supported) {
-    const option = options[0],
-      sensitivities = residualValues(option.sensitivities, f, inA),
-      types = residualValues(option.types, f, inA),
-      delays = residualValues(option.delays, f, inA);
-    st.rcdEnabled = true;
-    st.rcdIntegratedAuto = true;
-    st.rcdDevice = 0;
-    if (st.rcdSensitivity >= sensitivities.length) st.rcdSensitivity = 0;
-    if (st.rcdType >= types.length) st.rcdType = 0;
-    if (st.rcdDelay >= delays.length) st.rcdDelay = 0;
-    btn.disabled = true;
-    btn.style.opacity = "0.45";
-    btn.style.cursor = "not-allowed";
-    btn.textContent = "Fejlstrømsbeskyttelse integreret i relæ";
-    if (status) {
-      status.classList.remove("hidden");
-      status.innerHTML =
-        "<strong>Fejlstrømsbeskyttelse</strong><br>Fejlstrømsbeskyttelse integreret i valgt relæ";
-    }
-    panel.classList.remove("hidden");
-    setWrap("rcdSensitivityWrap", sensitivities.length > 0);
-    setWrap("rcdTypeWrap", types.length > 0);
-    setWrap("rcdDelayWrap", delays.length > 0);
-    fillIdx("rcdDevice", [option.device], 0);
-    fillIdx("rcdSensitivity", sensitivities, st.rcdSensitivity);
-    fillIdx("rcdType", types, st.rcdType);
-    fillIdx("rcdDelay", delays, st.rcdDelay);
-    return {
-      kind: option.kind || "integrated",
-      device: option.device,
-      sensitivity: sensitivities[st.rcdSensitivity],
-      type: types[st.rcdType],
-      delay: delays[st.rcdDelay],
-      sourceNote: option.sourceNote,
-    };
-  }
-  if (st.rcdIntegratedAuto) resetResidual();
+  const integratedSupported =
+    supported && r.residualCurrent && (r.residualCurrent.kind || "integrated") === "integrated";
   btn.disabled = !supported;
   btn.style.opacity = supported ? "1" : "0.45";
   btn.style.cursor = supported ? "pointer" : "not-allowed";
-  btn.textContent = st.rcdEnabled
-    ? "Fjern fejlstrømsbeskyttelse"
-    : "Tilføj fejlstrømsbeskyttelse";
+  btn.setAttribute("role", "switch");
+  btn.setAttribute("aria-checked", supported && st.rcdEnabled ? "true" : "false");
+  btn.textContent = integratedSupported
+    ? st.rcdEnabled
+      ? "Fravælg fejlstrømsbeskyttelse"
+      : "Anvend fejlstrømsbeskyttelse"
+    : st.rcdEnabled
+      ? "Fjern fejlstrømsbeskyttelse"
+      : "Tilføj fejlstrømsbeskyttelse";
   if (status) {
     status.classList.remove("hidden");
     status.innerHTML = supported
-      ? `<strong>Fejlstrømsbeskyttelse</strong><br>${st.rcdEnabled ? "Fejlstrømsbeskyttelse aktiv" : "Fejlstrømsbeskyttelse ikke valgt"}`
+      ? `<strong>Fejlstrømsbeskyttelse</strong><br>${
+          st.rcdEnabled
+            ? "Fejlstrømsbeskyttelse valgt til anvendelse"
+            : integratedSupported
+              ? "Relæet understøtter integreret fejlstrømsbeskyttelse - ikke valgt"
+              : "Fejlstrømsbeskyttelse ikke valgt"
+        }`
       : "<strong>Fejlstrømsbeskyttelse</strong><br>Ikke understøttet for valgt bryder/relæ";
   }
   if (!supported) {
@@ -5308,7 +5277,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.23-live",
+      version: "v6.25-live",
       anonymousId: anonymousId(),
       selection: selection(),
     });
@@ -5398,12 +5367,17 @@ function render() {
   let ir = best(bases, irFactors, desired);
   const irOpts = nsIrOptions(s, r, bases, desired);
   renderIrSettings(irOpts);
+  let relayPlugLabel = "";
   if (irOpts.length) {
     if (!irOpts.find((o) => o.id === st.irSetting)) st.irSetting = "standard";
     const chosen = irOpts.find((o) => o.id === st.irSetting) || irOpts[0];
+    if (chosen.id !== "standard")
+      relayPlugLabel =
+        chosen.id === "lower" ? "Low setting plug" : `${chosen.name} plug`;
     irFactors = chosen.ir;
     ir = best(bases, irFactors, desired);
   }
+  out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
   if (hasIo && !ir.verify && !ir.error) {
     rows.push(
       `<tr><td>Io</td><td>${range(bases, ir.base, fmtA)}</td><td>${fmtA(ir.base)}</td></tr>`,
