@@ -10,6 +10,13 @@
     <!--
       Versionshistorik
 
+      v6.26
+      2026-07-09
+      - Schneider MasterPact MTZ MicroLogic X Ir setting method tilfoejet med Quick settings (HMI) og Fine adjustment (EcoStruxure Power Commission)
+      - Fine adjustment beregner Ir i dokumenteret 1 A oploesning fra 0,4 x In til In uden at overstige oensket indstillingsstroem
+      - Dokumentationsoutput viser valgt MTZ Ir setting method
+      - app.js cache-busting opdateret til v6.26
+
       v6.25
       2026-06-30
       - Integreret fejlstroemsbeskyttelse aktiveres ikke laengere automatisk
@@ -141,13 +148,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.25
+      LIVEVERSION v6.26
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.25 - Fejlstroem aktivt valg
+          v6.26 - MTZ Ir fine adjustment
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -180,6 +187,10 @@
         ><select id="method">
           <option>Calculated settings</option>
           <option>Minimum settings</option></select
+        ><div id="irSettingWrap" class="statsBox hidden">
+          <h3 id="irSettingTitle">Ir setting method</h3>
+          <div id="irSettings" class="plugs"></div>
+        </div
         ><button id="rcdToggle" class="mailBtn" type="button">
           Tilføj fejlstrømsbeskyttelse</button
         ><div id="rcdStatus" class="statsBox"></div
@@ -245,10 +256,6 @@
         <div id="backupPanel" class="backupPanel"></div>
       </section>
       <aside class="panel right">
-        <div id="irSettingWrap" class="hidden">
-          <h3>NS Ir setting type</h3>
-          <div id="irSettings" class="plugs"></div>
-        </div>
         <div class="result-header">
           <h3>Resultat til dokumentation</h3>
           <button id="copy">Kopiér</button>
@@ -256,7 +263,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.25"></script>
+    <script src="app.js?v=6.26"></script>
     <div
       style="
         position: fixed;
@@ -272,7 +279,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.25
+      LIVEVERSION v6.26
     </div>
   </body>
 </html>
