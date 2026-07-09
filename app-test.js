@@ -77,6 +77,13 @@ const SCHNEIDER_NSX_VIGIPACT_DELAY = [
 ];
 const SCHNEIDER_NSXM_RCD_SENS = ["30 mA", "100 mA", "300 mA", "500 mA", "1 A"];
 const SCHNEIDER_NSXM_RCD_DELAY = ["0 ms", "60 ms", "150 ms", "500 ms", "1 s"];
+const SCHNEIDER_MTZ_MICROLOGIC_X_IR_QUICK = [
+  0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1,
+];
+const SCHNEIDER_MTZ_FINE_IR_FACTORS = (inA) =>
+  stepValues(inA * 0.4, inA, 1).map((value) =>
+    Number((value / inA).toFixed(9)),
+  );
 const SCHNEIDER_MTZ_RCD_SENS = ["0,5 ... 30 A (0,1 A trin)"];
 const SCHNEIDER_MTZ_RCD_DELAY = ["0,06 s", "0,15 s", "0,23 s", "0,35 s", "0,80 s"];
 
@@ -1080,7 +1087,7 @@ const DATA = [
     relays: [
       {
         name: "MicroLogic X",
-        ir: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1],
+        ir: SCHNEIDER_MTZ_MICROLOGIC_X_IR_QUICK,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
@@ -1094,7 +1101,7 @@ const DATA = [
             "Schneider Electric MasterPacT MTZ MicroLogic X User Guide DOCA0102, MicroLogic 7.0 X IEC earth-leakage protection: I\\u0394n 0.5-30 A in 0.1 A steps and delay settings verified.",
         },
         sourceNote:
-          "Schneider Electric MasterPacT MTZ MicroLogic X Control Unit User Guide DOCA0102EN-12, standard protection setting tables for L, S and I: Ir, tr, Isd and Ii values verified.",
+          "Schneider Electric MasterPacT MTZ MicroLogic X Control Unit User Guide DOCA0102EN-12, Protection menu I Long Time and Long-Time Overcurrent Protection: Ir quick settings 0.4/0.5/0.6/0.7/0.8/0.9/0.95/0.98/1 x In verified for HMI, and Ir(A) fine adjustment 0.4-1 x In with 1 A resolution verified for EcoStruxure Power Commission / Power Device app. tr, Isd and Ii values verified from the same guide.",
       },
     ],
     docs: [
@@ -5087,6 +5094,36 @@ function splitBackupValue(value) {
   return { cascading: raw.includes("kA") ? raw : raw + " kA", enhanced: raw };
 }
 
+function isMtzMicroLogicX(s, r) {
+  return (
+    s.brand === "Schneider Electric" &&
+    s.series === "MasterPact MTZ" &&
+    /^MicroLogic X/i.test(r.name)
+  );
+}
+function mtzIrOptions(s, r, inA, desired) {
+  if (!isMtzMicroLogicX(s, r)) return [];
+  const fineIr = SCHNEIDER_MTZ_FINE_IR_FACTORS(inA);
+  return [
+    {
+      id: "mtzQuick",
+      title: "Ir setting method",
+      name: "Quick settings (HMI)",
+      detail: "Ir (x In) - dokumenterede HMI-trin",
+      ir: SCHNEIDER_MTZ_MICROLOGIC_X_IR_QUICK,
+      best: best([inA], SCHNEIDER_MTZ_MICROLOGIC_X_IR_QUICK, desired),
+    },
+    {
+      id: "mtzFine",
+      title: "Ir setting method",
+      name: "Fine adjustment (EcoStruxure Power Commission)",
+      detail: "Ir (A) - 1 A oploesning",
+      ir: fineIr,
+      ampDisplay: true,
+      best: best([inA], fineIr, desired),
+    },
+  ];
+}
 function nsIrOptions(s, r, bases, desired) {
   if (!s.irSettingTypes || !r.name.includes("MicroLogic")) return [];
   const standard = s.irSettingTypes[0];
@@ -5104,19 +5141,26 @@ function nsIrOptions(s, r, bases, desired) {
 }
 function renderIrSettings(options) {
   const wrap = document.getElementById("irSettingWrap"),
-    box = document.getElementById("irSettings");
+    box = document.getElementById("irSettings"),
+    title = document.getElementById("irSettingTitle");
   if (!wrap || !box) return;
   wrap.classList.toggle("hidden", !options.length);
   if (!options.length) {
     box.innerHTML = "";
     return;
   }
-  if (!options.find((o) => o.id === st.irSetting)) st.irSetting = "standard";
+  if (title) title.textContent = options[0].title || "NS Ir setting type";
+  if (!options.find((o) => o.id === st.irSetting)) st.irSetting = options[0].id;
   box.innerHTML = options
-    .map(
-      (o) =>
-        `<button class="${o.id === st.irSetting ? "active" : ""}" data-ir-setting="${o.id}"><strong>${o.name}</strong><span>${o.typeNo || "Standard"} · In/Io ændres ikke</span><small>Forslag: Ir ${fmt(o.best.factor)} = ${fmtA(o.best.value)}</small></button>`,
-    )
+    .map((o) => {
+      const suggestion =
+        o.best && o.best.error
+          ? `Laveste Ir ${fmtA(o.best.minValue)}`
+          : o.ampDisplay
+            ? `Forslag: Ir ${fmtA(o.best.value)}`
+            : `Forslag: Ir ${fmt(o.best.factor)} = ${fmtA(o.best.value)}`;
+      return `<button class="${o.id === st.irSetting ? "active" : ""}" data-ir-setting="${o.id}"><strong>${o.name}</strong><span>${o.detail || `${o.typeNo || "Standard"} - In/Io ændres ikke`}</span><small>${suggestion}</small></button>`;
+    })
     .join("");
 }
 function componentGroup(name) {
@@ -5277,7 +5321,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.25-test",
+      version: "v6.26-test",
       anonymousId: anonymousId(),
       selection: selection(),
     });
@@ -5365,19 +5409,32 @@ function render() {
   const iiValues = settingValues(r.ii, f, inA);
   let irFactors = settingValues(r.ir, f, inA, [1]) || [1];
   let ir = best(bases, irFactors, desired);
-  const irOpts = nsIrOptions(s, r, bases, desired);
+  const mtzIrOpts = mtzIrOptions(s, r, inA, desired);
+  const irOpts = mtzIrOpts.length ? mtzIrOpts : nsIrOptions(s, r, bases, desired);
   renderIrSettings(irOpts);
   let relayPlugLabel = "";
+  let irSettingMethod = "";
+  let irAmpDisplay = false;
   if (irOpts.length) {
-    if (!irOpts.find((o) => o.id === st.irSetting)) st.irSetting = "standard";
+    if (!irOpts.find((o) => o.id === st.irSetting)) st.irSetting = irOpts[0].id;
     const chosen = irOpts.find((o) => o.id === st.irSetting) || irOpts[0];
-    if (chosen.id !== "standard")
+    if (mtzIrOpts.length) {
+      irSettingMethod = chosen.name;
+      irAmpDisplay = !!chosen.ampDisplay;
+    } else if (chosen.id !== "standard") {
       relayPlugLabel =
         chosen.id === "lower" ? "Low setting plug" : `${chosen.name} plug`;
+    }
     irFactors = chosen.ir;
     ir = best(bases, irFactors, desired);
   }
   out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
+  if (irSettingMethod) {
+    rows.push(
+      `<tr><td>Ir setting method</td><td>MasterPact MTZ MicroLogic X</td><td>${irSettingMethod}</td></tr>`,
+    );
+    out.push(`Ir setting method: ${irSettingMethod}`);
+  }
   if (hasIo && !ir.verify && !ir.error) {
     rows.push(
       `<tr><td>Io</td><td>${range(bases, ir.base, fmtA)}</td><td>${fmtA(ir.base)}</td></tr>`,
@@ -5407,10 +5464,18 @@ function render() {
         : "";
     $("requestWarning").classList.toggle("hidden", !msg);
     $("requestWarning").textContent = msg;
-    rows.push(
-      `<tr><td>${lbl.overload}</td><td>${range(irFactors, ir.factor, fmt)}</td><td>${fmt(ir.factor)} × ${ref} = ${fmtA(ir.value)}</td></tr>`,
-    );
-    out.push(`${lbl.overload}: ${fmt(ir.factor)} × ${ref} = ${fmtA(ir.value)}`);
+    if (irAmpDisplay) {
+      const ampValues = irFactors.map((factor) => Number((factor * inA).toFixed(6)));
+      rows.push(
+        `<tr><td>${lbl.overload}</td><td>${range(ampValues, ir.value, fmtA)}</td><td>Ir = ${fmtA(ir.value)}</td></tr>`,
+      );
+      out.push(`${lbl.overload}: ${fmtA(ir.value)}`);
+    } else {
+      rows.push(
+        `<tr><td>${lbl.overload}</td><td>${range(irFactors, ir.factor, fmt)}</td><td>${fmt(ir.factor)} × ${ref} = ${fmtA(ir.value)}</td></tr>`,
+      );
+      out.push(`${lbl.overload}: ${fmt(ir.factor)} × ${ref} = ${fmtA(ir.value)}`);
+    }
     if (msg) out.push("Bemærk: " + msg);
   }
   const overloadOk = ir && !ir.verify && !ir.error;
