@@ -69,6 +69,22 @@ const SCHNEIDER_NSX_MICROLOGIC_IO = {
 const SCHNEIDER_NSX_MICROLOGIC_IR = [
   0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 1,
 ];
+// MicroLogic 5/6/7 has an Ir dial preset plus keypad fine-tuning. The dial is
+// the maximum permitted Ir; the final effective Ir is selected in 1 A steps.
+const SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL = {
+  40: SCHNEIDER_NSX_MICROLOGIC_IO[40],
+  100: ratios(100, [40, 45, 50, 55, 63, 70, 80, 90, 100]),
+  160: SCHNEIDER_NSX_MICROLOGIC_IO[160],
+  250: ratios(250, [100, 110, 125, 140, 150, 175, 200, 225, 250]),
+  400: SCHNEIDER_NSX_MICROLOGIC_IO[400],
+  630: SCHNEIDER_NSX_MICROLOGIC_IO[630],
+};
+const SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR = {
+  100: { min: 36, step: 1 },
+  250: { min: 90, step: 1 },
+  400: { min: 100, step: 1 },
+  630: { min: 225, step: 1 },
+};
 const SCHNEIDER_NSXM_MICROLOGIC_41_IR = {
   25: ratios(25, [10, 11, 12, 14, 16, 18, 20, 22, 25]),
   50: ratios(50, [20, 22, 25, 28, 32, 36, 40, 45, 50]),
@@ -972,8 +988,9 @@ const DATA = [
           NSX160: [40, 100, 160],
           NSX250: [40, 100, 160, 250],
         },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        irFine: SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         tsd: SCHNEIDER_TSD_10IR,
@@ -989,8 +1006,9 @@ const DATA = [
           NSX160: [40, 100, 160],
           NSX250: [40, 100, 160, 250],
         },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        irFine: SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         tsd: SCHNEIDER_TSD_10IR,
@@ -1006,8 +1024,9 @@ const DATA = [
           NSX160: [100, 160],
           NSX250: [100, 160, 250],
         },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        irFine: SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         tsd: SCHNEIDER_TSD_10IR,
@@ -1061,21 +1080,23 @@ const DATA = [
         name: "MicroLogic 5.3 E",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        irFine: SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
         sourceNote:
-          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
+          "Schneider Electric ComPacT NSX MicroLogic 5/6/7 User Guide DOCA0188EN-03: MicroLogic 5/6/7 Ir uses dial presets plus 1 A keypad fine-tuning. For 400 A the documented minimum is 100 A; for 630 A it is 225 A.",
       },
       {
         name: "MicroLogic Vigi 7.3 E",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        irFine: SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         tsd: SCHNEIDER_TSD_10IR,
@@ -1096,8 +1117,9 @@ const DATA = [
         name: "MicroLogic 6.3 E",
         frames: ["NSX400", "NSX630"],
         ratingsByFrame: { NSX400: [400], NSX630: [630] },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
+        irFine: SCHNEIDER_NSX_MICROLOGIC_567_FINE_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
         tsd: SCHNEIDER_TSD_10IR,
@@ -2581,6 +2603,42 @@ function best(bases, factors, desired) {
     minValue: lowest ? lowest.value : 0,
     desired,
   };
+}
+function fineIrConfig(raw, frame, inA) {
+  if (!raw) return null;
+  return raw[`${frame}|${inA}`] || raw[inA] || raw[String(inA)] || raw.default || null;
+}
+function bestFineIr(bases, cfg, desired) {
+  const minimum = Number(cfg && cfg.min),
+    step = Number((cfg && cfg.step) || 1),
+    eps = 0.000001;
+  if (!isN(minimum) || !isN(step) || step <= 0) return null;
+  let out = null;
+  for (const rawBase of bases) {
+    const base = settingAmpValue(rawBase);
+    if (base < minimum - eps) continue;
+    const highest = Math.min(base, desired);
+    const stepCount = Math.floor((highest - minimum + eps) / step);
+    if (stepCount < 0) continue;
+    const value = settingAmpValue(minimum + stepCount * step);
+    const candidate = {
+      base,
+      factor: value / base,
+      value,
+      diff: desired - value,
+      desired,
+      minValue: minimum,
+      fine: true,
+      step,
+    };
+    if (
+      !out ||
+      candidate.diff < out.diff - eps ||
+      (Math.abs(candidate.diff - out.diff) <= eps && candidate.base < out.base)
+    )
+      out = candidate;
+  }
+  return out || { error: true, minValue: minimum, desired, fine: true, step };
 }
 function under(factors, base, limit) {
   if (!factors || !factors.length) return null;
@@ -5722,6 +5780,22 @@ function nsIrOptions(s, r, bases, desired) {
   }
   return visible;
 }
+function nsxFineIrOptions(s, r, f, inA, bases, desired) {
+  if (s.brand !== "Schneider Electric" || s.series !== "ComPacT NSX") return [];
+  const cfg = fineIrConfig(r.irFine, f.frame, inA);
+  if (!cfg) return [];
+  return [
+    {
+      id: "nsxFine",
+      title: "Ir indstillingsmetode",
+      name: "Drejeknap + keypad-finjustering",
+      detail: `Ir (A) - ${fmt(cfg.step)} A keypad-trin`,
+      fine: true,
+      fineCfg: cfg,
+      best: bestFineIr(bases, cfg, desired),
+    },
+  ];
+}
 function betterIrOption(a, b) {
   if (!a || !a.best || a.best.verify || a.best.error) return false;
   if (!b || !b.best || b.best.verify || b.best.error) return true;
@@ -5768,7 +5842,7 @@ function renderIrSettings(options) {
       const suggestion =
         o.best && o.best.error
           ? `Laveste Ir ${fmtA(o.best.minValue)}`
-          : o.ampDisplay
+          : o.ampDisplay || o.fine
             ? `Forslag: Ir ${fmtA(o.best.value)}`
             : `Forslag: Ir ${fmt(o.best.factor)} = ${fmtA(o.best.value)}`;
       return `<button class="${o.id === st.irSetting ? "active" : ""}" data-ir-setting="${o.id}"><strong>${o.name}</strong><span>${o.detail || `${o.typeNo || "Standard"} - In/Io ændres ikke`}</span><small>${suggestion}</small></button>`;
@@ -6034,10 +6108,23 @@ function render() {
   const iiValues = settingValues(r.ii, f, inA);
   const tmLSteps = namedStepsByRating(r.lStepsByRating, f, inA, ABB_TM_L_FACTORS);
   let irFactors = settingValues(r.ir, f, inA, [1]) || [1];
-  let ir = best(bases, irFactors, desired);
+  const fineIrCfg = fineIrConfig(r.irFine, f.frame, inA);
+  let ir = fineIrCfg
+    ? bestFineIr(bases, fineIrCfg, desired)
+    : best(bases, irFactors, desired);
   const mtzIrOpts = mtzIrOptions(s, r, inA, desired);
-  const irOpts = mtzIrOpts.length ? mtzIrOpts : nsIrOptions(s, r, bases, desired);
-  if (!mtzIrOpts.length && irOpts.length && st.method !== "Minimum settings") {
+  const nsxFineIrOpts = nsxFineIrOptions(s, r, f, inA, bases, desired);
+  const irOpts = mtzIrOpts.length
+    ? mtzIrOpts
+    : nsxFineIrOpts.length
+      ? nsxFineIrOpts
+      : nsIrOptions(s, r, bases, desired);
+  if (
+    !mtzIrOpts.length &&
+    !nsxFineIrOpts.length &&
+    irOpts.length &&
+    st.method !== "Minimum settings"
+  ) {
     const signature = irSelectionSignature(s, f, r, inA, desired),
       suggested = bestIrOption(irOpts);
     if (suggested && st.irChoiceSignature !== signature) st.irSetting = suggested.id;
@@ -6052,21 +6139,27 @@ function render() {
     if (mtzIrOpts.length) {
       irSettingMethod = chosen.name;
       irAmpDisplay = !!chosen.ampDisplay;
+    } else if (chosen.fine) {
+      irSettingMethod = chosen.name;
     } else if (chosen.id !== "standard") {
       relayPlugLabel =
         chosen.id === "lower" ? "Low setting plug" : `${chosen.name} plug`;
     }
-    irFactors = chosen.ir;
-    ir = best(bases, irFactors, desired);
+    if (chosen.fine) {
+      ir = bestFineIr(bases, chosen.fineCfg, desired);
+    } else {
+      irFactors = chosen.ir;
+      ir = best(bases, irFactors, desired);
+    }
   }
   out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
-  if (irSettingMethod) {
+  if (irSettingMethod && !ir.fine) {
     rows.push(
       `<tr><td>Ir setting method</td><td>MasterPact MTZ MicroLogic X</td><td>${irSettingMethod}</td></tr>`,
     );
     out.push(`Ir setting method: ${irSettingMethod}`);
   }
-  if (hasIo && !ir.verify && !ir.error) {
+  if (hasIo && !ir.verify && !ir.error && !ir.fine) {
     rows.push(
       `<tr><td>Io</td><td>${range(bases, ir.base, fmtA)}</td><td>${fmtA(ir.base)}</td></tr>`,
     );
@@ -6088,14 +6181,25 @@ function render() {
     );
     out.push(`${lbl.overload}: FEJL - ${msg}`);
   } else {
-    const min = Math.min(...bases) * Math.min(...irFactors);
+    const min = ir.fine
+      ? ir.minValue
+      : Math.min(...bases) * Math.min(...irFactors);
     const msg =
       desired < min
         ? `Ønsket indstillingsstrøm ${fmtA(desired)} er lavere end lavest mulige ${lbl.overload} ${fmtA(min)} for valgt relæstørrelse.`
         : "";
     $("requestWarning").classList.toggle("hidden", !msg);
     $("requestWarning").textContent = msg;
-    if (irAmpDisplay) {
+    if (ir.fine) {
+      rows.push(
+        `<tr><td>Ir-drejeknap</td><td>${range(bases, ir.base, fmtA)}</td><td>${fmtA(ir.base)} (forindstilling)</td></tr>`,
+        `<tr><td>${lbl.overload}</td><td>${fmtA(ir.minValue)} - ${fmtA(ir.base)}; ${fmt(ir.step)} A-trin</td><td>${fmtA(ir.value)} (keypad-finjustering)</td></tr>`,
+      );
+      out.push(`Ir-drejeknap: ${fmtA(ir.base)} (forindstilling)`);
+      out.push(
+        `${lbl.overload}: ${fmtA(ir.value)} (keypad-finjustering, ${fmt(ir.step)} A-trin)`,
+      );
+    } else if (irAmpDisplay) {
       const ampValues = irFactors.map((factor) => Number((factor * inA).toFixed(6)));
       rows.push(
         `<tr><td>${lbl.overload}</td><td>${range(ampValues, ir.value, fmtA)}</td><td>Ir = ${fmtA(ir.value)}</td></tr>`,

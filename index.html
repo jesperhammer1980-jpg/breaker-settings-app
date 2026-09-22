@@ -23,6 +23,12 @@
     <!--
       Versionshistorik
 
+      v6.36
+      2026-09-22
+      - MicroLogic 5/6/7 Ir modelleres nu med producentens drejeknapsforindstilling og 1 A keypad-finjustering, hvor endepunkterne er eksakt dokumenteret
+      - 100 A: 36-100 A; 250 A: 90-250 A; 400 A: 100-400 A; 630 A: 225-630 A
+      - app.js cache-busting opdateret til v6.36
+
       v6.35
       2026-09-22
       - ABB-beskyttelsesfunktioner vises nu konsekvent som I1, t1, I2, t2 og I3 i LIVE
@@ -223,13 +229,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.35
+      LIVEVERSION v6.36
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.35 - ABB I1/t1/I2/t2/I3
+          v6.36 - MicroLogic 5/6/7 Ir-finjustering
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -346,7 +352,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.35"></script>
+    <script src="app.js?v=6.36"></script>
     <div
       style="
         position: fixed;
@@ -362,7 +368,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.35
+      LIVEVERSION v6.36
     </div>
   </body>
 </html>

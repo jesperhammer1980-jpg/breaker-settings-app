@@ -88,6 +88,18 @@
 
       <section class="history-list" aria-label="Versionshistorik">
         <article class="history-entry">
+          <h2>v6.36</h2>
+          <time datetime="2026-09-22">2026-09-22</time>
+          <ul>
+            <li>MicroLogic 5/6/7 Ir modelleres nu med producentens drejeknapsforindstilling og endelig keypad-finjustering i 1 A-trin, hvor endepunkterne er eksakt dokumenteret.</li>
+            <li>100 A understøtter Ir fra 36 A, 250 A fra 90 A, 400 A fra 100 A og 630 A fra 225 A. Den effektive Ir overstiger aldrig den ønskede strøm.</li>
+            <li>Indstillingstabel og dokumentationsoutput viser både Ir-drejeknap og faktisk Ir-værdi.</li>
+            <li>Isd-beregningen bruger fortsat den faktiske Ir-værdi. 40 A og 160 A bevarer den eksisterende model, fordi producenten ikke angiver afrunding af deres ikke-heltallige 0,9-minimum.</li>
+            <li>app.js cache-busting opdateret til v6.36.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
           <h2>v6.35</h2>
           <time datetime="2026-09-22">2026-09-22</time>
           <ul>
