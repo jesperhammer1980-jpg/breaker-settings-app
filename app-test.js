@@ -8,6 +8,38 @@ const stepValues = (start, end, step) => {
   }
   return values;
 };
+const dkDecimal = (value) => String(value).replace(".", ",");
+const secondsText = (value) => `${dkDecimal(value)} s`;
+const msText = (value) => `${dkDecimal(value)} ms`;
+const TSD_I2T_OFF = "I²t OFF";
+const TSD_I2T_ON = "I²t ON";
+const tsdOption = (time, curve) => ({
+  value: `${time} - ${curve}`,
+  label: `${time} - ${curve}`,
+});
+const tsdCurveOptions = (
+  offTimes,
+  onTimes = [],
+  offCurve = TSD_I2T_OFF,
+  onCurve = TSD_I2T_ON,
+) => [
+  ...offTimes.map((time) => tsdOption(time, offCurve)),
+  ...onTimes.map((time) => tsdOption(time, onCurve)),
+];
+const secondsOptions = (start, end, step) =>
+  stepValues(start, end, step).map(secondsText);
+const siemens3wlEtu76FixedTsdTimes = () => {
+  const values = ["20 ms (M)"];
+  for (let ms = 80; ms <= 4000; ) {
+    values.push(msText(ms));
+    if (ms < 100) ms += 1;
+    else if (ms < 500) ms += 5;
+    else if (ms < 1000) ms += 10;
+    else if (ms < 1600) ms += 50;
+    else ms += 100;
+  }
+  return values;
+};
 const ratios = (inA, values) =>
   values.map((value) => Number((value / inA).toFixed(6)));
 const keyed = (keys, values) =>
@@ -86,6 +118,15 @@ const SCHNEIDER_MTZ_FINE_IR_FACTORS = (inA) =>
   );
 const SCHNEIDER_MTZ_RCD_SENS = ["0,5 ... 30 A (0,1 A trin)"];
 const SCHNEIDER_MTZ_RCD_DELAY = ["0,06 s", "0,15 s", "0,23 s", "0,35 s", "0,80 s"];
+const SCHNEIDER_TSD_10IR = {
+  adjustable: true,
+  summary: "I²t OFF: 0/0,1/0,2/0,3/0,4 s; I²t ON: 0,1/0,2/0,3/0,4 s",
+  reference: "10 x Ir",
+  options: tsdCurveOptions(
+    ["0 s", "0,1 s", "0,2 s", "0,3 s", "0,4 s"],
+    ["0,1 s", "0,2 s", "0,3 s", "0,4 s"],
+  ),
+};
 
 const ABB_DIP_L = [
   0.4, 0.42, 0.45, 0.47, 0.5, 0.52, 0.55, 0.57, 0.6, 0.62, 0.65, 0.67,
@@ -138,6 +179,209 @@ const ABB_XT_RC_SEL_DELAY = [
 const ABB_XT_RC_B_DELAY = ["0 s", "0,1 s", "0,2 s", "0,3 s", "0,5 s", "1 s", "2 s", "3 s"];
 const ABB_EMAX2_RC_SENS = ["3 ... 30 A"];
 const ABB_EMAX2_RC_DELAY = ["0,05 ... 0,8 s"];
+const ABB_TM_STEP_NAMES = ["MIN", "MED", "MAX"];
+const ABB_TM_L_FACTORS = [0.7, 0.85, 1];
+const ABB_TMD_L_STEPS = {
+  "XT1|25": [17.5, 21.25, 25],
+  "XT1|32": [22.4, 27.2, 32],
+  "XT1|40": [28, 34, 40],
+  "XT1|50": [35, 42.5, 50],
+  "XT1|63": [44.1, 53.55, 63],
+  "XT1|80": [56, 68, 80],
+  "XT1|100": [70, 85, 100],
+  "XT1|125": [87.5, 106.25, 125],
+  "XT1|160": [112, 136, 160],
+  "XT2|1.6": [1.1, 1.3, 1.6],
+  "XT2|2": [1.4, 1.7, 2],
+  "XT2|2.5": [1.7, 2.1, 2.5],
+  "XT2|3.2": [2.2, 2.7, 3.2],
+  "XT2|4": [2.8, 3.4, 4],
+  "XT2|5": [3.5, 4.2, 5],
+  "XT2|6.3": [4.4, 5.3, 6.3],
+  "XT2|8": [5.6, 6.8, 8],
+  "XT2|10": [7, 8.5, 10],
+  "XT2|12.5": [8.7, 10.6, 12.5],
+  "XT2|16": [11, 14, 16],
+  "XT2|20": [14, 17, 20],
+  "XT2|25": [18, 21, 25],
+  "XT2|32": [22, 27, 32],
+  "XT3|63": [44.1, 53.55, 63],
+  "XT3|80": [56, 68, 80],
+  "XT3|100": [70, 85, 100],
+  "XT3|125": [87.5, 106.25, 125],
+  "XT3|160": [112, 136, 160],
+  "XT3|200": [140, 170, 200],
+  "XT3|250": [175, 212.5, 250],
+  "XT4|16": [11, 14, 16],
+  "XT4|20": [14, 17, 20],
+  "XT4|25": [18, 21, 25],
+  "XT4|32": [22, 27, 32],
+};
+const ABB_TMA_L_STEPS = {
+  "XT2|40": [28, 34, 40],
+  "XT2|50": [35, 43, 50],
+  "XT2|63": [44, 54, 63],
+  "XT2|80": [56, 68, 80],
+  "XT2|100": [70, 85, 100],
+  "XT2|125": [88, 106, 125],
+  "XT2|160": [112, 136, 160],
+  "XT4|40": [28, 34, 40],
+  "XT4|50": [35, 43, 50],
+  "XT4|63": [44, 54, 63],
+  "XT4|80": [56, 68, 80],
+  "XT4|100": [70, 85, 100],
+  "XT4|125": [88, 106, 125],
+  "XT4|160": [112, 136, 160],
+  "XT4|200": [140, 170, 200],
+  "XT4|225": [158, 191, 225],
+  "XT4|250": [175, 213, 250],
+  "XT5|320": [224, 272, 320],
+  "XT5|400": [280, 340, 400],
+  "XT5|500": [350, 425, 500],
+  "XT5|630": [441, 535.5, 630],
+  "XT6|630": [441, 536, 630],
+  "XT6|800": [560, 680, 800],
+};
+const ABB_TMA_I_STEPS = {
+  "XT2|40": [300, 350, 400],
+  "XT2|50": [300, 400, 500],
+  "XT2|63": [300, 465, 630],
+  "XT2|80": [400, 600, 800],
+  "XT2|100": [500, 750, 1000],
+  "XT2|125": [625, 940, 1250],
+  "XT2|160": [800, 1200, 1600],
+  "XT4|40": [300, 350, 400],
+  "XT4|50": [300, 400, 500],
+  "XT4|63": [315, 473, 630],
+  "XT4|80": [400, 600, 800],
+  "XT4|100": [500, 750, 1000],
+  "XT4|125": [625, 938, 1250],
+  "XT4|160": [800, 1200, 1600],
+  "XT4|200": [1000, 1500, 2000],
+  "XT4|225": [1125, 1688, 2250],
+  "XT4|250": [1250, 1875, 2500],
+  "XT5|320": [1600, 2400, 3200],
+  "XT5|400": [2000, 3000, 4000],
+  "XT5|500": [2500, 3750, 5000],
+  "XT5|630": [3150, 4725, 6300],
+  "XT6|630": [3150, 4725, 6300],
+  "XT6|800": [4000, 6000, 8000],
+};
+const ABB_TMD_I_FIXED = {
+  "XT1|25": 450,
+  "XT1|32": 450,
+  "XT1|40": 450,
+  "XT1|50": 500,
+  "XT1|63": 630,
+  "XT1|80": 800,
+  "XT1|100": 1000,
+  "XT1|125": 1250,
+  "XT1|160": 1600,
+  "XT2|1.6": 16,
+  "XT2|2": 20,
+  "XT2|2.5": 25,
+  "XT2|3.2": 32,
+  "XT2|4": 40,
+  "XT2|5": 50,
+  "XT2|6.3": 63,
+  "XT2|8": 80,
+  "XT2|10": 100,
+  "XT2|12.5": 125,
+  "XT2|16": 300,
+  "XT2|20": 300,
+  "XT2|25": 300,
+  "XT2|32": 320,
+  "XT3|63": 630,
+  "XT3|80": 800,
+  "XT3|100": 1000,
+  "XT3|125": 1250,
+  "XT3|160": 1600,
+  "XT3|200": 2000,
+  "XT3|250": 2500,
+  "XT4|16": 300,
+  "XT4|20": 300,
+  "XT4|25": 300,
+  "XT4|32": 320,
+};
+const ABB_TSD_FIXED_CURVE = `${TSD_I2T_OFF} (t=k)`;
+const ABB_TSD_INVERSE_CURVE = `${TSD_I2T_ON} (t=k/I²)`;
+const ABB_TMAX_DIP_TSD_XT2_XT6 = {
+  adjustable: true,
+  summary: "t=k: 0,05/0,1/0,2/0,4 s; t=k/I²: 0,05/0,1/0,2/0,4 s",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,05 s", "0,1 s", "0,2 s", "0,4 s"],
+    ["0,05 s", "0,1 s", "0,2 s", "0,4 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_TMAX_DIP_TSD_XT7 = {
+  adjustable: true,
+  summary: "t=k: 0,1 ... 0,8 s; t=k/I²: 0,1 ... 0,8 s",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s", "0,3 s", "0,4 s", "0,5 s", "0,6 s", "0,7 s", "0,8 s"],
+    ["0,1 s", "0,2 s", "0,3 s", "0,4 s", "0,5 s", "0,6 s", "0,7 s", "0,8 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_TMAX_TOUCH_TSD_XT2_XT4 = {
+  adjustable: true,
+  summary: "t=k/t=k/I²: 0,05 ... 0,4 s i 0,01 s trin",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    secondsOptions(0.05, 0.4, 0.01),
+    secondsOptions(0.05, 0.4, 0.01),
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_TMAX_TOUCH_TSD_XT5 = {
+  adjustable: true,
+  summary: "t=k/t=k/I²: 0,05 ... 0,5 s i 0,01 s trin",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    secondsOptions(0.05, 0.5, 0.01),
+    secondsOptions(0.05, 0.5, 0.01),
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_TMAX_TOUCH_TSD_XT7 = {
+  adjustable: true,
+  summary: "t=k/t=k/I²: 0,05 ... 0,8 s i 0,01 s trin",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    secondsOptions(0.05, 0.8, 0.01),
+    secondsOptions(0.05, 0.8, 0.01),
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_EMAX2_DIP_TSD = {
+  adjustable: true,
+  summary: "t=k/t=k/I²: 0,1/0,2/0,4/0,8 s",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_EMAX2_TOUCH_TSD = {
+  adjustable: true,
+  summary: "t=k/t=k/I²: 0,05 ... 0,8 s i 0,01 s trin",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    secondsOptions(0.05, 0.8, 0.01),
+    secondsOptions(0.05, 0.8, 0.01),
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
 
 const SIEMENS_3VA2_ETU3_IR = {
   25: ratios(25, [10, 12, 14, 16, 18, 20, 22, 23, 24, 25]),
@@ -441,6 +685,50 @@ const SIEMENS_3VA_ETU6_IR = stepValues(0.4, 1, 0.001);
 const SIEMENS_3VA_ETU6_TR = stepValues(0.75, 36, 0.25);
 const SIEMENS_3VA_ETU6_ISD = stepValues(0.6, 10, 0.1);
 const SIEMENS_3VA_ETU6_II = stepValues(1.5, 15, 0.1);
+const SIEMENS_TSD_I2T_CURVE = "I²t";
+const SIEMENS_TSD_FIXED_CURVE = `${TSD_I2T_OFF} (t=const.)`;
+const SIEMENS_TSD_INVERSE_CURVE = TSD_I2T_ON;
+const SIEMENS_3VA_ETU350_TSD = {
+  adjustable: true,
+  summary: "I²t: 0/0,08/0,15/0,22/0,3/0,4 s",
+  reference: "8 x Ir",
+  options: ["0 s", "0,08 s", "0,15 s", "0,22 s", "0,3 s", "0,4 s"].map((time) =>
+    tsdOption(time, SIEMENS_TSD_I2T_CURVE),
+  ),
+};
+const SIEMENS_3VA27_ETU3_TSD = {
+  adjustable: true,
+  summary: "t=const.: 0,08/0,15/0,22/0,3/0,4 s; I²t: 0,1/0,2/0,3/0,4/0,5 s",
+  reference: "10 x In for I²t",
+  options: tsdCurveOptions(
+    ["0,08 s", "0,15 s", "0,22 s", "0,3 s", "0,4 s"],
+    ["0,1 s", "0,2 s", "0,3 s", "0,4 s", "0,5 s"],
+    SIEMENS_TSD_FIXED_CURVE,
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
+const SIEMENS_3VA_ETU850_TSD = {
+  adjustable: true,
+  summary: "I²t OFF/ON: 0,05 ... 0,5 s i 0,01 s trin",
+  reference: "8 x Ir",
+  options: tsdCurveOptions(
+    secondsOptions(0.05, 0.5, 0.01),
+    secondsOptions(0.05, 0.5, 0.01),
+    SIEMENS_TSD_FIXED_CURVE,
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
+const SIEMENS_3VA_ETU6_TSD = {
+  adjustable: true,
+  summary: "t=const.: 0,05 ... 0,4 s; I²t: 0,05 ... 0,5 s i 0,01 s trin",
+  reference: "10 x In for I²t",
+  options: tsdCurveOptions(
+    secondsOptions(0.05, 0.4, 0.01),
+    secondsOptions(0.05, 0.5, 0.01),
+    SIEMENS_TSD_FIXED_CURVE,
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
 
 const SIEMENS_3WL_ETU15_IR = [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1];
 const SIEMENS_3WL_ETU25_IR = [0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1];
@@ -473,6 +761,58 @@ const SIEMENS_3WA_ETU600_IR = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1];
 const SIEMENS_3WA_ETU600_TR = [1, 2, 5, 8, 10, 14, 17, 21, 25];
 const SIEMENS_3WA_ETU600_ISD = [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
 const SIEMENS_3WA_ETU600_II = [1.5, 2, 3, 4, 6, 8, 10, 12, 15];
+const SIEMENS_3WA_ETU300_TSD = {
+  adjustable: true,
+  summary: "I0t/I²t: 0,08/0,15/0,22/0,3/0,4 s",
+  reference: "direkte tsd-indstilling",
+  options: tsdCurveOptions(
+    ["0,08 s", "0,15 s", "0,22 s", "0,3 s", "0,4 s"],
+    ["0,08 s", "0,15 s", "0,22 s", "0,3 s", "0,4 s"],
+    "I²t OFF (I0t)",
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
+const SIEMENS_3WA_ETU600_TSD = {
+  adjustable: true,
+  summary: "I²t OFF: 0,08/0,15/0,22/0,3/0,4 s; I²t ON: 0,1/0,2/0,3/0,4 s",
+  reference: "direkte tsd-indstilling",
+  options: tsdCurveOptions(
+    ["0,08 s", "0,15 s", "0,22 s", "0,3 s", "0,4 s"],
+    ["0,1 s", "0,2 s", "0,3 s", "0,4 s"],
+    "I²t OFF (I0t)",
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
+const SIEMENS_3WL_ETU25_TSD = {
+  adjustable: true,
+  summary: "0/20(M)/100/200/300/400 ms",
+  reference: "direkte tsd-indstilling",
+  options: ["0 ms", "20 ms (M)", "100 ms", "200 ms", "300 ms", "400 ms"].map((time) =>
+    tsdOption(time, "fast delay"),
+  ),
+};
+const SIEMENS_3WL_ETU45_TSD = {
+  adjustable: true,
+  summary: "fast delay: 20(M)/100/200/300/400 ms; I²t: 100/200/300/400 ms",
+  reference: "direkte tsd-indstilling",
+  options: tsdCurveOptions(
+    ["20 ms (M)", "100 ms", "200 ms", "300 ms", "400 ms"],
+    ["100 ms", "200 ms", "300 ms", "400 ms"],
+    "fast delay",
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
+const SIEMENS_3WL_ETU76_TSD = {
+  adjustable: true,
+  summary: "fast delay: M og 80 ... 4000 ms; I²t: 100 ... 400 ms",
+  reference: "direkte tsd-indstilling",
+  options: tsdCurveOptions(
+    siemens3wlEtu76FixedTsdTimes(),
+    stepValues(100, 400, 5).map(msText),
+    "fast delay",
+    SIEMENS_TSD_INVERSE_CURVE,
+  ),
+};
 const SIEMENS_3WA_RATINGS_BY_FRAME = {
   "3WA11 Size 1": [250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500],
   "3WA12 Size 2": [
@@ -636,6 +976,7 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
         sourceNote:
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
@@ -652,6 +993,7 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
         sourceNote:
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
@@ -668,6 +1010,7 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12, 15],
         residualCurrent: {
           kind: "integrated",
@@ -722,6 +1065,7 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
         sourceNote:
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
@@ -734,6 +1078,7 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
         residualCurrent: {
           kind: "integrated",
@@ -755,6 +1100,7 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [1.5, 2, 3, 4, 6, 8, 10, 12],
         sourceNote:
           "Schneider Electric ComPacT NSX MicroLogic 5/6/7 Electronic Trip Units User Guide DOCA0141EN-03, Long-Time, Short-Time and Instantaneous protection setting tables: Io/Ir, tr, Isd and Ii values verified.",
@@ -990,6 +1336,7 @@ const DATA = [
         ir: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1],
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
         sourceNote:
           "Schneider Electric ComPacT NS MicroLogic guide DOCA0217EN, MicroLogic 5.0 protection setting tables: Ir, tr, Isd and Ii values verified.",
@@ -999,6 +1346,7 @@ const DATA = [
         ir: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1],
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
         sourceNote:
           "Schneider Electric ComPacT NS MicroLogic guide DOCA0217EN, MicroLogic 6.0 protection setting tables: Ir, tr, Isd and Ii values verified.",
@@ -1008,6 +1356,7 @@ const DATA = [
         ir: [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 1],
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
         sourceNote:
           "Schneider Electric ComPacT NS MicroLogic A/E User Guide DOCA0218EN-00, MicroLogic 7.0 A setting and current-protection tables: Ir, tr, Isd and Ii values verified.",
@@ -1090,6 +1439,7 @@ const DATA = [
         ir: SCHNEIDER_MTZ_MICROLOGIC_X_IR_QUICK,
         tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
         isd: [1.5, 2, 2.5, 3, 4, 5, 6, 8, 10],
+        tsd: SCHNEIDER_TSD_10IR,
         ii: [2, 3, 4, 6, 8, 10, 12, 15],
         residualCurrent: {
           kind: "integrated",
@@ -1213,7 +1563,9 @@ const DATA = [
           XT4: [16, 20, 25, 32],
         },
         ir: [0.7, 0.85, 1],
+        lStepsByRating: ABB_TMD_L_STEPS,
         trFixed: "Fast termisk kurve",
+        imFixedByRating: ABB_TMD_I_FIXED,
         imByRating: {
           "XT1|25": "450A",
           "XT1|32": "450A",
@@ -1251,7 +1603,7 @@ const DATA = [
           "XT4|32": "320A",
         },
         sourceNote:
-          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/19-3/20. XT3 TMD verified as 63, 80, 100, 125, 160, 200, 250 A.",
+          "ABB SACE Tmax XT IEC catalog 08/2024, page 3/20, table Available settings for TMD and TMA trip units: TMD L MIN/MED/MAX and fixed I3 values verified per frame/rating.",
       },
       {
         name: "TMA",
@@ -1263,7 +1615,9 @@ const DATA = [
           XT6: [630, 800],
         },
         ir: [0.7, 0.85, 1],
+        lStepsByRating: ABB_TMA_L_STEPS,
         trFixed: "Fast termisk kurve",
+        imStepsByRating: ABB_TMA_I_STEPS,
         imByRating: {
           "XT2|40": "300-400A",
           "XT2|50": "300-500A",
@@ -1290,7 +1644,7 @@ const DATA = [
           "XT6|800": "4000-8000A",
         },
         sourceNote:
-          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/19-3/20. TMA verified for XT2, XT4, XT5 and XT6.",
+          "ABB SACE Tmax XT IEC catalog 08/2024, page 3/20, table Available settings for TMD and TMA trip units: TMA L and I MIN/MED/MAX values verified per frame/rating.",
       },
       {
         name: "Ekip Dip",
@@ -1319,6 +1673,13 @@ const DATA = [
           XT6: ABB_DIP_S_XT2_XT6,
           XT7: ABB_DIP_S_XT7_EMAX,
         },
+        tsd: {
+          XT2: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT4: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT5: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT6: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT7: ABB_TMAX_DIP_TSD_XT7,
+        },
         ii: {
           XT2: ABB_DIP_I_XT2_XT6,
           XT4: ABB_DIP_I_XT2_XT6,
@@ -1346,6 +1707,12 @@ const DATA = [
           XT7: stepValues(3, 144, 1),
         },
         isd: ABB_TOUCH_S,
+        tsd: {
+          XT2: ABB_TMAX_TOUCH_TSD_XT2_XT4,
+          XT4: ABB_TMAX_TOUCH_TSD_XT2_XT4,
+          XT5: ABB_TMAX_TOUCH_TSD_XT5,
+          XT7: ABB_TMAX_TOUCH_TSD_XT7,
+        },
         ii: {
           XT2: ABB_TOUCH_I_XT2_XT5,
           XT4: ABB_TOUCH_I_XT2_XT5,
@@ -1381,6 +1748,12 @@ const DATA = [
           XT7: stepValues(3, 144, 1),
         },
         isd: ABB_TOUCH_S,
+        tsd: {
+          XT2: ABB_TMAX_TOUCH_TSD_XT2_XT4,
+          XT4: ABB_TMAX_TOUCH_TSD_XT2_XT4,
+          XT5: ABB_TMAX_TOUCH_TSD_XT5,
+          XT7: ABB_TMAX_TOUCH_TSD_XT7,
+        },
         ii: {
           XT2: ABB_TOUCH_I_XT2_XT5,
           XT4: ABB_TOUCH_I_XT2_XT5,
@@ -1525,6 +1898,7 @@ const DATA = [
         ir: ABB_DIP_L,
         tr: ABB_EMAX2_DIP_TR,
         isd: ABB_DIP_S_XT7_EMAX,
+        tsd: ABB_EMAX2_DIP_TSD,
         ii: ABB_DIP_I_XT7_EMAX,
         sourceNote:
           "ABB Emax 2 Ekip Dip manual 1SDH001000R0002, operator interface and summary table: L/tr/S/I DIP switch steps verified.",
@@ -1534,6 +1908,7 @@ const DATA = [
         ir: ABB_TOUCH_L,
         tr: stepValues(3, 144, 1),
         isd: ABB_TOUCH_S,
+        tsd: ABB_EMAX2_TOUCH_TSD,
         ii: ABB_TOUCH_I_XT7_EMAX,
         residualCurrent: {
           kind: "integrated",
@@ -1552,6 +1927,7 @@ const DATA = [
         ir: ABB_TOUCH_L,
         tr: stepValues(3, 144, 1),
         isd: ABB_TOUCH_S,
+        tsd: ABB_EMAX2_TOUCH_TSD,
         ii: ABB_TOUCH_I_XT7_EMAX,
         residualCurrent: {
           kind: "integrated",
@@ -1701,6 +2077,10 @@ const DATA = [
         ir: SIEMENS_3VA_ETU3_IR,
         tr: SIEMENS_3VA_ETU3_TR,
         isd: SIEMENS_3VA_ETU350_ISD,
+        tsd: {
+          default: SIEMENS_3VA_ETU350_TSD,
+          "3VA27 1600": SIEMENS_3VA27_ETU3_TSD,
+        },
         ii: SIEMENS_3VA_ETU350_II,
         iiByRating: SIEMENS_3VA_ETU350_II_FIXED,
         functions: ["L", "S", "I", "N"],
@@ -1713,6 +2093,7 @@ const DATA = [
         ir: SIEMENS_3VA27_ETU3_IR,
         tr: SIEMENS_3VA27_ETU3_TR,
         isd: SIEMENS_3VA27_ETU3_ISD,
+        tsd: SIEMENS_3VA27_ETU3_TSD,
         ii: SIEMENS_3VA27_ETU3_II,
         functions: ["L", "S", "I", "G", "N"],
         sourceNote:
@@ -1726,6 +2107,7 @@ const DATA = [
         tr: SIEMENS_3VA_ETU850_TR,
         isd: SIEMENS_3VA_ETU850_ISD,
         isdBase: "In",
+        tsd: SIEMENS_3VA_ETU850_TSD,
         ii: SIEMENS_3VA_ETU850_II,
         functions: ["L", "S", "I", "N"],
         sourceNote:
@@ -1737,6 +2119,7 @@ const DATA = [
         ir: SIEMENS_3VA_ETU6_IR,
         tr: SIEMENS_3VA_ETU6_TR,
         isd: SIEMENS_3VA_ETU6_ISD,
+        tsd: SIEMENS_3VA_ETU6_TSD,
         ii: SIEMENS_3VA_ETU6_II,
         functions: ["L", "S", "I", "N", "MCR", "I-NBA", "DAS", "DST"],
         sourceNote:
@@ -1748,6 +2131,7 @@ const DATA = [
         ir: SIEMENS_3VA_ETU6_IR,
         tr: SIEMENS_3VA_ETU6_TR,
         isd: SIEMENS_3VA_ETU6_ISD,
+        tsd: SIEMENS_3VA_ETU6_TSD,
         ii: SIEMENS_3VA_ETU6_II,
         functions: [
           "L",
@@ -1847,6 +2231,7 @@ const DATA = [
         ir: SIEMENS_3WA_ETU300_IR,
         tr: SIEMENS_3WA_ETU300_TR,
         isd: SIEMENS_3WA_ETU300_ISD,
+        tsd: SIEMENS_3WA_ETU300_TSD,
         ii: SIEMENS_3WA_ETU300_II,
         functions: ["L", "S", "I"],
         sourceNote:
@@ -1858,6 +2243,7 @@ const DATA = [
         ir: SIEMENS_3WA_ETU300_IR,
         tr: SIEMENS_3WA_ETU300_TR,
         isd: SIEMENS_3WA_ETU300_ISD,
+        tsd: SIEMENS_3WA_ETU300_TSD,
         ii: SIEMENS_3WA_ETU300_II,
         functions: ["L", "S", "I", "G"],
         sourceNote:
@@ -1869,6 +2255,7 @@ const DATA = [
         ir: SIEMENS_3WA_ETU600_IR,
         tr: SIEMENS_3WA_ETU600_TR,
         isd: SIEMENS_3WA_ETU600_ISD,
+        tsd: SIEMENS_3WA_ETU600_TSD,
         ii: SIEMENS_3WA_ETU600_II,
         functions: ["L", "S", "I"],
         sourceNote:
@@ -1880,6 +2267,7 @@ const DATA = [
         ir: SIEMENS_3WA_ETU600_IR,
         tr: SIEMENS_3WA_ETU600_TR,
         isd: SIEMENS_3WA_ETU600_ISD,
+        tsd: SIEMENS_3WA_ETU600_TSD,
         ii: SIEMENS_3WA_ETU600_II,
         functions: ["L", "S", "I", "G"],
         sourceNote:
@@ -1891,6 +2279,7 @@ const DATA = [
         ir: SIEMENS_3WA_ETU600_IR,
         tr: SIEMENS_3WA_ETU600_TR,
         isd: SIEMENS_3WA_ETU600_ISD,
+        tsd: SIEMENS_3WA_ETU600_TSD,
         ii: SIEMENS_3WA_ETU600_II,
         functions: ["L", "S", "I", "G", "Hi-Z"],
         sourceNote:
@@ -1963,6 +2352,7 @@ const DATA = [
         ir: SIEMENS_3WL_ETU25_IR,
         trFixed: "10s fixed at 6 x IR",
         isd: SIEMENS_3WL_ETU25_ISD,
+        tsd: SIEMENS_3WL_ETU25_TSD,
         iiByRating: SIEMENS_3WL_ETU25_II_FIXED,
         functions: ["L", "S", "I"],
         sourceNote:
@@ -1973,6 +2363,7 @@ const DATA = [
         ir: SIEMENS_3WL_ETU25_IR,
         trFixed: "10s fixed at 6 x IR",
         isd: SIEMENS_3WL_ETU25_ISD,
+        tsd: SIEMENS_3WL_ETU25_TSD,
         iiByRating: SIEMENS_3WL_ETU25_II_FIXED,
         functions: ["L", "N", "S", "I", "G"],
         sourceNote:
@@ -1983,6 +2374,7 @@ const DATA = [
         ir: SIEMENS_3WL_ETU25_IR,
         tr: SIEMENS_3WL_ETU45_TR,
         isd: SIEMENS_3WL_ETU25_ISD,
+        tsd: SIEMENS_3WL_ETU45_TSD,
         ii: SIEMENS_3WL_ETU45_II,
         functions: ["L", "N", "S", "I", "G optional"],
         sourceNote:
@@ -2003,6 +2395,7 @@ const DATA = [
         ir: ["0,4 ... 1 x In"],
         tr: ["2 ... 30 s (I2t), 1 ... 5 s (I4t)"],
         isd: ["1,25 x In ... 0,8 x Icw"],
+        tsd: SIEMENS_3WL_ETU76_TSD,
         ii: ["1,5 x In ... 0,8 x Ics"],
         functions: ["L", "N", "S", "I", "G optional"],
         sourceNote:
@@ -2035,6 +2428,9 @@ let st = {
   inc: "160",
   method: "Calculated settings",
   irSetting: "standard",
+  irChoiceSignature: "",
+  trChoice: "",
+  tsdChoice: "",
   backupComponent: "all",
   rcdEnabled: false,
   rcdDevice: 0,
@@ -2052,6 +2448,7 @@ const parseDk = (v) =>
       .replace(/[^0-9.\-]/g, ""),
   ) || 0;
 const fmt = (v) => String(v).replace(/\.0$/, "").replace(".", ",");
+const settingAmpValue = (v) => Number(Number(v).toFixed(3));
 const fmtA = (v) => {
   const n = Number(v);
   return (
@@ -2145,9 +2542,10 @@ function best(bases, factors, desired) {
   const eps = 0.000001;
   for (const b of bases)
     for (const f of factors) {
-      const value = Number((b * f).toFixed(6)),
+      const base = settingAmpValue(b),
+        value = settingAmpValue(base * f),
         diff = desired - value,
-        candidate = { base: b, factor: f, value, diff };
+        candidate = { base, factor: f, value, diff, desired };
       if (!lowest || candidate.value < lowest.value) lowest = candidate;
       if (candidate.value > desired + eps) continue;
       if (!out) {
@@ -2219,6 +2617,72 @@ function ratingSetting(map, f, inA) {
   if (!map) return undefined;
   return map[`${f.frame}|${inA}`] ?? map[String(inA)];
 }
+const fmtAUnit = (v) => {
+  const n = Number(v);
+  return (Number.isFinite(n) ? fmt(Math.round(n * 100) / 100) : String(v)) + " A";
+};
+function fmtNamedFactor(value, decimals) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return String(value);
+  if (decimals !== undefined) return fmt(n.toFixed(decimals));
+  if (Math.abs(n - Math.round(n)) < 0.000001) return fmt(Math.round(n));
+  if (Math.abs(n * 10 - Math.round(n * 10)) < 0.000001)
+    return fmt((Math.round(n * 10) / 10).toFixed(1));
+  return fmt((Math.round(n * 100) / 100).toFixed(2));
+}
+function namedStepLabel(step) {
+  return `${step.name} (${fmtNamedFactor(step.factor, step.factorDecimals)} × In) = ${fmtAUnit(step.value)}`;
+}
+function namedStepsFromValues(values, inA, fixedFactors) {
+  if (!Array.isArray(values) || values.length !== ABB_TM_STEP_NAMES.length) return null;
+  return values.map((value, index) => ({
+    name: ABB_TM_STEP_NAMES[index],
+    value,
+    factor: fixedFactors ? fixedFactors[index] : Number((value / inA).toFixed(6)),
+    factorDecimals: fixedFactors ? 2 : undefined,
+  }));
+}
+function namedStepsHtml(steps, selectedIndex = -1) {
+  return steps
+    .map((step, index) => {
+      const label = namedStepLabel(step);
+      return index === selectedIndex ? `<u>${label}</u>` : label;
+    })
+    .join("<br>");
+}
+function namedStepsText(steps) {
+  return steps.map(namedStepLabel).join("; ");
+}
+function namedStepsByRating(map, f, inA, fixedFactors) {
+  return namedStepsFromValues(ratingSetting(map, f, inA), inA, fixedFactors);
+}
+function abbTmSelectedLIndex(ir) {
+  if (!ir || !isN(ir.factor)) return -1;
+  let selected = 0;
+  let diff = Infinity;
+  ABB_TM_L_FACTORS.forEach((factor, index) => {
+    const nextDiff = Math.abs(factor - ir.factor);
+    if (nextDiff < diff) {
+      selected = index;
+      diff = nextDiff;
+    }
+  });
+  return selected;
+}
+function namedStepSelectionByLimit(steps, limit) {
+  if (!steps || !steps.length) return null;
+  let selected = null;
+  steps.forEach((step, index) => {
+    if (step.value <= limit && (!selected || step.value > selected.step.value))
+      selected = { step, index };
+  });
+  if (selected) return selected;
+  return { error: true, step: steps[0], index: 0, limit };
+}
+function fixedI3Text(value, inA) {
+  const factor = Number(value) / Number(inA);
+  return `Fast I3 (${fmtNamedFactor(factor)} × In) = ${fmtAUnit(value)}`;
+}
 function settingValues(raw, f, inA, fallback = []) {
   if (!raw) return fallback;
   if (Array.isArray(raw)) return raw;
@@ -2231,6 +2695,111 @@ function settingValues(raw, f, inA, fallback = []) {
       fallback
     );
   return fallback;
+}
+function choiceValue(values, stateKey) {
+  if (!values || !values.length || !values.every(isN)) {
+    st[stateKey] = "";
+    return null;
+  }
+  const valid = values.find((value) => String(value) === st[stateKey]);
+  if (valid !== undefined) return valid;
+  const lowest = values.reduce((min, value) =>
+    Number(value) < Number(min) ? value : min,
+  );
+  st[stateKey] = String(lowest);
+  return lowest;
+}
+function renderNumericChoiceControls(
+  panelId,
+  selectId,
+  infoId,
+  stateKey,
+  values,
+  formatter,
+  infoText = "",
+) {
+  const panel = document.getElementById(panelId),
+    select = document.getElementById(selectId),
+    info = document.getElementById(infoId);
+  const numeric = values && values.every(isN) ? values : [];
+  const selected = choiceValue(numeric, stateKey);
+  if (!panel || !select) return selected;
+  panel.classList.toggle("hidden", numeric.length < 2);
+  if (numeric.length < 2) {
+    select.innerHTML = "";
+    if (info) info.textContent = "";
+    return selected;
+  }
+  select.innerHTML = numeric
+    .map((value) => {
+      const raw = String(value);
+      return `<option value="${raw}" ${raw === st[stateKey] ? "selected" : ""}>${formatter(value)}</option>`;
+    })
+    .join("");
+  select.value = st[stateKey];
+  if (info) info.textContent = infoText;
+  return selected;
+}
+function secondsFmt(value) {
+  return `${fmt(value)}s`;
+}
+function tsdSetting(raw, f, inA) {
+  if (!raw) return null;
+  if (raw.options || raw.fixed || raw.summary) return raw;
+  if (typeof raw === "object")
+    return (
+      raw[`${f.frame}|${inA}`] ??
+      raw[f.frame] ??
+      raw[String(inA)] ??
+      raw.default ??
+      null
+    );
+  return null;
+}
+function resetTsd() {
+  st.tsdChoice = "";
+}
+function renderTsdControls(cfg) {
+  const panel = document.getElementById("tsdPanel"),
+    select = document.getElementById("tsdChoice"),
+    info = document.getElementById("tsdInfo");
+  if (!panel || !select) return null;
+  const options = cfg && Array.isArray(cfg.options) ? cfg.options : [];
+  panel.classList.toggle("hidden", !options.length);
+  if (!options.length) {
+    select.innerHTML = "";
+    if (info) info.textContent = "";
+    resetTsd();
+    return null;
+  }
+  if (!options.some((option) => option.value === st.tsdChoice))
+    st.tsdChoice = options[0].value;
+  select.innerHTML = [
+    ...options.map(
+      (option) =>
+        `<option value="${option.value}" ${option.value === st.tsdChoice ? "selected" : ""}>${option.label}</option>`,
+    ),
+  ].join("");
+  select.value = st.tsdChoice;
+  if (info) info.textContent = cfg.summary || "";
+  return options.find((option) => option.value === st.tsdChoice) || null;
+}
+function renderTsdRow(cfg, selected, label = "tsd") {
+  if (!cfg) return null;
+  if (cfg.fixed)
+    return {
+      row: `<tr><td>${label}</td><td>Fast${cfg.reference ? `; ref. ${cfg.reference}` : ""}</td><td>${cfg.fixed}</td></tr>`,
+      output: `${label}: ${cfg.fixed}`,
+    };
+  if (!cfg.options || !cfg.options.length) return null;
+  const detail = `${cfg.summary || "Dokumenterede producentvalg"}${
+    cfg.reference ? `; ref. ${cfg.reference}` : ""
+  }`;
+  const value = selected ? selected.label : `Vælg dokumenteret ${label}`;
+  return {
+    row: `<tr><td>${label}</td><td>${detail}</td><td>${value}</td></tr>`,
+    output: `${label}: ${value}`,
+  };
 }
 function resetResidual() {
   st.rcdEnabled = false;
@@ -2336,8 +2905,22 @@ function renderResidualControls(s, f, c, r, inA) {
 
 function labelsFor(s) {
   if (s.brand === "ABB")
-    return { overload: "L", short: "S", instant: "I", magnetic: "I" };
-  return { overload: "Ir", short: "Isd", instant: "Ii", magnetic: "Ii" };
+    return {
+      overload: "I1",
+      time: "t1",
+      short: "I2",
+      shortTime: "t2",
+      instant: "I3",
+      magnetic: "I3",
+    };
+  return {
+    overload: "Ir",
+    time: "tr",
+    short: "Isd",
+    shortTime: "tsd",
+    instant: "Ii",
+    magnetic: "Ii",
+  };
 }
 function deviceLabel(s) {
   return (s.brand === "Schneider Electric" && s.series === "MasterPact MTZ") ||
@@ -5139,6 +5722,35 @@ function nsIrOptions(s, r, bases, desired) {
   }
   return visible;
 }
+function betterIrOption(a, b) {
+  if (!a || !a.best || a.best.verify || a.best.error) return false;
+  if (!b || !b.best || b.best.verify || b.best.error) return true;
+  const eps = 0.000001;
+  if (a.best.diff < b.best.diff - eps) return true;
+  if (a.best.diff > b.best.diff + eps) return false;
+  const aFine = Math.abs(a.best.factor - 1),
+    bFine = Math.abs(b.best.factor - 1);
+  if (aFine < bFine - eps) return true;
+  if (aFine > bFine + eps) return false;
+  const aBase = Math.abs(a.best.base - a.best.desired),
+    bBase = Math.abs(b.best.base - b.best.desired);
+  return aBase < bBase - eps;
+}
+function bestIrOption(options) {
+  return options.reduce(
+    (selected, option) => (betterIrOption(option, selected) ? option : selected),
+    null,
+  );
+}
+function irSelectionSignature(s, f, r, inA, desired) {
+  return [s.brand, s.series, f.frame, r.name, inA, st.method, desired].join("|");
+}
+function currentIrSelectionSignature() {
+  const s = S(),
+    f = F(),
+    r = R();
+  return irSelectionSignature(s, f, r, rating(), parseDk(st.desired));
+}
 function renderIrSettings(options) {
   const wrap = document.getElementById("irSettingWrap"),
     box = document.getElementById("irSettings"),
@@ -5372,6 +5984,8 @@ function render() {
     inc = parseDk(st.inc),
     name = `${f.frame}${c[0]} ${p}`;
   const lbl = labelsFor(s);
+  $("trChoiceLabel").textContent = lbl.time;
+  $("tsdChoiceLabel").textContent = lbl.shortTime;
   ["desired", "ikmin", "ikmax", "inc"].forEach((id) => ($(id).value = st[id]));
   $("method").value = st.method;
   $("img").src = s.image;
@@ -5402,15 +6016,32 @@ function render() {
   const ioFactors = settingValues(r.io, f, inA),
     hasIo = ioFactors && ioFactors.length,
     bases = hasIo
-      ? ioFactors.map((x) => Number((x * inA).toFixed(6)))
+      ? ioFactors.map((x) => settingAmpValue(x * inA))
       : [inA];
   const trValues = settingValues(r.tr, f, inA);
   const isdValues = settingValues(r.isd, f, inA);
+  const tsdCfg = tsdSetting(r.tsd, f, inA);
+  const selectedTr = renderNumericChoiceControls(
+    "trPanel",
+    "trChoice",
+    "trInfo",
+    "trChoice",
+    trValues,
+    secondsFmt,
+    `Dokumenterede ${lbl.time}-trin`,
+  );
+  const selectedTsd = renderTsdControls(tsdCfg);
   const iiValues = settingValues(r.ii, f, inA);
+  const tmLSteps = namedStepsByRating(r.lStepsByRating, f, inA, ABB_TM_L_FACTORS);
   let irFactors = settingValues(r.ir, f, inA, [1]) || [1];
   let ir = best(bases, irFactors, desired);
   const mtzIrOpts = mtzIrOptions(s, r, inA, desired);
   const irOpts = mtzIrOpts.length ? mtzIrOpts : nsIrOptions(s, r, bases, desired);
+  if (!mtzIrOpts.length && irOpts.length && st.method !== "Minimum settings") {
+    const signature = irSelectionSignature(s, f, r, inA, desired),
+      suggested = bestIrOption(irOpts);
+    if (suggested && st.irChoiceSignature !== signature) st.irSetting = suggested.id;
+  }
   renderIrSettings(irOpts);
   let relayPlugLabel = "";
   let irSettingMethod = "";
@@ -5470,6 +6101,13 @@ function render() {
         `<tr><td>${lbl.overload}</td><td>${range(ampValues, ir.value, fmtA)}</td><td>Ir = ${fmtA(ir.value)}</td></tr>`,
       );
       out.push(`${lbl.overload}: ${fmtA(ir.value)}`);
+    } else if (tmLSteps) {
+      const selectedIndex = abbTmSelectedLIndex(ir);
+      const selectedStep = tmLSteps[selectedIndex] || tmLSteps[tmLSteps.length - 1];
+      rows.push(
+        `<tr><td>${lbl.overload}</td><td>${namedStepsHtml(tmLSteps, selectedIndex)}</td><td>${namedStepLabel(selectedStep)}</td></tr>`,
+      );
+      out.push(`${lbl.overload}: ${namedStepLabel(selectedStep)}`);
     } else {
       rows.push(
         `<tr><td>${lbl.overload}</td><td>${range(irFactors, ir.factor, fmt)}</td><td>${fmt(ir.factor)} × ${ref} = ${fmtA(ir.value)}</td></tr>`,
@@ -5480,19 +6118,19 @@ function render() {
   }
   const overloadOk = ir && !ir.verify && !ir.error;
   if (r.trFixed) {
-    rows.push(`<tr><td>tr</td><td>Fast</td><td>${r.trFixed}</td></tr>`);
-    out.push("tr: " + r.trFixed);
+    rows.push(`<tr><td>${lbl.time}</td><td>Fast</td><td>${r.trFixed}</td></tr>`);
+    out.push(lbl.time + ": " + r.trFixed);
   } else if (trValues && trValues.length) {
     if (!trValues.every(isN)) {
       const status = statusText(trValues);
-      rows.push(`<tr><td>tr</td><td>${status}</td><td>${status}</td></tr>`);
-      out.push("tr: " + status);
+      rows.push(`<tr><td>${lbl.time}</td><td>${status}</td><td>${status}</td></tr>`);
+      out.push(lbl.time + ": " + status);
     } else {
-      const tr = trValues[0];
+      const tr = selectedTr ?? trValues[0];
       rows.push(
-        `<tr><td>tr</td><td>${range(trValues, tr, (x) => x + "s")}</td><td>${tr}s</td></tr>`,
+        `<tr><td>${lbl.time}</td><td>${range(trValues, tr, secondsFmt)}</td><td>${secondsFmt(tr)}</td></tr>`,
       );
-      out.push("tr: " + tr + "s");
+      out.push(lbl.time + ": " + secondsFmt(tr));
     }
   }
   if (isdValues && isdValues.length) {
@@ -5524,6 +6162,11 @@ function render() {
         );
       }
     }
+  }
+  const tsdRow = renderTsdRow(tsdCfg, selectedTsd, lbl.shortTime);
+  if (tsdRow) {
+    rows.push(tsdRow.row);
+    out.push(tsdRow.output);
   }
   let instantWritten = false;
   if (iiValues && iiValues.length) {
@@ -5563,7 +6206,37 @@ function render() {
       instantWritten = true;
     }
   }
-  if (r.imByRating) {
+  if (r.imStepsByRating) {
+    const steps = namedStepsByRating(r.imStepsByRating, f, inA);
+    if (steps) {
+      const selected = namedStepSelectionByLimit(steps, ikmin * 1000 * 0.8);
+      if (selected && selected.error) {
+        rows.push(
+          `<tr><td>${lbl.magnetic}</td><td>${namedStepsHtml(steps)}</td><td class="statusError">Laveste ${lbl.magnetic} ${fmtAUnit(selected.step.value)} er højere end grænse ${fmtAUnit(selected.limit)}</td></tr>`,
+        );
+        out.push(
+          `${lbl.magnetic}: FEJL - laveste ${lbl.magnetic} er højere end Ik min-grænse`,
+        );
+      } else if (selected) {
+        const txt = namedStepLabel(selected.step);
+        rows.push(
+          `<tr><td>${lbl.magnetic}</td><td>${namedStepsHtml(steps, selected.index)}</td><td>${txt}</td></tr>`,
+        );
+        out.push(`${lbl.magnetic}: ${txt}`);
+      }
+      instantWritten = true;
+    }
+  } else if (r.imFixedByRating) {
+    const fixedI3 = ratingSetting(r.imFixedByRating, f, inA);
+    if (fixedI3) {
+      const txt = fixedI3Text(fixedI3, inA);
+      rows.push(
+        `<tr><td>${lbl.magnetic}</td><td>ABB fast I3</td><td>${txt}</td></tr>`,
+      );
+      out.push(lbl.magnetic + ": " + txt);
+      instantWritten = true;
+    }
+  } else if (r.imByRating) {
     const txt = settingText(ratingSetting(r.imByRating, f, inA) || V, inA);
     if (txt) {
       rows.push(
@@ -5672,6 +6345,18 @@ function bind() {
     st.method = e.target.value;
     render();
   };
+  const trChoice = document.getElementById("trChoice");
+  if (trChoice)
+    trChoice.onchange = (e) => {
+      st.trChoice = e.target.value;
+      render();
+    };
+  const tsdChoice = document.getElementById("tsdChoice");
+  if (tsdChoice)
+    tsdChoice.onchange = (e) => {
+      st.tsdChoice = e.target.value;
+      render();
+    };
   const bc = document.getElementById("backupComponent");
   if (bc)
     bc.onchange = (e) => {
@@ -5684,6 +6369,7 @@ function bind() {
       const b = e.target.closest("button[data-ir-setting]");
       if (b) {
         st.irSetting = b.dataset.irSetting;
+        st.irChoiceSignature = currentIrSelectionSignature();
         render();
       }
     };
