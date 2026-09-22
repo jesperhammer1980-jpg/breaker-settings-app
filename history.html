@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BreakerSettings Versionshistorik</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        min-height: 100vh;
+        color: #edf5f0;
+      }
+      .history-shell {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 16px;
+      }
+      .history-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+      }
+      .history-top h1 {
+        margin: 0;
+      }
+      .history-top p {
+        margin: 6px 0 0;
+      }
+      .back-link {
+        color: #92ffb4;
+        text-decoration: none;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+      .history-list {
+        display: grid;
+        gap: 10px;
+      }
+      .history-entry {
+        background: linear-gradient(180deg, #0b1722, #08111a);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 14px;
+      }
+      .history-entry h2 {
+        margin: 0;
+        color: #34f36a;
+        font-size: 18px;
+      }
+      .history-entry time {
+        display: block;
+        margin-top: 3px;
+        color: #90a1ad;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .history-entry ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: #c2d0d8;
+        line-height: 1.55;
+      }
+      @media (max-width: 640px) {
+        .history-shell {
+          padding: 12px;
+        }
+        .history-top {
+          display: block;
+        }
+        .back-link {
+          display: inline-block;
+          margin-top: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="history-shell">
+      <header class="history-top">
+        <div>
+          <h1>Breaker<span>Settings</span></h1>
+          <p class="subtitle">Versionshistorik</p>
+        </div>
+        <a class="back-link" href="index.html">Tilbage til BreakerSettings</a>
+      </header>
+
+      <section class="history-list" aria-label="Versionshistorik">
+        <article class="history-entry">
+          <h2>v6.35</h2>
+          <time datetime="2026-09-22">2026-09-22</time>
+          <ul>
+            <li>ABB-beskyttelsesfunktioner vises nu konsekvent som I1, t1, I2, t2 og I3 i LIVE.</li>
+            <li>ABB I2-beregninger refererer nu til I1 i indstillingstabellen, dokumentationsoutputtet og Kopiér-funktionen.</li>
+            <li>Funktioner uden producentdata vises fortsat ikke, og beregnings- og beskyttelseslogikken er uændret.</li>
+            <li>Schneider- og Siemens-benævnelser er uændrede.</li>
+            <li>app.js cache-busting opdateret til v6.35.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.34</h2>
+          <time datetime="2026-08-13">2026-08-13</time>
+          <ul>
+            <li>Io/Ir-beregningen normaliserer nu ampereværdier, så præcise Io × Ir-match vælges korrekt.</li>
+            <li>Schneider NSX630 MicroLogic 5.3 E 630A ved ønsket 400A vælger nu Io 400A og Ir 1,00 × Io = 400A.</li>
+            <li>Tidligere Ir-setting-valg kan ikke længere blokere et bedre beregnet valg, når ønsket strøm ændres.</li>
+            <li>app.js cache-busting opdateret til v6.34.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.33</h2>
+          <time datetime="2026-08-06">2026-08-06</time>
+          <ul>
+            <li>ABB TMA I-rækken viser nu konkrete MIN/MED/MAX-trin i intervalkolonnen.</li>
+            <li>ABB TMA I-resultatet viser kun det beregnede valgte trin i stedet for alle tre trin.</li>
+            <li>Teksten "ABB MIN/MED/MAX" er fjernet fra I-rækken.</li>
+            <li>app.js cache-busting opdateret til v6.33.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.32</h2>
+          <time datetime="2026-08-06">2026-08-06</time>
+          <ul>
+            <li>Isd/S-panelet fjernet igen, så Isd/S kun beregnes automatisk efter eksisterende logik.</li>
+            <li>Isd/S vises fortsat som beregnet værdi i indstillingstabel og dokumentationsoutput.</li>
+            <li>tr og tsd bevarer minimum som standardvalg med gyldige manuelle valg.</li>
+            <li>app.js cache-busting opdateret til v6.32.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.31</h2>
+          <time datetime="2026-08-06">2026-08-06</time>
+          <ul>
+            <li>Isd/S standardvalg rettet tilbage til beregnet værdi efter Ik min × 0,8.</li>
+            <li>Isd/S bruger igen den eksisterende korttidsberegningslogik i stedet for minimum.</li>
+            <li>tr og tsd forudvælger fortsat laveste dokumenterede trin og bevarer gyldige manuelle valg.</li>
+            <li>app.js cache-busting opdateret til v6.31.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.30</h2>
+          <time datetime="2026-08-06">2026-08-06</time>
+          <ul>
+            <li>tr, Isd/S og tsd forudvælger laveste dokumenterede gyldige producenttrin.</li>
+            <li>Manuelle tr, Isd/S og tsd valg bevares ved genberegning og nulstilles kun ved ugyldig ny kombination.</li>
+            <li>Dokumentationsoutput viser det faktisk valgte tids-/korttidstrin.</li>
+            <li>app.js cache-busting opdateret til v6.30.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.29</h2>
+          <time datetime="2026-08-06">2026-08-06</time>
+          <ul>
+            <li>ABB TMD/TMA relæstørrelse-dropdown gjort kort igen, så MIN/MED/MAX ikke fylder i In-valget.</li>
+            <li>ABB MIN/MED/MAX vises fortsat i indstillingstabel, beregningsresultat og dokumentationsoutput.</li>
+            <li>app.js cache-busting opdateret til v6.29.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.28</h2>
+          <time datetime="2026-08-06">2026-08-06</time>
+          <ul>
+            <li>ABB TMD/TMA L- og I-indstillinger viser producentens MIN/MED/MAX-betjeningsnavne.</li>
+            <li>TMA I-trin vises datadrevet pr. frame/rating efter ABB-tabellen uden at ændre beregningslogikken.</li>
+            <li>app.js cache-busting opdateret til v6.28.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.27</h2>
+          <time datetime="2026-08-04">2026-08-04</time>
+          <ul>
+            <li>Datadrevet tsd tilføjet for relæer med dokumenterede producenttrin eller -intervaller hos Schneider, ABB og Siemens.</li>
+            <li>Justerbar tsd vises som brugerens valg blandt dokumenterede muligheder; faste/ikke-dokumenterede tsd-værdier skjules efter producentdata.</li>
+            <li>tsd vises i indstillingstabellen og dokumentationsoutputtet uden at vælge en vilkårlig standard.</li>
+            <li>Separat history.html oprettet med fuld versionshistorik og link tilbage til BreakerSettings.</li>
+            <li>app.js cache-busting opdateret til v6.27.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.26</h2>
+          <time datetime="2026-07-09">2026-07-09</time>
+          <ul>
+            <li>Schneider MasterPact MTZ MicroLogic X Ir setting method tilføjet med Quick settings (HMI) og Fine adjustment (EcoStruxure Power Commission).</li>
+            <li>Fine adjustment beregner Ir i dokumenteret 1 A opløsning fra 0,4 x In til In uden at overstige ønsket indstillingsstrøm.</li>
+            <li>Dokumentationsoutput viser valgt MTZ Ir setting method.</li>
+            <li>app.js cache-busting opdateret til v6.26.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.25</h2>
+          <time datetime="2026-06-30">2026-06-30</time>
+          <ul>
+            <li>Integreret fejlstrømsbeskyttelse aktiveres ikke længere automatisk.</li>
+            <li>Relæer med integreret fejlstrømsbeskyttelse viser switchen "Anvend fejlstrømsbeskyttelse" som standard ikke valgt.</li>
+            <li>Fejlstrømsfelter og dokumentationsdata vises kun, når brugeren aktivt vælger fejlstrømsbeskyttelse.</li>
+            <li>app.js cache-busting opdateret til v6.25.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.24</h2>
+          <time datetime="2026-06-29">2026-06-29</time>
+          <ul>
+            <li>ComPacT NS rating plug vises nu på samme dokumentationslinje som relæet.</li>
+            <li>Standard settings tilføjer ikke ekstra tekst i dokumentationsoutput.</li>
+            <li>app.js cache-busting opdateret til v6.24.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.23</h2>
+          <time datetime="2026-06-26">2026-06-26</time>
+          <ul>
+            <li>ABB Tmax XT XT1-XT4 RC-moduler gennemgået mod ABB SACE Tmax XT katalog 1SDC210033D0201 side 3/28-3/32.</li>
+            <li>XT3 TMD suppleret med RC B Type XT3 som dokumenteret Type B-modul.</li>
+            <li>RC Inst og RC Sel rettet til Type A-valg uden separat Type AC-valg.</li>
+            <li>app.js cache-busting opdateret til v6.23.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.22</h2>
+          <time datetime="2026-06-25">2026-06-25</time>
+          <ul>
+            <li>ABB Tmax XT XT1-XT4 fejlstrømslogik rettet mod officielle ABB RC Inst/RC Sel-data.</li>
+            <li>XT3 TMD kan nu vælge RC Inst og RC Sel med dokumenterede indstillinger.</li>
+            <li>ABB Ekip Touch Rc og Ekip Hi-Touch Rc behandles som integreret fejlstrømsbeskyttelse uden separat modulknap.</li>
+            <li>app.js cache-busting opdateret til v6.22.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.21</h2>
+          <time datetime="2026-06-24">2026-06-24</time>
+          <ul>
+            <li>Relæ-dropdowns sorteret med elektroniske relæer først og termisk-magnetiske relæer nederst.</li>
+            <li>Schneider NSX400/NSX630 MicroLogic 2.3 manglende Ii for 250A rettet fra officiel Schneider Ii-tabel.</li>
+            <li>Fejlstrømsbeskyttelse viser nu tydelig status for ikke valgt/aktiv/ikke understøttet.</li>
+            <li>app.js cache-busting opdateret til v6.21.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.20</h2>
+          <time datetime="2026-06-22">2026-06-22</time>
+          <ul>
+            <li>Anonym brugsstatistik tilføjet via /api/stats.</li>
+            <li>Skjult statistikside tilføjet på /admin-stats.</li>
+            <li>Besøg, anonymt brugerestimat, beregninger, dokumentationskopieringer og mest brugte tekniske valg registreres uden persondata.</li>
+            <li>app.js cache-busting opdateret til v6.20.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.19</h2>
+          <time datetime="2026-06-22">2026-06-22</time>
+          <ul>
+            <li>Siemens 3WA tilføjet som luftafbryder/ACB-serie.</li>
+            <li>3WA11, 3WA12 og 3WA13 frames, Icu/Ics-klasser og option-plug In-værdier indlæst fra officiel Siemens 3WA1 equipment manual.</li>
+            <li>ETU300 LSI/LSIG og ETU600 LSI/LSIG/LSIG Hi-Z Ir, tr, Isd og Ii rotary-switch settings verificeret mod Siemens-manualen.</li>
+            <li>3WA backup-/cascadingdata ikke indlæst, da ingen producentverificeret 415V backup-/cascadingtabel er fundet i de gennemgåede 3WA-kilder.</li>
+            <li>app.js cache-busting opdateret til v6.19.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.18</h2>
+          <time datetime="2026-06-16">2026-06-16</time>
+          <ul>
+            <li>Indstillingsstrøm-regel rettet så appen aldrig foreslår en værdi over ønsket strøm.</li>
+            <li>Fejlstrømsbeskyttelse tilføjet for dokumenterede Schneider, ABB og Siemens kombinationer.</li>
+            <li>Backup-/cascading ingen-data tekst rettet til aftalt formulering.</li>
+            <li>app.js cache-busting opdateret til v6.18.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.17</h2>
+          <time datetime="2026-06-13">2026-06-13</time>
+          <ul>
+            <li>Schneider backup-/cascadingdata indlæst fra officiel LVPED318033EN 2025 side A-194 til A-197 for NSXm, NSX, NS og MTZ.</li>
+            <li>Schneider relæ-/trip-unit-listen suppleret med MicroLogic 4.1, MicroLogic Vigi 4.2/4.3, MicroLogic Vigi 7.2/7.3 og MicroLogic 7.0.</li>
+            <li>Schneider relæ- og In-filtrering kontrolleret pr. frame.</li>
+            <li>app.js cache-busting opdateret til v6.17.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.16</h2>
+          <time datetime="2026-06-13">2026-06-13</time>
+          <ul>
+            <li>MasterPact MTZ framevalg rettet til MTZ1, MTZ2 og MTZ3.</li>
+            <li>MTZ1 06 og MTZ1 10 samlet under MTZ1 med relæ-/In-størrelser 630A, 1000A og 1600A.</li>
+            <li>MTZ2/MTZ3 og øvrige fabrikantserier kontrolleret for tilsvarende rating-som-frame-opdeling.</li>
+            <li>app.js cache-busting opdateret til v6.16.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.15</h2>
+          <time datetime="2026-06-13">2026-06-13</time>
+          <ul>
+            <li>ABB Tmax XT backup-/cascadingdata indlæst fra officiel ABB 415V coordination table for XT1-XT4 mod S200/S200M/S200P/S800.</li>
+            <li>Siemens 3VA2 backup-/cascadingdata indlæst fra officielle Siemens 3VA2 tables mod 5SY, 5SL4 og 5SU1.</li>
+            <li>Backup-/cascadingvisning viser nu entydig ingen-data tekst for kombinationer uden producentverificerede data.</li>
+            <li>app.js cache-busting opdateret til v6.15.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.14</h2>
+          <time datetime="2026-06-13">2026-06-13</time>
+          <ul>
+            <li>Database lukket for alle serier: Schneider NSXm/NSX/NS/MTZ, ABB Tmax XT/Emax 2 og Siemens 3VA/3WL.</li>
+            <li>Åbne og delvise seriestatusser fjernet fra testdatabasen.</li>
+            <li>Manglende producentværdier markeret "Ikke dokumenteret af producent".</li>
+            <li>Schneider NSX Selectivity Enhanced by Cascading lukket som ikke dokumenteret af producent.</li>
+            <li>Siemens 3VA defaultfelter lukket som ikke dokumenteret af producent, hvor konkrete ratingtabeller ikke findes.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.13</h2>
+          <time datetime="2026-06-13">2026-06-13</time>
+          <ul>
+            <li>Siemens 3WL ETU76B tidligere åben status rettet til verificerede Siemens-range-værdier.</li>
+            <li>ETU76B kildehenvisning opdateret til Siemens 3WL Air Circuit Breakers 10/2014 side 36 og 3WL circuit breaker software 08/2011.</li>
+            <li>Schneider NSXm TM-D/TM-G tr rettet til verificeret ikke-indstillelig fast termisk kurve.</li>
+            <li>Schneider NSXm TM-D/TM-G Ir-range, tr og faste Ii-værdier synkroniseret med officiel Schneider-kilde.</li>
+            <li>Schneider NSXm 20A markeret "Ikke dokumenteret af producent", da den ikke fremgår af den officielle NSXm TM-D-tabel.</li>
+            <li>Schneider NSX Selectivity Enhanced by Cascading status flyttet fra åben status til kildeafklaring.</li>
+            <li>Konsistenskontrol for ETU76B mellem auditstatus, app.js og live-visning.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.12</h2>
+          <time datetime="2026-06-12">2026-06-12</time>
+          <ul>
+            <li>Schneider NSX MicroLogic Io/Ir-valg rettet til fuld kombinationssøgning.</li>
+            <li>NSX MicroLogic Io/Ir-trin udvidet så 133A og 160A eksempler rammes korrekt.</li>
+            <li>MasterPact MTZ dokumentationsoutput rettet til Luftafbryder.</li>
+            <li>Overflødige funktionslinjer skjult i dokumentationsoutput.</li>
+            <li>Siemens 3VA ETU850 regression kontrolleret.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.11</h2>
+          <time datetime="2026-06-11">2026-06-11</time>
+          <ul>
+            <li>Siemens 3VA ETU850 LSI tilføjet som ekstra relæ i testversionen.</li>
+            <li>ETU850 frames/ratingområder og L/tr/S/I settings verificeret mod officiel Siemens 3VA IEC-manual.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.10</h2>
+          <time datetime="2026-06-04">2026-06-04</time>
+          <ul>
+            <li>ABB XT6 630A Ekip Dip tr markeret "Ikke dokumenteret af producent".</li>
+            <li>Siemens ETU55B markeret "Ikke dokumenteret af producent".</li>
+            <li>Siemens 3VA 80A/125A/200A/320A/500A/1250A auditfelter markeret "Ikke dokumenteret af producent".</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.9</h2>
+          <time datetime="2026-06-03">2026-06-03</time>
+          <ul>
+            <li>ABB/Siemens verification + backup/cascading.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

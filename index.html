@@ -7,8 +7,83 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <a
+      href="history.html"
+      style="
+        position: fixed;
+        left: 10px;
+        top: 8px;
+        z-index: 9999;
+        color: #78909c;
+        font: 700 12px Arial, sans-serif;
+        text-decoration: none;
+      "
+      >Versionshistorik</a
+    >
     <!--
       Versionshistorik
+
+      v6.35
+      2026-09-22
+      - ABB-beskyttelsesfunktioner vises nu konsekvent som I1, t1, I2, t2 og I3 i LIVE
+      - ABB I2-beregninger refererer nu til I1 i tabel, dokumentation og kopioutput
+      - Schneider- og Siemens-benævnelser er uændrede
+      - app.js cache-busting opdateret til v6.35
+
+      v6.34
+      2026-08-13
+      - Io/Ir-beregningen normaliserer nu ampereværdier, saa præcise Io x Ir-match vælges korrekt
+      - Schneider NSX630 MicroLogic 5.3 E 630A ved ønsket 400A vælger nu Io 400A og Ir 1,00 x Io = 400A
+      - Tidligere Ir-setting-valg kan ikke længere blokere et bedre beregnet valg, naar ønsket strøm ændres
+      - app.js cache-busting opdateret til v6.34
+
+      v6.33
+      2026-08-06
+      - ABB TMA I-rækken viser nu konkrete MIN/MED/MAX-trin i intervalkolonnen
+      - ABB TMA I-resultatet viser kun det beregnede valgte trin i stedet for alle tre trin
+      - Teksten "ABB MIN/MED/MAX" fjernet fra I-rækken
+      - app.js cache-busting opdateret til v6.33
+
+      v6.32
+      2026-08-06
+      - Isd/S-panelet fjernet igen, saa Isd/S kun beregnes automatisk efter eksisterende logik
+      - Isd/S vises fortsat som beregnet vaerdi i indstillingstabel og dokumentationsoutput
+      - tr og tsd bevarer minimum som standardvalg med gyldige manuelle valg
+      - app.js cache-busting opdateret til v6.32
+
+      v6.31
+      2026-08-06
+      - Isd/S standardvalg rettet tilbage til beregnet vaerdi efter Ik min x 0,8
+      - Isd/S bruger igen den eksisterende korttidsberegningslogik i stedet for minimum
+      - tr og tsd forudvaelger fortsat laveste dokumenterede trin og bevarer gyldige manuelle valg
+      - app.js cache-busting opdateret til v6.31
+
+      v6.30
+      2026-08-06
+      - tr, Isd/S og tsd forudvaelger laveste dokumenterede gyldige producenttrin
+      - Manuelle tr, Isd/S og tsd valg bevares ved genberegning og nulstilles kun ved ugyldig ny kombination
+      - Dokumentationsoutput viser det faktisk valgte tids-/korttidstrin
+      - app.js cache-busting opdateret til v6.30
+
+      v6.29
+      2026-08-06
+      - ABB TMD/TMA relaestørrelse-dropdown gjort kort igen, saa MIN/MED/MAX ikke fylder i In-valget
+      - ABB MIN/MED/MAX vises fortsat i indstillingstabel, beregningsresultat og dokumentationsoutput
+      - app.js cache-busting opdateret til v6.29
+
+      v6.28
+      2026-08-06
+      - ABB TMD/TMA L- og I-indstillinger viser producentens MIN/MED/MAX-betjeningsnavne
+      - TMA I-trin vises datadrevet pr. frame/rating efter ABB-tabellen uden at aendre beregningslogikken
+      - app.js cache-busting opdateret til v6.28
+
+      v6.27
+      2026-08-04
+      - Datadrevet tsd tilfoejet for relaeer med dokumenterede producenttrin eller -intervaller hos Schneider, ABB og Siemens
+      - Justerbar tsd vises som brugerens valg blandt dokumenterede muligheder; faste/ikke-dokumenterede tsd-vaerdier skjules efter producentdata
+      - tsd vises i indstillingstabellen og dokumentationsoutputtet uden at vaelge en vilkaarlig standard
+      - Separat history.html oprettet med fuld versionshistorik og link tilbage til BreakerSettings
+      - app.js cache-busting opdateret til v6.27
 
       v6.26
       2026-07-09
@@ -20,7 +95,7 @@
       v6.25
       2026-06-30
       - Integreret fejlstroemsbeskyttelse aktiveres ikke laengere automatisk
-      - Relaeer med integreret fejlstroemsbeskyttelse viser switchen "Anvend fejlstroemsbeskyttelse" som standard ikke valgt
+      - Relæer med integreret fejlstroemsbeskyttelse viser switchen "Anvend fejlstroemsbeskyttelse" som standard ikke valgt
       - Fejlstroemsfelter og dokumentationsdata vises kun, naar brugeren aktivt vaelger fejlstroemsbeskyttelse
       - app.js cache-busting opdateret til v6.25
 
@@ -110,7 +185,7 @@
       - Schneider NSXm TM-D/TM-G Ir-range, tr og faste Ii-vaerdier synkroniseret med officiel Schneider-kilde
       - Schneider NSXm 20A markeret "Ikke dokumenteret af producent", da den ikke fremgaar af den officielle NSXm TM-D-tabel
       - Schneider NSX Selectivity Enhanced by Cascading status flyttet fra aaben status til kildeafklaring
-      - Konsistenskontrol for ETU76B mellem auditstatus, app-test.js og TEST-visning
+      - Konsistenskontrol for ETU76B mellem auditstatus, app.js og live-visning
 
       v6.12
       2026-06-12
@@ -148,13 +223,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.26
+      LIVEVERSION v6.35
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.26 - MTZ Ir fine adjustment
+          v6.35 - ABB I1/t1/I2/t2/I3
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -187,6 +262,14 @@
         ><select id="method">
           <option>Calculated settings</option>
           <option>Minimum settings</option></select
+        ><div id="trPanel" class="statsBox hidden">
+          <label id="trChoiceLabel" for="trChoice">tr</label><select id="trChoice"></select>
+          <div id="trInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="tsdPanel" class="statsBox hidden">
+          <label id="tsdChoiceLabel" for="tsdChoice">tsd</label><select id="tsdChoice"></select>
+          <div id="tsdInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
         ><div id="irSettingWrap" class="statsBox hidden">
           <h3 id="irSettingTitle">Ir setting method</h3>
           <div id="irSettings" class="plugs"></div>
@@ -263,7 +346,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.26"></script>
+    <script src="app.js?v=6.35"></script>
     <div
       style="
         position: fixed;
@@ -279,7 +362,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.26
+      LIVEVERSION v6.35
     </div>
   </body>
 </html>
