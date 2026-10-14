@@ -69,6 +69,29 @@ const SCHNEIDER_NSX_MICROLOGIC_IO = {
 const SCHNEIDER_NSX_MICROLOGIC_IR = [
   0.9, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 1,
 ];
+// MicroLogic 2 has frame-specific physical Io dial positions. Do not reuse the
+// later MicroLogic 5/6/7 keypad model here: its Ir adjustment is mechanical.
+const SCHNEIDER_NSX_MICROLOGIC_2_IO = settingsByRow(
+  [
+    { frame: "NSX100", inA: 40, values: [16, 18, 20, 23, 25, 28, 32, 36, 40] },
+    { frame: "NSX100", inA: 100, values: [40, 45, 50, 55, 63, 70, 80, 90, 100] },
+    { frame: "NSX160", inA: 40, values: [16, 18, 20, 23, 25, 28, 32, 36, 40] },
+    { frame: "NSX160", inA: 100, values: [40, 45, 50, 55, 63, 70, 80, 90, 100] },
+    { frame: "NSX160", inA: 160, values: [63, 70, 80, 90, 100, 110, 125, 150, 160] },
+    { frame: "NSX250", inA: 40, values: [16, 18, 20, 23, 25, 28, 32, 36, 40] },
+    { frame: "NSX250", inA: 100, values: [40, 45, 50, 55, 63, 70, 80, 90, 100] },
+    { frame: "NSX250", inA: 160, values: [63, 70, 80, 90, 100, 110, 125, 150, 160] },
+    { frame: "NSX250", inA: 250, values: [100, 110, 125, 140, 160, 175, 200, 225, 250] },
+    { frame: "NSX400", inA: 250, values: [70, 100, 125, 140, 160, 175, 200, 225, 250] },
+    { frame: "NSX400", inA: 400, values: [160, 180, 200, 230, 250, 280, 320, 360, 400] },
+    { frame: "NSX630", inA: 630, values: [250, 280, 320, 350, 400, 450, 500, 570, 630] },
+  ],
+  (row) => ratios(row.inA, row.values),
+);
+const SCHNEIDER_NSX_MICROLOGIC_2_TSD = {
+  fixed: "20 ms ikke-udløsende tid; maks. afbrydelsestid 80 ms",
+  reference: "Isd",
+};
 // MicroLogic 5/6/7 has an Ir dial preset plus keypad fine-tuning. The dial is
 // the maximum permitted Ir; the final effective Ir is selected in 1 A steps.
 const SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL = {
@@ -947,13 +970,14 @@ const DATA = [
           NSX160: [40, 100, 160],
           NSX250: [40, 100, 160, 250],
         },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        io: SCHNEIDER_NSX_MICROLOGIC_2_IO,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
-        tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
-        isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        trFixed: "16 s (fast, ved 6 × Ir)",
+        isd: [1.5, 2, 3, 4, 5, 6, 7, 8, 10],
+        tsd: SCHNEIDER_NSX_MICROLOGIC_2_TSD,
         iiByRating: { 40: "600A", 100: "1500A", 160: "2400A", 250: "3000A" },
         sourceNote:
-          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings.",
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-04 and NNZ4765207 p. 9, MicroLogic 2.2: frame/rating-specific Io positions, Ir factors 0.90-1.00, fixed 16 s long-time point, Isd 1.5-10 x Ir including 7 x Ir, 20/80 ms short-time behavior and fixed Ii values verified.",
       },
       {
         name: "MicroLogic Vigi 4.2",
@@ -1046,14 +1070,15 @@ const DATA = [
       {
         name: "MicroLogic 2.3",
         frames: ["NSX400", "NSX630"],
-        ratingsByFrame: { NSX400: [250, 400], NSX630: [250, 400, 630] },
-        io: SCHNEIDER_NSX_MICROLOGIC_IO,
+        ratingsByFrame: { NSX400: [250, 400], NSX630: [630] },
+        io: SCHNEIDER_NSX_MICROLOGIC_2_IO,
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
-        tr: [0.5, 1, 2, 4, 8, 12, 16, 20, 24],
-        isd: [1.5, 2, 3, 4, 5, 6, 8, 10],
+        trFixed: "16 s (fast, ved 6 × Ir)",
+        isd: [1.5, 2, 3, 4, 5, 6, 7, 8, 10],
+        tsd: SCHNEIDER_NSX_MICROLOGIC_2_TSD,
         iiByRating: { 250: "3000A", 400: "4800A", 630: "6930A" },
         sourceNote:
-          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-03, MicroLogic 2 electronic trip unit setting tables and instantaneous protection pickup Ii table: Io/Ir, tr, Isd and fixed Ii values verified for 2.2 and 2.3 ratings, including Ii 3000A for In 250A, 4800A for In 400A and 6930A for In 630A.",
+          "Schneider Electric ComPacT NSX User Guide DOCA0187EN-04 and Schneider MicroLogic 2 dial tables: frame/rating-specific Io positions, Ir factors 0.90-1.00, fixed 16 s long-time point, Isd 1.5-10 x Ir including 7 x Ir, 20/80 ms short-time behavior and fixed Ii values verified. Product references C4032D250/C4032D400 apply to NSX400; C6332D630 applies to NSX630.",
       },
       {
         name: "MicroLogic Vigi 4.3",
