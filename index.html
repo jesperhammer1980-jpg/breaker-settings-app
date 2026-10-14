@@ -23,6 +23,12 @@
     <!--
       Versionshistorik
 
+      v6.37
+      2026-10-14
+      - Schneider ComPacT NSX MicroLogic 2.2/2.3 Io/Ir gennemgået pr. frame og mærkestrøm mod officielle producenttabeller
+      - MicroLogic 2 bruger faste tr- og korttidsegenskaber; Isd inkluderer nu alle dokumenterede trin, herunder 7 x Ir
+      - app.js cache-busting opdateret til v6.37
+
       v6.36
       2026-09-22
       - MicroLogic 5/6/7 Ir modelleres nu med producentens drejeknapsforindstilling og 1 A keypad-finjustering, hvor endepunkterne er eksakt dokumenteret
@@ -229,13 +235,13 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.36
+      LIVEVERSION v6.37
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.36 - MicroLogic 5/6/7 Ir-finjustering
+          v6.37 - MicroLogic 2.2/2.3 producentaudit
         </p>
         <div class="liveBanner"></div>
         <label>Fabrikat</label
@@ -352,7 +358,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.36"></script>
+    <script src="app.js?v=6.37"></script>
     <div
       style="
         position: fixed;
@@ -368,7 +374,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.36
+      LIVEVERSION v6.37
     </div>
   </body>
 </html>
