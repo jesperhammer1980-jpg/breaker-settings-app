@@ -27,7 +27,7 @@ Denne reference beskriver den implementerede TEST-logik i `app-test.js`. Den er 
 ## Tid og kortslutning
 
 - `choiceValue` vælger laveste numeriske tr-værdi eller bevarer et gyldigt manuelt valg.
-- `renderTsdControls` gør det samme for justerbare tsd-optioner. En `fixed` tsd vises uden kontrol.
+- `renderTsdControls` gør det samme for justerbare tsd-optioner. Tekniske faste korttidskarakteristikker er ikke tsd-indstillinger og vises ikke i tabel, resultat eller Kopiér-output.
 - `under(factors, base, limit)` vælger den højeste dokumenterede faktor, hvor `factor * base <= limit`.
 - Isd anvender normalt `base = faktisk Ir`; `isdBase: "In"` anvender `base = In`.
 - Isd-grænse: `Ik min * 1000 * 0,8`.
@@ -47,4 +47,4 @@ NSX100, MicroLogic 2.2, In 100 A, ønsket 55 A:
 - Dokumenteret Io-position 55 A og Ir-faktor 1,00 giver det præcise match 55 A.
 - Ved Ik min 9 kA er Isd-grænsen 7.200 A.
 - Dokumenteret Isd 10 x Ir giver 550 A og er derfor gyldig.
-- `tr` er fast 16 s ved 6 x Ir; den vises ikke som dropdown.
+- `tr` er fast 16 s ved 6 x Ir; den vises ikke som dropdown. MicroLogic 2's 20/80 ms-korttidsadfærd er kun en ikke-justerbar teknisk karakteristik og vises ikke som tsd.

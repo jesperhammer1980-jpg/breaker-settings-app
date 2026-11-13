@@ -36,6 +36,12 @@
     <!--
       Versionshistorik
 
+      v6.39
+      2026-11-13
+      - MicroLogic 2.2/2.3 tekniske korttidskarakteristik er fjernet fra tsd-indstilling, resultat og Kopiér-output
+      - Fast 20/80 ms-korttidsadfærd beskrives kun som ikke-justerbar teknisk karakteristik i beregningsvejledningen
+      - app-test.js cache-busting opdateret til v6.39
+
       v6.38
       2026-11-13
       - Beregningsvejledning tilføjet i TEST med de faktiske udvælgelsesregler, producentbegrænsninger og regneeksempler
@@ -254,13 +260,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.38
+      TEST v6.39
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.38 - beregningsvejledning og In-standard
+          TEST v6.39 - MicroLogic 2 korttidskarakteristik
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -377,7 +383,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.38"></script>
+    <script src="app-test.js?v=6.39"></script>
     <div
       style="
         position: fixed;
@@ -393,7 +399,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.38 - live ikke opdateret
+      TEST v6.39 - live ikke opdateret
     </div>
   </body>
 </html>
