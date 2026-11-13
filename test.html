@@ -20,8 +20,27 @@
       "
       >Versionshistorik</a
     >
+    <a
+      href="calculation-guide-test.html"
+      style="
+        position: fixed;
+        left: 126px;
+        top: 8px;
+        z-index: 9999;
+        color: #78909c;
+        font: 700 12px Arial, sans-serif;
+        text-decoration: none;
+      "
+      >Beregningsvejledning</a
+    >
     <!--
       Versionshistorik
+
+      v6.38
+      2026-11-13
+      - Beregningsvejledning tilføjet i TEST med de faktiske udvælgelsesregler, producentbegrænsninger og regneeksempler
+      - Ønsket indstillingsstrøm og INC initialiseres nu til relæets reelle In og nulstilles kun, når In ændres
+      - app-test.js cache-busting opdateret til v6.38
 
       v6.37
       2026-10-14
@@ -235,13 +254,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.37
+      TEST v6.38
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.37 - MicroLogic 2.2/2.3 producentaudit
+          TEST v6.38 - beregningsvejledning og In-standard
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -263,13 +282,13 @@
           id="desired"
           type="text"
           inputmode="decimal"
-          value="125"
+          value=""
         /><label>Ik min. kA</label
         ><input id="ikmin" type="text" inputmode="decimal" value="3,1" /><label
           >Ik max. kA</label
         ><input id="ikmax" type="text" inputmode="decimal" value="14" /><label
           >INC manuel værdi</label
-        ><input id="inc" type="text" inputmode="decimal" value="160" /><label
+        ><input id="inc" type="text" inputmode="decimal" value="" /><label
           >Metode</label
         ><select id="method">
           <option>Calculated settings</option>
@@ -358,7 +377,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.37"></script>
+    <script src="app-test.js?v=6.38"></script>
     <div
       style="
         position: fixed;
@@ -374,7 +393,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.37 - live ikke opdateret
+      TEST v6.38 - live ikke opdateret
     </div>
   </body>
 </html>

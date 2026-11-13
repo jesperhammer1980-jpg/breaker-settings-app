@@ -2469,10 +2469,11 @@ let st = {
   relay: "",
   rating: 0,
   poles: 0,
-  desired: "125",
+  desired: "",
   ikmin: "3,1",
   ikmax: "14",
-  inc: "160",
+  inc: "",
+  inputRating: null,
   method: "Calculated settings",
   irSetting: "standard",
   irChoiceSignature: "",
@@ -6075,8 +6076,9 @@ function render() {
     f = F(),
     c = C(),
     r = R(),
-    inA = rating(),
-    p = P(),
+    inA = rating();
+  syncInputsForRating(inA);
+  const p = P(),
     desired = parseDk(st.desired),
     ikmin = parseDk(st.ikmin),
     ikmax = parseDk(st.ikmax),
@@ -6418,8 +6420,13 @@ function reset(prevPole) {
   st.rating = 0;
   const idx = F().poles.indexOf(prevPole);
   st.poles = idx >= 0 ? idx : 0;
-  st.inc = String(F().ratings[F().ratings.length - 1]);
   resetResidual();
+}
+function syncInputsForRating(inA) {
+  if (st.inputRating === inA) return;
+  st.inputRating = inA;
+  st.desired = String(inA);
+  st.inc = String(inA);
 }
 function bind() {
   $("brand").onchange = (e) => {
@@ -6444,7 +6451,6 @@ function bind() {
     resetResidual();
     const idx = F().poles.indexOf(oldPole);
     st.poles = idx >= 0 ? idx : 0;
-    st.inc = String(F().ratings[F().ratings.length - 1]);
     render();
   };
   $("cls").onchange = (e) => {
@@ -6459,7 +6465,6 @@ function bind() {
   };
   $("rating").onchange = (e) => {
     st.rating = +e.target.value;
-    st.inc = String(rating());
     render();
   };
   $("poles").onchange = (e) => {
