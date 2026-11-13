@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BreakerSettings beregningsvejledning</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body { min-height: 100vh; color: #edf5f0; }
+      .guide-shell { max-width: 980px; margin: 0 auto; padding: 16px; }
+      .guide-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+      .guide-top h1 { margin: 0; } .guide-top p { margin: 6px 0 0; }
+      .back-link { color: #92ffb4; text-decoration: none; font-weight: 900; white-space: nowrap; }
+      .guide-list { display: grid; gap: 10px; }
+      .guide-section { background: linear-gradient(180deg, #0b1722, #08111a); border: 1px solid rgba(255,255,255,.08); border-radius: 8px; padding: 14px; }
+      .guide-section h2 { margin: 0; color: #34f36a; font-size: 18px; }
+      .guide-section p, .guide-section li { color: #c2d0d8; line-height: 1.55; }
+      .guide-section p { margin: 8px 0 0; } .guide-section ul, .guide-section ol { margin: 8px 0 0; padding-left: 20px; }
+      .formula { display: block; margin-top: 8px; padding: 8px 10px; border-left: 3px solid #34f36a; background: #08111a; color: #edf5f0; font-family: Consolas, monospace; overflow-wrap: anywhere; }
+      @media (max-width: 640px) { .guide-shell { padding: 12px; } .guide-top { display: block; } .back-link { display: inline-block; margin-top: 10px; } }
+    </style>
+  </head>
+  <body>
+    <main class="guide-shell">
+      <header class="guide-top"><div><h1>Breaker<span>Settings</span></h1><p class="subtitle">Beregningsvejledning</p></div><a class="back-link" href="index.html">Tilbage til BreakerSettings</a></header>
+      <section class="guide-list" aria-label="Beregningsvejledning">
+        <article class="guide-section"><h2>Udgangspunkt og brugerinput</h2><p>Ved første visning, og hver gang den faktiske relæmærkestrøm In ændres, sættes både Ønsket indstillingsstrøm og INC manuel værdi til In. Det er kun en startværdi: begge felter kan ændres frit bagefter.</p><p>En almindelig genberegning, ændring af Ik min., Ik max., polantal, metode eller fejlstrømsvalg overskriver ikke manuelle værdier. INC vises i resultatet og dokumentationsoutputtet som den indtastede manuelle værdi; den bruges ikke til at vælge Ir, Isd eller Ii.</p><span class="formula">In = 100 A &rarr; ønsket strøm = 100 A og INC = 100 A ved initialisering.</span></article>
+        <article class="guide-section"><h2>Overlast: Io og Ir / I1</h2><p>Appen bruger kun producentens dokumenterede fysiske positioner og faktorer for den valgte producent, serie, frame, relæ og In. Hvor et relæ har Io, afprøves alle gyldige Io &times; Ir-kombinationer. Uden Io bruges In som reference.</p><ol><li>Et præcist match med ønsket strøm vælges først.</li><li>Ellers vælges den højeste gyldige effektive overlaststrøm, som ikke overstiger ønsket strøm.</li><li>Ved samme resultat foretrækkes Ir-faktoren nærmest 1,00; derefter den nærmeste grovindstilling.</li></ol><p>Calculated settings kan, hvor producentdata indeholder flere dokumenterede MicroLogic-indstillingstyper, foreslå den type der kommer nærmest uden at overskride ønsket strøm. Minimum settings holder sig til standardtypen. For øvrige relæer ændrer metodevalget ikke kandidatberegningen.</p><p>Findes der ingen fysisk mulig værdi ved eller under ønsket strøm, vises en fejl med lavest mulige værdi. Appen hæver ikke strømmen for at ramme et trin.</p><span class="formula">NSX100, MicroLogic 2.2, In 100 A, ønsket 55 A: Io 55 A &times; Ir 1,00 = 55 A.</span></article>
+        <article class="guide-section"><h2>Tid: tr / t1 og tsd / t2</h2><p>Justerbare tr/t1- og tsd/t2-værdier kommer kun fra relæets dokumenterede tabeller. Det laveste gyldige trin vælges først, og et gyldigt manuelt valg bevares, indtil relæ/rating ændres, så det ikke længere findes.</p><p>En fast producentkarakteristik er ikke en dropdown eller en relæindstilling i resultatet. MicroLogic 2 har fast tr 16 s ved 6 &times; Ir og en ikke-justerbar korttidskarakteristik med 20 ms ikke-udløsende tid og højst 80 ms afbrydelsestid. Denne 20/80 ms-oplysning vises kun her som teknisk karakteristik, ikke som tsd.</p></article>
+        <article class="guide-section"><h2>Kortslutningsbeskyttelse: Isd / I2 og Ii / I3 / Im</h2><p>For en numerisk Isd/I2 vælges det højeste dokumenterede faktortrin, som holder sig inden for 80 % af Ik min. Referencen er normalt den faktisk valgte Ir/I1; enkelte relæmodeller er dokumenteret med In som reference. Hvis selv laveste trin er over grænsen, vises en fejl.</p><span class="formula">Isd/I2-grænse = Ik min &times; 1.000 &times; 0,8.</span><p>For en justerbar Ii/I3 anvendes tilsvarende dokumenterede trin og den relevante Ik-grænse. Faste Ii/I3/Im-værdier eller producentangivne intervaller vises som faste oplysninger og kan ikke ændres.</p><span class="formula">Ik min 9 kA og faktisk Ir 55 A: grænse 7.200 A; MicroLogic 2.2 vælger Isd 10 &times; Ir = 550 A.</span></article>
+        <article class="guide-section"><h2>Producentforskelle</h2><p>Schneider vises normalt med Ir, tr, Isd, tsd og Ii samt Io, hvor relæet har en fysisk grovindstilling. Dokumenterede MicroLogic 5/6/7-varianter kan have drejeknap som maksimum og elektronisk Ir-finjustering i 1 A-trin; den faktiske Ir må stadig ikke overstige ønsket strøm.</p><p>ABB vises med producentbetegnelserne I1, t1, I2, t2 og I3. Schneider- og Siemens-betegnelser ændres ikke. Siemens relæer kan have direkte numeriske indstillinger eller faste/angivne karakteristikdata afhængigt af ETU-modellen.</p></article>
+        <article class="guide-section"><h2>Hvad resultatet betyder</h2><p>Understregningen i intervalkolonnen markerer det valgte dokumenterede trin. Resultat- og Kopiér-teksten viser den samme valgte værdi. Tekster som Fast, Fast/angivet eller en producentangivet karakteristik er tekniske oplysninger, ikke brugerjusterbare indstillinger.</p><p>Producentens kilde-links for den valgte kombination findes under appens dokumentation.</p></article>
+      </section>
+    </main>
+  </body>
+</html>

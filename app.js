@@ -88,10 +88,6 @@ const SCHNEIDER_NSX_MICROLOGIC_2_IO = settingsByRow(
   ],
   (row) => ratios(row.inA, row.values),
 );
-const SCHNEIDER_NSX_MICROLOGIC_2_TSD = {
-  fixed: "20 ms ikke-udløsende tid; maks. afbrydelsestid 80 ms",
-  reference: "Isd",
-};
 // MicroLogic 5/6/7 has an Ir dial preset plus keypad fine-tuning. The dial is
 // the maximum permitted Ir; the final effective Ir is selected in 1 A steps.
 const SCHNEIDER_NSX_MICROLOGIC_567_IR_DIAL = {
@@ -974,7 +970,6 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         trFixed: "16 s (fast, ved 6 × Ir)",
         isd: [1.5, 2, 3, 4, 5, 6, 7, 8, 10],
-        tsd: SCHNEIDER_NSX_MICROLOGIC_2_TSD,
         iiByRating: { 40: "600A", 100: "1500A", 160: "2400A", 250: "3000A" },
         sourceNote:
           "Schneider Electric ComPacT NSX User Guide DOCA0187EN-04 and NNZ4765207 p. 9, MicroLogic 2.2: frame/rating-specific Io positions, Ir factors 0.90-1.00, fixed 16 s long-time point, Isd 1.5-10 x Ir including 7 x Ir, 20/80 ms short-time behavior and fixed Ii values verified.",
@@ -1075,7 +1070,6 @@ const DATA = [
         ir: SCHNEIDER_NSX_MICROLOGIC_IR,
         trFixed: "16 s (fast, ved 6 × Ir)",
         isd: [1.5, 2, 3, 4, 5, 6, 7, 8, 10],
-        tsd: SCHNEIDER_NSX_MICROLOGIC_2_TSD,
         iiByRating: { 250: "3000A", 400: "4800A", 630: "6930A" },
         sourceNote:
           "Schneider Electric ComPacT NSX User Guide DOCA0187EN-04 and Schneider MicroLogic 2 dial tables: frame/rating-specific Io positions, Ir factors 0.90-1.00, fixed 16 s long-time point, Isd 1.5-10 x Ir including 7 x Ir, 20/80 ms short-time behavior and fixed Ii values verified. Product references C4032D250/C4032D400 apply to NSX400; C6332D630 applies to NSX630.",
@@ -2469,10 +2463,11 @@ let st = {
   relay: "",
   rating: 0,
   poles: 0,
-  desired: "125",
+  desired: "",
   ikmin: "3,1",
   ikmax: "14",
-  inc: "160",
+  inc: "",
+  inputRating: null,
   method: "Calculated settings",
   irSetting: "standard",
   irChoiceSignature: "",
@@ -6075,8 +6070,9 @@ function render() {
     f = F(),
     c = C(),
     r = R(),
-    inA = rating(),
-    p = P(),
+    inA = rating();
+  syncInputsForRating(inA);
+  const p = P(),
     desired = parseDk(st.desired),
     ikmin = parseDk(st.ikmin),
     ikmax = parseDk(st.ikmax),
@@ -6418,8 +6414,13 @@ function reset(prevPole) {
   st.rating = 0;
   const idx = F().poles.indexOf(prevPole);
   st.poles = idx >= 0 ? idx : 0;
-  st.inc = String(F().ratings[F().ratings.length - 1]);
   resetResidual();
+}
+function syncInputsForRating(inA) {
+  if (st.inputRating === inA) return;
+  st.inputRating = inA;
+  st.desired = String(inA);
+  st.inc = String(inA);
 }
 function bind() {
   $("brand").onchange = (e) => {
@@ -6444,7 +6445,6 @@ function bind() {
     resetResidual();
     const idx = F().poles.indexOf(oldPole);
     st.poles = idx >= 0 ? idx : 0;
-    st.inc = String(F().ratings[F().ratings.length - 1]);
     render();
   };
   $("cls").onchange = (e) => {
@@ -6459,7 +6459,6 @@ function bind() {
   };
   $("rating").onchange = (e) => {
     st.rating = +e.target.value;
-    st.inc = String(rating());
     render();
   };
   $("poles").onchange = (e) => {
