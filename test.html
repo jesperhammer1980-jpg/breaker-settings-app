@@ -36,6 +36,13 @@
     <!--
       Versionshistorik
 
+      v6.43
+      2026-11-26
+      - Ekip Dip I3 anvender nu Ik min x 0,8, når I2 fysisk er sat til OFF; I2 aktiv og I3 aktiv anvender fortsat Ik max x 0,8 for I3
+      - OFF vises som faktisk I2/I3-resultat, også når AUTO ikke kan finde et gyldigt aktivt trin
+      - Kopiér er spærret ved ugyldige aktive AUTO-indstillinger og når ingen kortslutningsbeskyttelse er aktiv
+      - app-test.js cache-busting opdateret til v6.43
+
       v6.42
       2026-11-26
       - ABB Ekip Dip I2 og I3 har nu dokumenterede OFF-DIP-valg, hvor producenten angiver dem
@@ -278,13 +285,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.42
+      TEST v6.43
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.42 - ABB Ekip Dip OFF og dokumentationskontrol
+          TEST v6.43 - ABB Ekip Dip I2/I3 OFF-validering
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -388,6 +395,7 @@
         <div id="warning" class="warning hidden"></div>
         <div id="requestWarning" class="warning hidden"></div>
         <div id="relaySuggestion" class="warning hidden"></div>
+        <div id="shortProtectionWarning" class="warning hidden"></div>
         <div id="documentationWarning" class="warning hidden"></div>
         <h3>Beregnede indstillinger</h3>
         <table>
@@ -423,7 +431,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.42"></script>
+    <script src="app-test.js?v=6.43"></script>
     <div
       style="
         position: fixed;
@@ -439,7 +447,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.42 - live ikke opdateret
+      TEST v6.43 - live ikke opdateret
     </div>
   </body>
 </html>

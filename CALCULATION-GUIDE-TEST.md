@@ -31,7 +31,7 @@ Denne reference beskriver den implementerede TEST-logik i `app-test.js`. Den er 
 - `under(factors, base, limit)` vælger den højeste dokumenterede faktor, hvor `factor * base <= limit`.
 - Isd anvender normalt `base = faktisk Ir`; `isdBase: "In"` anvender `base = In`.
 - Isd-grænse: `Ik min * 1000 * 0,8`.
-- Justerbar Ii anvender `Ik max * 1000 * 0,8`, når Isd findes, ellers `Ik min * 1000 * 0,8`.
+- Justerbar Ii anvender `Ik max * 1000 * 0,8`, når Isd/I2 er aktiv, ellers `Ik min * 1000 * 0,8`.
 - Faste Ii/I3/Im-data vises som teknisk producentinformation og beregnes ikke om.
 
 ## Producentetiketter
@@ -53,7 +53,8 @@ ABB SACE Tmax XT IEC, dokument `1SDC210100D0206`, revision 08/2024, side 3/23 og
 - Ekip Dip LS/I har en fysisk S/I DIP-switch. TEST kræver teknikervalget: `S` viser og dokumenterer I2/t2, mens `I` viser og dokumenterer I3. Før valget dokumenteres ingen af dem, og I2/t2 og I3 kan aldrig være aktive samtidig.
 - Ekip Dip LIG og LSIG har separat G-jordfejlsbeskyttelse, ikke RCD. I4 vælges manuelt mellem `OFF` og producentens dokumenterede faktorer; når I4 er aktiv, vælges t4 manuelt. XT2-XT6 bruger I4 = 0,20/0,25/0,45/0,55/0,75/0,80/1,00 x In. XT7 bruger 0,20/0,30/0,40/0,60/0,80/0,90/1,00 x In for LIG og 0,10/0,20/0,30/0,40/0,60/0,80/0,90/1,00 x In for LSIG. t4 er 0,1/0,2/0,4/0,8 s; XT7 tilbyder desuden den dokumenterede t=k/I²-kurve.
 - ABBs samme tabel dokumenterer `OFF` for I2 og I3. TEST viser OFF som fysisk DIP-valg for Ekip Dip-typerne og beholder den Ik-baserede automatiske beregning som standard for en aktiv beskyttelse. Manuelle numeriske I2/I3-valg filtreres til dokumenterede trin, der overholder den eksisterende Ik-grænse. I2 OFF skjuler t2.
-- `Kopiér` er spærret, når den fysiske indstilling er ufuldstændig: LS/I uden S/I-valg, LIG/LSIG uden I4-valg eller aktiv I4 uden t4. I4 OFF er komplet. `resetDipSelections()` nulstiller S/I, I2, I3, I4 og t4 ved frame-, relæ- og ratingskift, så valg ikke arves af en anden fysisk variant.
+- Når I2 er OFF og I3 er aktiv, beregnes I3 mod `Ik min * 1000 * 0,8`; er både I2 og I3 aktive, bevares I3 mod `Ik max * 1000 * 0,8`. OFF har prioritet over AUTO-fejl og dokumenteres som OFF. Er begge kortslutningsfunktioner OFF eller inaktive, vises en advarsel om manglende aktiv kortslutningsbeskyttelse.
+- `Kopiér` er spærret, når den fysiske indstilling er ufuldstændig eller ugyldig: LS/I uden S/I-valg, LIG/LSIG uden I4-valg eller aktiv I4 uden t4, aktiv I2/I3 AUTO uden gyldigt producenttrin eller ingen aktiv kortslutningsbeskyttelse. I4 OFF er komplet. `resetDipSelections()` nulstiller S/I, I2, I3, I4 og t4 ved frame-, relæ- og ratingskift, så valg ikke arves af en anden fysisk variant.
 
 Eksempel: XT5, In 400 A, ønsket 280 A giver LS/I `I1 = 0,68 x In = 272 A`, mens LSI kan bruge `I1 = 0,70 x In = 280 A`.
 

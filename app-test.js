@@ -2684,6 +2684,7 @@ let st = {
   i3Choice: "",
   gChoice: "",
   tgChoice: "",
+  documentationIssues: [],
   backupComponent: "all",
   rcdEnabled: false,
   rcdDevice: 0,
@@ -3237,7 +3238,7 @@ function resetDipSelections() {
 }
 function documentationMissingForCurrentSelection() {
   const r = R();
-  const missing = [];
+  const missing = [...(st.documentationIssues || [])];
   if (r.shortCircuitSelector && !st.siMode)
     missing.push("Vælg S eller I med S/I DIP-switchen.");
   if (r.earthFault && !st.gChoice) missing.push("Vælg I4 eller OFF.");
@@ -6483,7 +6484,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.26-test",
+      version: "v6.43-test",
       anonymousId: anonymousId(),
       selection: selection(),
     });
@@ -6662,8 +6663,11 @@ function render() {
     !!r.physicalDipThresholds && overloadOk,
   );
   if (i2Dip && i2Dip.choice === "OFF") selectedTsd = renderTsdControls(null);
+  const i2Off = i2Dip && i2Dip.choice === "OFF";
   const iiLimit =
-    isdValues && isdValues.length ? ikmax * 1000 * 0.8 : ikmin * 1000 * 0.8;
+    isdValues && isdValues.length && !i2Off
+      ? ikmax * 1000 * 0.8
+      : ikmin * 1000 * 0.8;
   // Keep documented textual I3 data on the existing verification path; only
   // the Ekip Dip control itself requires numeric, physically selectable steps.
   const autoI3 = under(iiValues, inA, iiLimit);
@@ -6679,6 +6683,26 @@ function render() {
     autoI3,
     !!r.physicalDipThresholds,
   );
+  const i3Off = i3Dip && i3Dip.choice === "OFF";
+  const hasActiveShortProtection =
+    (isdValues && isdValues.length && !i2Off) ||
+    (iiValues && iiValues.length && !i3Off);
+  const noActiveShortProtection =
+    !!r.physicalDipThresholds && !shortFunctionPending && !hasActiveShortProtection;
+  st.documentationIssues = [];
+  if (ir && ir.error) st.documentationIssues.push("Overbelastningsindstillingen er ugyldig.");
+  if (i2Dip && i2Dip.choice === "AUTO" && autoI2 && (autoI2.error || autoI2.verify))
+    st.documentationIssues.push("Den aktive I2 AUTO-indstilling er ugyldig.");
+  if (i3Dip && i3Dip.choice === "AUTO" && autoI3 && (autoI3.error || autoI3.verify))
+    st.documentationIssues.push("Den aktive I3 AUTO-indstilling er ugyldig.");
+  if (noActiveShortProtection)
+    st.documentationIssues.push("Ingen aktiv kortslutningsbeskyttelse: I2 og I3 er OFF eller inaktive.");
+  $("shortProtectionWarning").classList.toggle("hidden", !noActiveShortProtection);
+  $("shortProtectionWarning").textContent = noActiveShortProtection
+    ? "ADVARSEL: Ingen aktiv kortslutningsbeskyttelse. I2 og I3 er OFF eller inaktive."
+    : "";
+  if (noActiveShortProtection)
+    out.push("ADVARSEL: Ingen aktiv kortslutningsbeskyttelse (I2/I3 er OFF eller inaktive).");
   out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
   if (irSettingMethod && !ir.fine) {
     rows.push(
@@ -6782,7 +6806,13 @@ function render() {
       out.push(lbl.short + ": " + status);
     } else if (overloadOk) {
       const isd = autoI2;
-      if (isd.verify) {
+      const off = i2Off;
+      if (off) {
+        rows.push(
+          `<tr><td>${lbl.short}</td><td>OFF / ${range(isdValues, isdValues[0], fmt)}</td><td>OFF</td></tr>`,
+        );
+        out.push(`${lbl.short}: OFF`);
+      } else if (isd.verify) {
         const status = isd.status || V;
         rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
         out.push(lbl.short + ": " + status);
@@ -6794,7 +6824,6 @@ function render() {
           `${lbl.short}: FEJL - laveste ${lbl.short} er højere end Ik min-grænse`,
         );
       } else {
-        const off = i2Dip && i2Dip.choice === "OFF";
         const factor = i2Dip && i2Dip.factor !== null ? i2Dip.factor : isd.factor;
         const available = r.physicalDipThresholds
           ? `OFF / ${range(isdValues, factor, fmt)}`
@@ -6822,7 +6851,14 @@ function render() {
   if (iiValues && iiValues.length) {
     const lim = iiLimit,
       ii = autoI3;
-    if (ii.verify) {
+    const off = i3Off;
+    if (off) {
+      rows.push(
+        `<tr><td>${lbl.instant}</td><td>OFF / ${range(iiValues, iiValues[0], fmt)}</td><td>OFF</td></tr>`,
+      );
+      out.push(`${lbl.instant}: OFF`);
+      instantWritten = true;
+    } else if (ii.verify) {
       const status = ii.status || V;
       rows.push(`<tr><td>${lbl.instant}</td><td>${status}</td><td>${status}</td></tr>`);
       out.push(lbl.instant + ": " + status);
@@ -6836,7 +6872,6 @@ function render() {
       );
       instantWritten = true;
     } else {
-      const off = i3Dip && i3Dip.choice === "OFF";
       const factor = i3Dip && i3Dip.factor !== null ? i3Dip.factor : ii.factor;
       const available = r.physicalDipThresholds
         ? `OFF / ${range(iiValues, factor, fmt)}`
