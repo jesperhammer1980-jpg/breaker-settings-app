@@ -40,6 +40,19 @@ Denne reference beskriver den implementerede TEST-logik i `app-test.js`. Den er 
 - Schneider og Siemens beholder deres etablerede etiketter.
 - Faste tider og korttidskarakteristik er ikke brugerindstillinger, selv om de vises i resultatet.
 
+## ABB Tmax XT Ekip Dip
+
+ABB SACE Tmax XT IEC, dokument `1SDC210100D0206`, revision 08/2024, side 3/23 og 3/25, opdeler Ekip Dip i separate fysiske relætyper. TEST-data modellerer derfor `Ekip Dip LS/I`, `Ekip Dip LSI`, `Ekip Dip LIG` og `Ekip Dip LSIG` hver for sig.
+
+- LS/I og LIG: `I1 = 0,4...1,0 x In` i trin på `0,04 x In`; `t1 = 12/36 s` og `12/48 s` på XT7.
+- LSI og LSIG: `I1 = 0,4...1,0 x In` i trin på `0,02 x In` for XT2-XT6; XT7 bruger ABBs dokumenterede, særskilte værdiliste. `t1`, `I2`, `t2` og `I3` følger hver types dokumenterede frame-tabel.
+- I2 for LS/I, LSI og LSIG bruger `isdBase: "In"`: `I2 = faktor x In`. Den bruger ikke valgt I1 som reference.
+- LIG har L/I/G, men ikke den dokumenterede selektive S-funktion i denne model; TEST viser derfor hverken I2 eller t2 for LIG.
+- Ekip Dip-indstillingerne er fysiske DIP-switch-positioner. Resultat og Kopiér-output skriver derfor eksempelvis `I1: 0,68 x In = 272 A` og `I2: 7 x In = 2800 A`.
+- Når valgt LS/I giver en lavere fysisk I1 end ønsket, undersøger `ekipDipAlternativeSuggestion` kun dokumenteret kompatibel LSI med samme frame, In, poltal og nødvendige L/S/I-funktioner. Den viser et informativt forslag, men ændrer aldrig valgt relæ.
+
+Eksempel: XT5, In 400 A, ønsket 280 A giver LS/I `I1 = 0,68 x In = 272 A`, mens LSI kan bruge `I1 = 0,70 x In = 280 A`.
+
 ## Kontroleksempel
 
 NSX100, MicroLogic 2.2, In 100 A, ønsket 55 A:

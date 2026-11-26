@@ -66,6 +66,13 @@
           <p>ABB vises med producentbetegnelserne I1, t1, I2, t2 og I3. Schneider- og Siemens-betegnelser ændres ikke. Siemens relæer kan have direkte numeriske indstillinger eller faste/angivne karakteristikdata afhængigt af ETU-modellen.</p>
         </article>
         <article class="guide-section">
+          <h2>ABB Tmax XT: Ekip Dip</h2>
+          <p>Ekip Dip LS/I, LSI, LIG og LSIG er separate relætyper. Appen blander ikke længere deres DIP-indstillinger. ABB SACE Tmax XT IEC, 1SDC210100D0206, 08/2024, side 3/25 dokumenterer LS/I med I1 = 0,4...1,0 &times; In i 0,04-trin og LSI/LSIG med 0,02-trin på XT2-XT6; XT7 bruger den særskilte ABB-liste.</p>
+          <p>For LS/I, LSI og LSIG er I2 en fysisk DIP-værdi ganget med In, ikke med den valgte I1. LIG har ikke selektiv kortslutningsbeskyttelse i denne tabel og viser derfor ikke I2 eller t2. I1, I2 og I3 i resultatet er de fysiske relæindstillinger.</p>
+          <span class="formula">XT5, Ekip Dip LS/I, In 400 A: I1 = 0,68 &times; In = 272 A. Ekip Dip LSI kan i samme dokumenterede konfiguration bruge I1 = 0,70 &times; In = 280 A.</span>
+          <p>Når valgt LS/I ikke kan ramme ønsket strøm præcist, viser appen kun et forslag til LSI, hvis samme frame, In, poltal og L/S/I-beskyttelse er dokumenteret kompatible. Forslaget ændrer aldrig det valgte relæ.</p>
+        </article>
+        <article class="guide-section">
           <h2>Hvad resultatet betyder</h2>
           <p>Understregningen i intervalkolonnen markerer det valgte dokumenterede trin. Resultat- og Kopiér-teksten viser den samme valgte værdi. Tekster som Fast, Fast/angivet eller en producentangivet karakteristik er tekniske oplysninger, ikke brugerjusterbare indstillinger.</p>
           <p>Vejledningen beskriver den nuværende TEST-implementering. Producentens kilde-links for den valgte kombination findes stadig under appens dokumentation.</p>

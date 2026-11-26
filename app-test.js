@@ -168,6 +168,9 @@ const ABB_DIP_L = [
   0.7, 0.72, 0.75, 0.77, 0.8, 0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97,
   1,
 ];
+// ABB Ekip Dip uses distinct physical DIP tables for LS/I and LSI families.
+const ABB_EKIP_DIP_LS_I_L = stepValues(0.4, 1, 0.04);
+const ABB_EKIP_DIP_LSI_L_XT2_XT6 = stepValues(0.4, 1, 0.02);
 const ABB_DIP_S_XT2_XT6 = [
   1, 1.5, 2, 2.5, 3, 3.5, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 10,
 ];
@@ -347,6 +350,22 @@ const ABB_TMAX_DIP_TSD_XT2_XT6 = {
   options: tsdCurveOptions(
     ["0,05 s", "0,1 s", "0,2 s", "0,4 s"],
     ["0,05 s", "0,1 s", "0,2 s", "0,4 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_TMAX_DIP_TSD_LS_I_XT2_XT6 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2 s",
+  options: tsdCurveOptions(["0,1 s", "0,2 s"], [], ABB_TSD_FIXED_CURVE),
+};
+const ABB_TMAX_DIP_TSD_LS_I_XT7 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2 s; t=k/I²: 0,1/0,2 s",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s"],
+    ["0,1 s", "0,2 s"],
     ABB_TSD_FIXED_CURVE,
     ABB_TSD_INVERSE_CURVE,
   ),
@@ -1688,7 +1707,7 @@ const DATA = [
           "ABB SACE Tmax XT IEC catalog 08/2024, page 3/20, table Available settings for TMD and TMA trip units: TMA L and I MIN/MED/MAX values verified per frame/rating.",
       },
       {
-        name: "Ekip Dip",
+        name: "Ekip Dip LS/I",
         frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
         ratingsByFrame: {
           XT2: [10, 25, 40, 63, 100, 160],
@@ -1697,7 +1716,50 @@ const DATA = [
           XT6: [630, 800, 1000],
           XT7: [630, 800, 1000, 1250, 1600],
         },
-        ir: ABB_DIP_L,
+        poles: ["3P", "4P"],
+        functions: ["L", "S", "I"],
+        suggestionGroup: "abb-ekip-dip-power-lsi",
+        ir: ABB_EKIP_DIP_LS_I_L,
+        tr: {
+          XT2: [12, 36],
+          XT4: [12, 36],
+          XT5: [12, 36],
+          XT6: [12, 36],
+          XT7: [12, 48],
+        },
+        isd: ABB_DIP_S_XT2_XT6,
+        isdBase: "In",
+        tsd: {
+          XT2: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT4: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT5: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT6: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT7: ABB_TMAX_DIP_TSD_LS_I_XT7,
+        },
+        ii: ABB_DIP_I_XT2_XT6,
+        sourceNote:
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LS/I; physical DIP settings I1 in 0.04 x In steps, I2/I3 in x In.",
+      },
+      {
+        name: "Ekip Dip LSI",
+        frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
+        ratingsByFrame: {
+          XT2: [10, 25, 40, 63, 100, 160],
+          XT4: [40, 63, 100, 160, 250],
+          XT5: [250, 320, 400, 630],
+          XT6: [630, 800, 1000],
+          XT7: [630, 800, 1000, 1250, 1600],
+        },
+        poles: ["3P", "4P"],
+        functions: ["L", "S", "I"],
+        suggestionGroup: "abb-ekip-dip-power-lsi",
+        ir: {
+          XT2: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT4: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT5: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT6: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT7: ABB_DIP_L,
+        },
         tr: {
           XT2: [3, 12, 36, 60],
           XT4: [3, 12, 36, 60],
@@ -1714,6 +1776,7 @@ const DATA = [
           XT6: ABB_DIP_S_XT2_XT6,
           XT7: ABB_DIP_S_XT7_EMAX,
         },
+        isdBase: "In",
         tsd: {
           XT2: ABB_TMAX_DIP_TSD_XT2_XT6,
           XT4: ABB_TMAX_DIP_TSD_XT2_XT6,
@@ -1729,7 +1792,84 @@ const DATA = [
           XT7: ABB_DIP_I_XT7_EMAX,
         },
         sourceNote:
-          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23-3/26. Ekip Dip L/tr/S/I steps verified per frame where listed.",
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LSI; physical DIP settings I1 in 0.02 x In steps on XT2-XT6, specified XT7 list, and I2/I3 in x In.",
+      },
+      {
+        name: "Ekip Dip LIG",
+        frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
+        ratingsByFrame: {
+          XT2: [10, 25, 40, 63, 100, 160],
+          XT4: [40, 63, 100, 160, 250],
+          XT5: [250, 320, 400, 630],
+          XT6: [630, 800, 1000],
+          XT7: [630, 800, 1000, 1250, 1600],
+        },
+        poles: ["3P", "4P"],
+        functions: ["L", "I", "G"],
+        ir: ABB_EKIP_DIP_LS_I_L,
+        tr: {
+          XT2: [12, 36],
+          XT4: [12, 36],
+          XT5: [12, 36],
+          XT6: [12, 36],
+          XT7: [12, 48],
+        },
+        ii: ABB_DIP_I_XT2_XT6,
+        sourceNote:
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LIG has L/I/G; no I2/t2 is rendered because selective short-circuit protection is not specified for this type.",
+      },
+      {
+        name: "Ekip Dip LSIG",
+        frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
+        ratingsByFrame: {
+          XT2: [10, 25, 40, 63, 100, 160],
+          XT4: [40, 63, 100, 160, 250],
+          XT5: [250, 320, 400, 630],
+          XT6: [630, 800, 1000],
+          XT7: [630, 800, 1000, 1250, 1600],
+        },
+        poles: ["3P", "4P"],
+        functions: ["L", "S", "I", "G"],
+        ir: {
+          XT2: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT4: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT5: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT6: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT7: ABB_DIP_L,
+        },
+        tr: {
+          XT2: [3, 12, 36, 60],
+          XT4: [3, 12, 36, 60],
+          XT5: [3, 12, 36, 48],
+          "XT6|630": [NOT_DOCUMENTED],
+          "XT6|800": [3, 12, 36, 72],
+          "XT6|1000": [3, 12, 36, 42],
+          XT7: [3, 12, 24, 36, 48, 72, 108, 144],
+        },
+        isd: {
+          XT2: ABB_DIP_S_XT2_XT6,
+          XT4: ABB_DIP_S_XT2_XT6,
+          XT5: ABB_DIP_S_XT2_XT6,
+          XT6: ABB_DIP_S_XT2_XT6,
+          XT7: ABB_DIP_S_XT7_EMAX,
+        },
+        isdBase: "In",
+        tsd: {
+          XT2: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT4: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT5: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT6: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT7: ABB_TMAX_DIP_TSD_XT7,
+        },
+        ii: {
+          XT2: ABB_DIP_I_XT2_XT6,
+          XT4: ABB_DIP_I_XT2_XT6,
+          XT5: ABB_DIP_I_XT2_XT6,
+          XT6: ABB_DIP_I_XT2_XT6,
+          XT7: ABB_DIP_I_XT7_EMAX,
+        },
+        sourceNote:
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LSIG; physical DIP settings I1, I2 and I3 use their documented type-specific tables.",
       },
       {
         name: "Ekip Touch",
@@ -2999,6 +3139,72 @@ function labelsFor(s) {
     instant: "Ii",
     magnetic: "Ii",
   };
+}
+function relaySupportsSelection(relay, f, inA, poles) {
+  const supportedRatings = relay.ratingsByFrame && relay.ratingsByFrame[f.frame];
+  return (
+    (!relay.frames || relay.frames.includes(f.frame)) &&
+    (!supportedRatings || supportedRatings.includes(inA)) &&
+    (!relay.poles || relay.poles.includes(poles))
+  );
+}
+function hasRequiredFunctions(candidate, selected) {
+  const required = selected.functions || [];
+  const available = candidate.functions || [];
+  return required.every((fn) => available.includes(fn));
+}
+function ekipDipAlternativeSuggestion(s, f, r, inA, poles, desired, current) {
+  if (
+    s.brand !== "ABB" ||
+    s.series !== "Tmax XT" ||
+    !r.suggestionGroup ||
+    !isN(desired) ||
+    !current ||
+    current.error ||
+    current.verify ||
+    !isN(current.value) ||
+    Math.abs(current.value - desired) < 0.000001
+  )
+    return "";
+  const candidates = relays().filter(
+    (candidate) =>
+      candidate.name !== r.name &&
+      candidate.suggestionGroup === r.suggestionGroup &&
+      relaySupportsSelection(candidate, f, inA, poles) &&
+      hasRequiredFunctions(candidate, r),
+  );
+  let better = null;
+  for (const candidate of candidates) {
+    const factors = settingValues(candidate.ir, f, inA, []);
+    const alternative = best([inA], factors, desired);
+    if (
+      alternative.error ||
+      alternative.verify ||
+      !isN(alternative.value) ||
+      alternative.value <= current.value + 0.000001
+    )
+      continue;
+    if (
+      !better ||
+      alternative.value > better.result.value + 0.000001 ||
+      (Math.abs(alternative.value - better.result.value) < 0.000001 &&
+        candidate.name < better.relay.name)
+    )
+      better = { relay: candidate, result: alternative };
+  }
+  if (!better) return "";
+  const alternativeText =
+    Math.abs(better.result.value - desired) < 0.000001
+      ? `kan indstilles til præcis ${fmtA(desired)}`
+      : `kan indstilles til ${fmtA(better.result.value)}`;
+  return `Forslag: ${better.relay.name} ${alternativeText}. Det valgte ${r.name}-relæ kan kun indstilles til ${fmtA(current.value)}.`;
+}
+function renderRelaySuggestion(s, f, r, inA, poles, desired, current) {
+  const el = document.getElementById("relaySuggestion");
+  if (!el) return;
+  const message = ekipDipAlternativeSuggestion(s, f, r, inA, poles, desired, current);
+  el.classList.toggle("hidden", !message);
+  el.textContent = message;
 }
 function deviceLabel(s) {
   return (s.brand === "Schneider Electric" && s.series === "MasterPact MTZ") ||
@@ -6173,6 +6379,7 @@ function render() {
       ir = best(bases, irFactors, desired);
     }
   }
+  renderRelaySuggestion(s, f, r, inA, p, desired, ir);
   out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
   if (irSettingMethod && !ir.fine) {
     rows.push(

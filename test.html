@@ -36,6 +36,12 @@
     <!--
       Versionshistorik
 
+      v6.40
+      2026-11-26
+      - ABB Tmax XT Ekip Dip er opdelt i LS/I, LSI, LIG og LSIG med type-specifikke, dokumenterede DIP-trin
+      - I2 for Ekip Dip beregnes mod In, og LS/I kan foreslå kompatibel LSI uden automatisk relæskift
+      - app-test.js cache-busting opdateret til v6.40
+
       v6.39
       2026-11-13
       - MicroLogic 2.2/2.3 tekniske korttidskarakteristik er fjernet fra tsd-indstilling, resultat og Kopiér-output
@@ -260,13 +266,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.39
+      TEST v6.40
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.39 - MicroLogic 2 korttidskarakteristik
+          TEST v6.40 - ABB Ekip Dip LS/I og LSI
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -349,6 +355,7 @@
         </div>
         <div id="warning" class="warning hidden"></div>
         <div id="requestWarning" class="warning hidden"></div>
+        <div id="relaySuggestion" class="warning hidden"></div>
         <h3>Beregnede indstillinger</h3>
         <table>
           <thead>
@@ -383,7 +390,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.39"></script>
+    <script src="app-test.js?v=6.40"></script>
     <div
       style="
         position: fixed;
@@ -399,7 +406,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.39 - live ikke opdateret
+      TEST v6.40 - live ikke opdateret
     </div>
   </body>
 </html>
