@@ -36,6 +36,12 @@
     <!--
       Versionshistorik
 
+      v6.41
+      2026-11-26
+      - Ekip Dip LS/I kræver nu fysisk valg af enten S (I2/t2) eller I (I3); funktionerne dokumenteres aldrig samtidig
+      - Ekip Dip LIG og LSIG har verificerede, manuelle I4/t4 DIP-indstillinger inkl. OFF, tydeligt adskilt fra RCD
+      - app-test.js cache-busting opdateret til v6.41
+
       v6.40
       2026-11-26
       - ABB Tmax XT Ekip Dip er opdelt i LS/I, LSI, LIG og LSIG med type-specifikke, dokumenterede DIP-trin
@@ -266,13 +272,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.40
+      TEST v6.41
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.40 - ABB Ekip Dip LS/I og LSI
+          TEST v6.41 - ABB Ekip Dip S/I og G
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -312,6 +318,18 @@
         ><div id="tsdPanel" class="statsBox hidden">
           <label id="tsdChoiceLabel" for="tsdChoice">tsd</label><select id="tsdChoice"></select>
           <div id="tsdInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="siModePanel" class="statsBox hidden">
+          <label for="siModeChoice">S/I DIP-switch</label><select id="siModeChoice"></select>
+          <div id="siModeInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="gPanel" class="statsBox hidden">
+          <label for="gChoice">I4 (G-beskyttelse)</label><select id="gChoice"></select>
+          <div id="gInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="tgPanel" class="statsBox hidden">
+          <label for="tgChoice">t4 (G-beskyttelse)</label><select id="tgChoice"></select>
+          <div id="tgInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
         </div
         ><div id="irSettingWrap" class="statsBox hidden">
           <h3 id="irSettingTitle">Ir setting method</h3>
@@ -390,7 +408,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.40"></script>
+    <script src="app-test.js?v=6.41"></script>
     <div
       style="
         position: fixed;
@@ -406,7 +424,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.40 - live ikke opdateret
+      TEST v6.41 - live ikke opdateret
     </div>
   </body>
 </html>

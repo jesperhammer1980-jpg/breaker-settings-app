@@ -183,6 +183,9 @@ const ABB_DIP_I_XT2_XT6 = [
 const ABB_DIP_I_XT7_EMAX = [
   1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 ];
+const ABB_EKIP_DIP_G_XT2_XT6 = [0.2, 0.25, 0.45, 0.55, 0.75, 0.8, 1];
+const ABB_EKIP_DIP_G_LIG_XT7 = [0.2, 0.3, 0.4, 0.6, 0.8, 0.9, 1];
+const ABB_EKIP_DIP_G_LSIG_XT7 = [0.1, 0.2, 0.3, 0.4, 0.6, 0.8, 0.9, 1];
 const ABB_TOUCH_L = stepValues(0.4, 1, 0.001);
 const ABB_TOUCH_S = stepValues(0.6, 10, 0.1);
 const ABB_TOUCH_I_XT2_XT5 = stepValues(1.5, 10, 0.1);
@@ -366,6 +369,26 @@ const ABB_TMAX_DIP_TSD_LS_I_XT7 = {
   options: tsdCurveOptions(
     ["0,1 s", "0,2 s"],
     ["0,1 s", "0,2 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_EKIP_DIP_T4_XT2_XT6 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2/0,4/0,8 s",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
+    [],
+    ABB_TSD_FIXED_CURVE,
+  ),
+};
+const ABB_EKIP_DIP_T4_XT7 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2/0,4/0,8 s; t=k/I²: 0,1/0,2/0,4/0,8 s",
+  reference: "3 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
     ABB_TSD_FIXED_CURVE,
     ABB_TSD_INVERSE_CURVE,
   ),
@@ -1719,6 +1742,7 @@ const DATA = [
         poles: ["3P", "4P"],
         functions: ["L", "S", "I"],
         suggestionGroup: "abb-ekip-dip-power-lsi",
+        shortCircuitSelector: "S/I DIP-switch",
         ir: ABB_EKIP_DIP_LS_I_L,
         tr: {
           XT2: [12, 36],
@@ -1815,6 +1839,25 @@ const DATA = [
           XT7: [12, 48],
         },
         ii: ABB_DIP_I_XT2_XT6,
+        earthFault: {
+          method: "Fysisk DIP-switch",
+          factors: {
+            XT2: ABB_EKIP_DIP_G_XT2_XT6,
+            XT4: ABB_EKIP_DIP_G_XT2_XT6,
+            XT5: ABB_EKIP_DIP_G_XT2_XT6,
+            XT6: ABB_EKIP_DIP_G_XT2_XT6,
+            XT7: ABB_EKIP_DIP_G_LIG_XT7,
+          },
+          time: {
+            XT2: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT4: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT5: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT6: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT7: ABB_EKIP_DIP_T4_XT7,
+          },
+          sourceNote:
+            "ABB SACE Tmax XT IEC catalog 08/2024, page 3/25: Ekip Dip LIG I4/t4 physical DIP settings; I4 OFF is selectable.",
+        },
         sourceNote:
           "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LIG has L/I/G; no I2/t2 is rendered because selective short-circuit protection is not specified for this type.",
       },
@@ -1867,6 +1910,25 @@ const DATA = [
           XT5: ABB_DIP_I_XT2_XT6,
           XT6: ABB_DIP_I_XT2_XT6,
           XT7: ABB_DIP_I_XT7_EMAX,
+        },
+        earthFault: {
+          method: "Fysisk DIP-switch",
+          factors: {
+            XT2: ABB_EKIP_DIP_G_XT2_XT6,
+            XT4: ABB_EKIP_DIP_G_XT2_XT6,
+            XT5: ABB_EKIP_DIP_G_XT2_XT6,
+            XT6: ABB_EKIP_DIP_G_XT2_XT6,
+            XT7: ABB_EKIP_DIP_G_LSIG_XT7,
+          },
+          time: {
+            XT2: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT4: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT5: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT6: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT7: ABB_EKIP_DIP_T4_XT7,
+          },
+          sourceNote:
+            "ABB SACE Tmax XT IEC catalog 08/2024, page 3/25: Ekip Dip LSIG I4/t4 physical DIP settings; I4 OFF is selectable.",
         },
         sourceNote:
           "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LSIG; physical DIP settings I1, I2 and I3 use their documented type-specific tables.",
@@ -2613,6 +2675,9 @@ let st = {
   irChoiceSignature: "",
   trChoice: "",
   tsdChoice: "",
+  siMode: "",
+  gChoice: "",
+  tgChoice: "",
   backupComponent: "all",
   rcdEnabled: false,
   rcdDevice: 0,
@@ -3019,6 +3084,96 @@ function renderTsdRow(cfg, selected, label = "tsd") {
     output: `${label}: ${value}`,
   };
 }
+function renderSiModeControls(r) {
+  const panel = document.getElementById("siModePanel"),
+    select = document.getElementById("siModeChoice"),
+    info = document.getElementById("siModeInfo"),
+    active = !!r.shortCircuitSelector;
+  if (!panel || !select) return "";
+  panel.classList.toggle("hidden", !active);
+  if (!active) {
+    st.siMode = "";
+    select.innerHTML = "";
+    if (info) info.textContent = "";
+    return "";
+  }
+  if (!["S", "I"].includes(st.siMode)) st.siMode = "";
+  select.innerHTML = [
+    '<option value="">Vælg S eller I</option>',
+    '<option value="S">S - selektiv kortslutning (I2/t2)</option>',
+    '<option value="I">I - øjeblikkelig kortslutning (I3)</option>',
+  ].join("");
+  select.value = st.siMode;
+  if (info)
+    info.textContent =
+      "Fysisk S/I DIP-switch: ABB tillader kun én af funktionerne ad gangen.";
+  return st.siMode;
+}
+function renderEarthFaultControls(cfg, f, inA, lbl) {
+  const panel = document.getElementById("gPanel"),
+    select = document.getElementById("gChoice"),
+    info = document.getElementById("gInfo"),
+    timePanel = document.getElementById("tgPanel"),
+    timeSelect = document.getElementById("tgChoice"),
+    timeInfo = document.getElementById("tgInfo"),
+    factors = cfg ? settingValues(cfg.factors, f, inA) : [];
+  if (!panel || !select || !timePanel || !timeSelect) return null;
+  panel.classList.toggle("hidden", !factors.length);
+  if (!factors.length) {
+    st.gChoice = "";
+    st.tgChoice = "";
+    select.innerHTML = "";
+    timeSelect.innerHTML = "";
+    timePanel.classList.add("hidden");
+    if (info) info.textContent = "";
+    if (timeInfo) timeInfo.textContent = "";
+    return null;
+  }
+  const validChoices = ["OFF", ...factors.map(String)];
+  if (!validChoices.includes(st.gChoice)) st.gChoice = "";
+  select.innerHTML = [
+    `<option value="">Vælg ${lbl.earth}</option>`,
+    '<option value="OFF">OFF</option>',
+    ...factors.map(
+      (factor) =>
+        `<option value="${factor}">${fmt(factor)} × In = ${fmtA(factor * inA)}</option>`,
+    ),
+  ].join("");
+  select.value = st.gChoice;
+  if (info)
+    info.textContent = `${cfg.method}; G er indbygget jordfejlsbeskyttelse, ikke RCD.`;
+  const timeCfg = cfg && tsdSetting(cfg.time, f, inA);
+  const options = timeCfg && Array.isArray(timeCfg.options) ? timeCfg.options : [];
+  const enabled = st.gChoice !== "" && st.gChoice !== "OFF" && options.length;
+  timePanel.classList.toggle("hidden", !enabled);
+  if (!enabled) {
+    st.tgChoice = "";
+    timeSelect.innerHTML = "";
+    if (timeInfo) timeInfo.textContent = "";
+    return {
+      factors,
+      choice: st.gChoice,
+      timeCfg,
+      selectedTime: null,
+    };
+  }
+  if (!options.some((option) => option.value === st.tgChoice)) st.tgChoice = "";
+  timeSelect.innerHTML = [
+    `<option value="">Vælg ${lbl.earthTime}</option>`,
+    ...options.map(
+      (option) =>
+        `<option value="${option.value}">${option.label}</option>`,
+    ),
+  ].join("");
+  timeSelect.value = st.tgChoice;
+  if (timeInfo) timeInfo.textContent = timeCfg.summary || "";
+  return {
+    factors,
+    choice: st.gChoice,
+    timeCfg,
+    selectedTime: options.find((option) => option.value === st.tgChoice) || null,
+  };
+}
 function resetResidual() {
   st.rcdEnabled = false;
   st.rcdDevice = 0;
@@ -3130,6 +3285,8 @@ function labelsFor(s) {
       shortTime: "t2",
       instant: "I3",
       magnetic: "I3",
+      earth: "I4",
+      earthTime: "t4",
     };
   return {
     overload: "Ir",
@@ -3138,6 +3295,8 @@ function labelsFor(s) {
     shortTime: "tsd",
     instant: "Ii",
     magnetic: "Ii",
+    earth: "Ig",
+    earthTime: "tg",
   };
 }
 function relaySupportsSelection(relay, f, inA, poles) {
@@ -6222,6 +6381,9 @@ const usageStats = (() => {
       inc: st.inc,
       method: st.method,
       irSetting: st.irSetting,
+      siMode: st.siMode,
+      gChoice: st.gChoice,
+      tgChoice: st.tgChoice,
       backupComponent: st.backupComponent,
       rcdDevice: st.rcdDevice,
       rcdSensitivity: st.rcdSensitivity,
@@ -6320,8 +6482,16 @@ function render() {
       ? ioFactors.map((x) => settingAmpValue(x * inA))
       : [inA];
   const trValues = settingValues(r.tr, f, inA);
-  const isdValues = settingValues(r.isd, f, inA);
-  const tsdCfg = tsdSetting(r.tsd, f, inA);
+  const siMode = renderSiModeControls(r);
+  const shortFunctionPending = r.shortCircuitSelector && siMode === "";
+  const isdValues =
+    shortFunctionPending || siMode === "I"
+      ? []
+      : settingValues(r.isd, f, inA);
+  const tsdCfg =
+    shortFunctionPending || siMode === "I"
+      ? null
+      : tsdSetting(r.tsd, f, inA);
   const selectedTr = renderNumericChoiceControls(
     "trPanel",
     "trChoice",
@@ -6332,7 +6502,11 @@ function render() {
     `Dokumenterede ${lbl.time}-trin`,
   );
   const selectedTsd = renderTsdControls(tsdCfg);
-  const iiValues = settingValues(r.ii, f, inA);
+  const iiValues =
+    shortFunctionPending || siMode === "S"
+      ? []
+      : settingValues(r.ii, f, inA);
+  const earthFault = renderEarthFaultControls(r.earthFault, f, inA, lbl);
   const tmLSteps = namedStepsByRating(r.lStepsByRating, f, inA, ABB_TM_L_FACTORS);
   let irFactors = settingValues(r.ir, f, inA, [1]) || [1];
   const fineIrCfg = fineIrConfig(r.irFine, f.frame, inA);
@@ -6465,6 +6639,18 @@ function render() {
       out.push(lbl.time + ": " + secondsFmt(tr));
     }
   }
+  if (r.shortCircuitSelector) {
+    const modeText =
+      siMode === "S"
+        ? "S aktiv: I2/t2"
+        : siMode === "I"
+          ? "I aktiv: I3"
+          : "Vælg S eller I";
+    rows.push(
+      `<tr><td>S/I</td><td>${r.shortCircuitSelector}</td><td>${modeText}</td></tr>`,
+    );
+    out.push(`S/I DIP-switch: ${modeText}`);
+  }
   if (isdValues && isdValues.length) {
     if (!isdValues.every(isN)) {
       const status = statusText(isdValues);
@@ -6578,6 +6764,39 @@ function render() {
       instantWritten = true;
     }
   }
+  if (earthFault) {
+    const { factors, choice, timeCfg, selectedTime } = earthFault;
+    const available = `OFF / ${factors.map((factor) => fmt(factor)).join("/")} × In`;
+    rows.push(
+      `<tr><td>G</td><td>Indbygget jordfejl</td><td>${r.earthFault.method}; I4/t4, ikke RCD</td></tr>`,
+    );
+    out.push(`G: Indbygget jordfejlsbeskyttelse via ${r.earthFault.method}; ikke RCD`);
+    if (choice === "OFF") {
+      rows.push(`<tr><td>${lbl.earth}</td><td>${available}</td><td>OFF</td></tr>`);
+      out.push(`${lbl.earth}: OFF`);
+    } else if (choice) {
+      const factor = Number(choice);
+      rows.push(
+        `<tr><td>${lbl.earth}</td><td>${available}</td><td>${fmt(factor)} × In = ${fmtA(factor * inA)}</td></tr>`,
+      );
+      out.push(`${lbl.earth}: ${fmt(factor)} × In = ${fmtA(factor * inA)}`);
+      if (timeCfg) {
+        const timeDetail = `${timeCfg.summary || "Dokumenterede producentvalg"}${
+          timeCfg.reference ? `; ref. ${timeCfg.reference}` : ""
+        }`;
+        const value = selectedTime ? selectedTime.label : `Vælg ${lbl.earthTime}`;
+        rows.push(
+          `<tr><td>${lbl.earthTime}</td><td>${timeDetail}</td><td>${value}</td></tr>`,
+        );
+        out.push(`${lbl.earthTime}: ${value}`);
+      }
+    } else {
+      rows.push(
+        `<tr><td>${lbl.earth}</td><td>${available}</td><td>Vælg ${lbl.earth}</td></tr>`,
+      );
+      out.push(`${lbl.earth}: Vælg ${lbl.earth}`);
+    }
+  }
   if (residual) {
     const kind = residual.kind === "module" ? "Separat modul" : "Integreret i relæ";
     rows.push(
@@ -6619,6 +6838,9 @@ function reset(prevPole) {
   st.cls = 0;
   st.relay = "";
   st.rating = 0;
+  st.siMode = "";
+  st.gChoice = "";
+  st.tgChoice = "";
   const idx = F().poles.indexOf(prevPole);
   st.poles = idx >= 0 ? idx : 0;
   resetResidual();
@@ -6690,6 +6912,24 @@ function bind() {
   if (tsdChoice)
     tsdChoice.onchange = (e) => {
       st.tsdChoice = e.target.value;
+      render();
+    };
+  const siModeChoice = document.getElementById("siModeChoice");
+  if (siModeChoice)
+    siModeChoice.onchange = (e) => {
+      st.siMode = e.target.value;
+      render();
+    };
+  const gChoice = document.getElementById("gChoice");
+  if (gChoice)
+    gChoice.onchange = (e) => {
+      st.gChoice = e.target.value;
+      render();
+    };
+  const tgChoice = document.getElementById("tgChoice");
+  if (tgChoice)
+    tgChoice.onchange = (e) => {
+      st.tgChoice = e.target.value;
       render();
     };
   const bc = document.getElementById("backupComponent");
