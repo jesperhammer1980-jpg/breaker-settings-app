@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>BreakerSettings Versionshistorik</title>
+    <title>BreakerSettings versionshistorik</title>
     <link rel="stylesheet" href="style.css" />
     <style>
       body {
@@ -81,21 +81,86 @@
       <header class="history-top">
         <div>
           <h1>Breaker<span>Settings</span></h1>
-          <p class="subtitle">Versionshistorik</p>
+          <p class="subtitle">LIVE versionshistorik</p>
         </div>
         <a class="back-link" href="index.html">Tilbage til BreakerSettings</a>
       </header>
 
       <section class="history-list" aria-label="Versionshistorik">
         <article class="history-entry">
+          <h2>v6.44</h2>
+          <time datetime="2026-11-26">2026-11-26</time>
+          <ul>
+            <li>Kopiér-validering er nu fælles for alle fabrikater og relætyper og bruger strukturerede fejlstatusser fra beregningen.</li>
+            <li>Ir-, Isd-, Ii/I3- og ABB MIN/MED/MAX-fejl låser Kopiér, mens faste producentkarakteristikker og gyldige OFF-valg fortsat kan dokumenteres.</li>
+            <li>app.js cache-busting opdateret til v6.44.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.43</h2>
+          <time datetime="2026-11-26">2026-11-26</time>
+          <ul>
+            <li>Når Ekip Dip I2 er OFF og I3 er aktiv, beregnes I3 nu mod Ik min × 0,8; når både I2 og I3 er aktive, bevares I3 mod Ik max × 0,8.</li>
+            <li>I2/I3 OFF har prioritet over en AUTO-fejl og dokumenteres konsekvent som OFF.</li>
+            <li>Kopiér er spærret ved ugyldige aktive AUTO-indstillinger og ved manglende aktiv kortslutningsbeskyttelse; resultatet viser en tydelig advarsel.</li>
+            <li>app.js cache-busting opdateret til v6.43.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.42</h2>
+          <time datetime="2026-11-26">2026-11-26</time>
+          <ul>
+            <li>ABB Ekip Dip LS/I, LSI, LIG og LSIG viser nu de dokumenterede OFF-valg for I2 og/eller I3 som fysiske DIP-positioner.</li>
+            <li>Kopiér-funktionen er spærret, indtil S/I, I4 og ved aktiv I4 også t4 er komplet valgt; I4 OFF er en gyldig afsluttet indstilling.</li>
+            <li>Manuelle Ekip Dip-DIP-valg nulstilles ved skift af frame, relætype eller In, så de ikke overføres til en anden fysisk variant.</li>
+            <li>app.js cache-busting opdateret til v6.42.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.41</h2>
+          <time datetime="2026-11-26">2026-11-26</time>
+          <ul>
+            <li>Ekip Dip LS/I modellerer ABBs fysiske S/I DIP-switch: kun S med I2/t2 eller I med I3 kan være aktiv ad gangen.</li>
+            <li>Ekip Dip LIG og LSIG har nu manuelle, dokumenterede I4/t4 DIP-indstillinger med OFF-funktion og type-specifikke XT7 I4-trin.</li>
+            <li>G er tydeligt angivet som indbygget jordfejlsbeskyttelse og holdes adskilt fra RCD-funktionen.</li>
+            <li>app.js cache-busting opdateret til v6.41.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.40</h2>
+          <time datetime="2026-11-26">2026-11-26</time>
+          <ul>
+            <li>ABB Tmax XT Ekip Dip er opdelt i de dokumenterede relætyper LS/I, LSI, LIG og LSIG.</li>
+            <li>LS/I bruger I1-trin på 0,04 × In; LSI/LSIG bruger 0,02 × In på XT2-XT6 og ABBs særskilte XT7-liste.</li>
+            <li>I2 beregnes mod In for de dokumenterede Ekip Dip-varianter, og I2/t2 vises ikke for LIG.</li>
+            <li>LS/I kan diskret foreslå en kompatibel Ekip Dip LSI, når LSI giver en bedre fysisk I1-indstilling uden at skifte relætype automatisk.</li>
+            <li>app.js cache-busting opdateret til v6.40.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
           <h2>v6.39</h2>
           <time datetime="2026-11-13">2026-11-13</time>
           <ul>
-            <li>Beregningsvejledning tilføjet direkte fra appen samt som teknisk Markdown-reference.</li>
-            <li>Ønsket indstillingsstrøm og INC initialiseres nu til relæets faktiske In og nulstilles kun ved et reelt In-skift.</li>
             <li>MicroLogic 2.2/2.3 viser ikke længere tsd i indstillingstabel, resultat eller Kopiér-output.</li>
             <li>Den dokumenterede 20/80 ms-korttidskarakteristik bevares kun som ikke-justerbar teknisk oplysning i beregningsvejledningen.</li>
+            <li>Øvrige tsd-funktioner er gennemgået og bevares kun, hvor de har producentdokumenterede, valgbare trin.</li>
             <li>app.js cache-busting opdateret til v6.39.</li>
+          </ul>
+        </article>
+
+        <article class="history-entry">
+          <h2>v6.38</h2>
+          <time datetime="2026-11-13">2026-11-13</time>
+          <ul>
+            <li>Beregningsvejledning tilføjet direkte fra LIVE-appen samt som teknisk Markdown-reference i projektet.</li>
+            <li>Ønsket indstillingsstrøm og INC initialiseres nu til relæets faktiske In ved første render og ved et reelt In-skift.</li>
+            <li>Manuelle værdier bevares ved genberegning, Ik-ændringer, polskift og andre valg uden ændring af In.</li>
+            <li>app.js cache-busting opdateret til v6.38.</li>
           </ul>
         </article>
 
@@ -171,7 +236,7 @@
           <h2>v6.31</h2>
           <time datetime="2026-08-06">2026-08-06</time>
           <ul>
-            <li>Isd/S standardvalg rettet tilbage til beregnet værdi efter Ik min × 0,8.</li>
+            <li>Isd/S standardvalg er rettet tilbage til beregnet værdi efter Ik min × 0,8 i LIVE.</li>
             <li>Isd/S bruger igen den eksisterende korttidsberegningslogik i stedet for minimum.</li>
             <li>tr og tsd forudvælger fortsat laveste dokumenterede trin og bevarer gyldige manuelle valg.</li>
             <li>app.js cache-busting opdateret til v6.31.</li>
@@ -182,7 +247,7 @@
           <h2>v6.30</h2>
           <time datetime="2026-08-06">2026-08-06</time>
           <ul>
-            <li>tr, Isd/S og tsd forudvælger laveste dokumenterede gyldige producenttrin.</li>
+            <li>tr, Isd/S og tsd forudvælger laveste dokumenterede gyldige producenttrin i LIVE.</li>
             <li>Manuelle tr, Isd/S og tsd valg bevares ved genberegning og nulstilles kun ved ugyldig ny kombination.</li>
             <li>Dokumentationsoutput viser det faktisk valgte tids-/korttidstrin.</li>
             <li>app.js cache-busting opdateret til v6.30.</li>
@@ -203,7 +268,7 @@
           <h2>v6.28</h2>
           <time datetime="2026-08-06">2026-08-06</time>
           <ul>
-            <li>ABB TMD/TMA L- og I-indstillinger viser producentens MIN/MED/MAX-betjeningsnavne.</li>
+            <li>ABB TMD/TMA L- og I-indstillinger viser producentens MIN/MED/MAX-betjeningsnavne i LIVE.</li>
             <li>TMA I-trin vises datadrevet pr. frame/rating efter ABB-tabellen uden at ændre beregningslogikken.</li>
             <li>app.js cache-busting opdateret til v6.28.</li>
           </ul>
@@ -216,7 +281,7 @@
             <li>Datadrevet tsd tilføjet for relæer med dokumenterede producenttrin eller -intervaller hos Schneider, ABB og Siemens.</li>
             <li>Justerbar tsd vises som brugerens valg blandt dokumenterede muligheder; faste/ikke-dokumenterede tsd-værdier skjules efter producentdata.</li>
             <li>tsd vises i indstillingstabellen og dokumentationsoutputtet uden at vælge en vilkårlig standard.</li>
-            <li>Separat history.html oprettet med fuld versionshistorik og link tilbage til BreakerSettings.</li>
+            <li>Separat history.html oprettet med fuld LIVE-versionshistorik og link tilbage til BreakerSettings.</li>
             <li>app.js cache-busting opdateret til v6.27.</li>
           </ul>
         </article>
@@ -290,7 +355,7 @@
           <h2>v6.20</h2>
           <time datetime="2026-06-22">2026-06-22</time>
           <ul>
-            <li>Anonym brugsstatistik tilføjet via /api/stats.</li>
+            <li>Anonym brugsstatistik tilføjet i LIVE via /api/stats.</li>
             <li>Skjult statistikside tilføjet på /admin-stats.</li>
             <li>Besøg, anonymt brugerestimat, beregninger, dokumentationskopieringer og mest brugte tekniske valg registreres uden persondata.</li>
             <li>app.js cache-busting opdateret til v6.20.</li>
@@ -301,7 +366,7 @@
           <h2>v6.19</h2>
           <time datetime="2026-06-22">2026-06-22</time>
           <ul>
-            <li>Siemens 3WA tilføjet som luftafbryder/ACB-serie.</li>
+            <li>Siemens 3WA tilføjet som luftafbryder/ACB-serie i LIVE.</li>
             <li>3WA11, 3WA12 og 3WA13 frames, Icu/Ics-klasser og option-plug In-værdier indlæst fra officiel Siemens 3WA1 equipment manual.</li>
             <li>ETU300 LSI/LSIG og ETU600 LSI/LSIG/LSIG Hi-Z Ir, tr, Isd og Ii rotary-switch settings verificeret mod Siemens-manualen.</li>
             <li>3WA backup-/cascadingdata ikke indlæst, da ingen producentverificeret 415V backup-/cascadingtabel er fundet i de gennemgåede 3WA-kilder.</li>
@@ -314,7 +379,7 @@
           <time datetime="2026-06-16">2026-06-16</time>
           <ul>
             <li>Indstillingsstrøm-regel rettet så appen aldrig foreslår en værdi over ønsket strøm.</li>
-            <li>Fejlstrømsbeskyttelse tilføjet for dokumenterede Schneider, ABB og Siemens kombinationer.</li>
+            <li>Fejlstrømsbeskyttelse tilføjet i LIVE for dokumenterede Schneider, ABB og Siemens kombinationer.</li>
             <li>Backup-/cascading ingen-data tekst rettet til aftalt formulering.</li>
             <li>app.js cache-busting opdateret til v6.18.</li>
           </ul>
@@ -375,7 +440,7 @@
             <li>Schneider NSXm TM-D/TM-G Ir-range, tr og faste Ii-værdier synkroniseret med officiel Schneider-kilde.</li>
             <li>Schneider NSXm 20A markeret "Ikke dokumenteret af producent", da den ikke fremgår af den officielle NSXm TM-D-tabel.</li>
             <li>Schneider NSX Selectivity Enhanced by Cascading status flyttet fra åben status til kildeafklaring.</li>
-            <li>Konsistenskontrol for ETU76B mellem auditstatus, app.js og live-visning.</li>
+            <li>Konsistenskontrol for ETU76B mellem auditstatus, app.js og LIVE-visning.</li>
           </ul>
         </article>
 

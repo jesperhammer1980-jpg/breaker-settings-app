@@ -168,6 +168,9 @@ const ABB_DIP_L = [
   0.7, 0.72, 0.75, 0.77, 0.8, 0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97,
   1,
 ];
+// ABB Ekip Dip uses distinct physical DIP tables for LS/I and LSI families.
+const ABB_EKIP_DIP_LS_I_L = stepValues(0.4, 1, 0.04);
+const ABB_EKIP_DIP_LSI_L_XT2_XT6 = stepValues(0.4, 1, 0.02);
 const ABB_DIP_S_XT2_XT6 = [
   1, 1.5, 2, 2.5, 3, 3.5, 4.5, 5.5, 6.5, 7, 7.5, 8, 8.5, 9, 10,
 ];
@@ -180,6 +183,9 @@ const ABB_DIP_I_XT2_XT6 = [
 const ABB_DIP_I_XT7_EMAX = [
   1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 ];
+const ABB_EKIP_DIP_G_XT2_XT6 = [0.2, 0.25, 0.45, 0.55, 0.75, 0.8, 1];
+const ABB_EKIP_DIP_G_LIG_XT7 = [0.2, 0.3, 0.4, 0.6, 0.8, 0.9, 1];
+const ABB_EKIP_DIP_G_LSIG_XT7 = [0.1, 0.2, 0.3, 0.4, 0.6, 0.8, 0.9, 1];
 const ABB_TOUCH_L = stepValues(0.4, 1, 0.001);
 const ABB_TOUCH_S = stepValues(0.6, 10, 0.1);
 const ABB_TOUCH_I_XT2_XT5 = stepValues(1.5, 10, 0.1);
@@ -347,6 +353,42 @@ const ABB_TMAX_DIP_TSD_XT2_XT6 = {
   options: tsdCurveOptions(
     ["0,05 s", "0,1 s", "0,2 s", "0,4 s"],
     ["0,05 s", "0,1 s", "0,2 s", "0,4 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_TMAX_DIP_TSD_LS_I_XT2_XT6 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2 s",
+  options: tsdCurveOptions(["0,1 s", "0,2 s"], [], ABB_TSD_FIXED_CURVE),
+};
+const ABB_TMAX_DIP_TSD_LS_I_XT7 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2 s; t=k/I²: 0,1/0,2 s",
+  reference: "10 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s"],
+    ["0,1 s", "0,2 s"],
+    ABB_TSD_FIXED_CURVE,
+    ABB_TSD_INVERSE_CURVE,
+  ),
+};
+const ABB_EKIP_DIP_T4_XT2_XT6 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2/0,4/0,8 s",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
+    [],
+    ABB_TSD_FIXED_CURVE,
+  ),
+};
+const ABB_EKIP_DIP_T4_XT7 = {
+  adjustable: true,
+  summary: "t=k: 0,1/0,2/0,4/0,8 s; t=k/I²: 0,1/0,2/0,4/0,8 s",
+  reference: "3 x In for t=k/I²",
+  options: tsdCurveOptions(
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
+    ["0,1 s", "0,2 s", "0,4 s", "0,8 s"],
     ABB_TSD_FIXED_CURVE,
     ABB_TSD_INVERSE_CURVE,
   ),
@@ -1688,7 +1730,7 @@ const DATA = [
           "ABB SACE Tmax XT IEC catalog 08/2024, page 3/20, table Available settings for TMD and TMA trip units: TMA L and I MIN/MED/MAX values verified per frame/rating.",
       },
       {
-        name: "Ekip Dip",
+        name: "Ekip Dip LS/I",
         frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
         ratingsByFrame: {
           XT2: [10, 25, 40, 63, 100, 160],
@@ -1697,7 +1739,53 @@ const DATA = [
           XT6: [630, 800, 1000],
           XT7: [630, 800, 1000, 1250, 1600],
         },
-        ir: ABB_DIP_L,
+        poles: ["3P", "4P"],
+        functions: ["L", "S", "I"],
+        suggestionGroup: "abb-ekip-dip-power-lsi",
+        shortCircuitSelector: "S/I DIP-switch",
+        physicalDipThresholds: true,
+        ir: ABB_EKIP_DIP_LS_I_L,
+        tr: {
+          XT2: [12, 36],
+          XT4: [12, 36],
+          XT5: [12, 36],
+          XT6: [12, 36],
+          XT7: [12, 48],
+        },
+        isd: ABB_DIP_S_XT2_XT6,
+        isdBase: "In",
+        tsd: {
+          XT2: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT4: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT5: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT6: ABB_TMAX_DIP_TSD_LS_I_XT2_XT6,
+          XT7: ABB_TMAX_DIP_TSD_LS_I_XT7,
+        },
+        ii: ABB_DIP_I_XT2_XT6,
+        sourceNote:
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LS/I; physical DIP settings I1 in 0.04 x In steps, I2/I3 in x In.",
+      },
+      {
+        name: "Ekip Dip LSI",
+        frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
+        ratingsByFrame: {
+          XT2: [10, 25, 40, 63, 100, 160],
+          XT4: [40, 63, 100, 160, 250],
+          XT5: [250, 320, 400, 630],
+          XT6: [630, 800, 1000],
+          XT7: [630, 800, 1000, 1250, 1600],
+        },
+        poles: ["3P", "4P"],
+        functions: ["L", "S", "I"],
+        suggestionGroup: "abb-ekip-dip-power-lsi",
+        physicalDipThresholds: true,
+        ir: {
+          XT2: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT4: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT5: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT6: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT7: ABB_DIP_L,
+        },
         tr: {
           XT2: [3, 12, 36, 60],
           XT4: [3, 12, 36, 60],
@@ -1714,6 +1802,7 @@ const DATA = [
           XT6: ABB_DIP_S_XT2_XT6,
           XT7: ABB_DIP_S_XT7_EMAX,
         },
+        isdBase: "In",
         tsd: {
           XT2: ABB_TMAX_DIP_TSD_XT2_XT6,
           XT4: ABB_TMAX_DIP_TSD_XT2_XT6,
@@ -1729,7 +1818,124 @@ const DATA = [
           XT7: ABB_DIP_I_XT7_EMAX,
         },
         sourceNote:
-          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23-3/26. Ekip Dip L/tr/S/I steps verified per frame where listed.",
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LSI; physical DIP settings I1 in 0.02 x In steps on XT2-XT6, specified XT7 list, and I2/I3 in x In.",
+      },
+      {
+        name: "Ekip Dip LIG",
+        frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
+        ratingsByFrame: {
+          XT2: [10, 25, 40, 63, 100, 160],
+          XT4: [40, 63, 100, 160, 250],
+          XT5: [250, 320, 400, 630],
+          XT6: [630, 800, 1000],
+          XT7: [630, 800, 1000, 1250, 1600],
+        },
+        poles: ["3P", "4P"],
+        functions: ["L", "I", "G"],
+        physicalDipThresholds: true,
+        ir: ABB_EKIP_DIP_LS_I_L,
+        tr: {
+          XT2: [12, 36],
+          XT4: [12, 36],
+          XT5: [12, 36],
+          XT6: [12, 36],
+          XT7: [12, 48],
+        },
+        ii: ABB_DIP_I_XT2_XT6,
+        earthFault: {
+          method: "Fysisk DIP-switch",
+          factors: {
+            XT2: ABB_EKIP_DIP_G_XT2_XT6,
+            XT4: ABB_EKIP_DIP_G_XT2_XT6,
+            XT5: ABB_EKIP_DIP_G_XT2_XT6,
+            XT6: ABB_EKIP_DIP_G_XT2_XT6,
+            XT7: ABB_EKIP_DIP_G_LIG_XT7,
+          },
+          time: {
+            XT2: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT4: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT5: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT6: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT7: ABB_EKIP_DIP_T4_XT7,
+          },
+          sourceNote:
+            "ABB SACE Tmax XT IEC catalog 08/2024, page 3/25: Ekip Dip LIG I4/t4 physical DIP settings; I4 OFF is selectable.",
+        },
+        sourceNote:
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LIG has L/I/G; no I2/t2 is rendered because selective short-circuit protection is not specified for this type.",
+      },
+      {
+        name: "Ekip Dip LSIG",
+        frames: ["XT2", "XT4", "XT5", "XT6", "XT7"],
+        ratingsByFrame: {
+          XT2: [10, 25, 40, 63, 100, 160],
+          XT4: [40, 63, 100, 160, 250],
+          XT5: [250, 320, 400, 630],
+          XT6: [630, 800, 1000],
+          XT7: [630, 800, 1000, 1250, 1600],
+        },
+        poles: ["3P", "4P"],
+        functions: ["L", "S", "I", "G"],
+        physicalDipThresholds: true,
+        ir: {
+          XT2: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT4: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT5: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT6: ABB_EKIP_DIP_LSI_L_XT2_XT6,
+          XT7: ABB_DIP_L,
+        },
+        tr: {
+          XT2: [3, 12, 36, 60],
+          XT4: [3, 12, 36, 60],
+          XT5: [3, 12, 36, 48],
+          "XT6|630": [NOT_DOCUMENTED],
+          "XT6|800": [3, 12, 36, 72],
+          "XT6|1000": [3, 12, 36, 42],
+          XT7: [3, 12, 24, 36, 48, 72, 108, 144],
+        },
+        isd: {
+          XT2: ABB_DIP_S_XT2_XT6,
+          XT4: ABB_DIP_S_XT2_XT6,
+          XT5: ABB_DIP_S_XT2_XT6,
+          XT6: ABB_DIP_S_XT2_XT6,
+          XT7: ABB_DIP_S_XT7_EMAX,
+        },
+        isdBase: "In",
+        tsd: {
+          XT2: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT4: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT5: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT6: ABB_TMAX_DIP_TSD_XT2_XT6,
+          XT7: ABB_TMAX_DIP_TSD_XT7,
+        },
+        ii: {
+          XT2: ABB_DIP_I_XT2_XT6,
+          XT4: ABB_DIP_I_XT2_XT6,
+          XT5: ABB_DIP_I_XT2_XT6,
+          XT6: ABB_DIP_I_XT2_XT6,
+          XT7: ABB_DIP_I_XT7_EMAX,
+        },
+        earthFault: {
+          method: "Fysisk DIP-switch",
+          factors: {
+            XT2: ABB_EKIP_DIP_G_XT2_XT6,
+            XT4: ABB_EKIP_DIP_G_XT2_XT6,
+            XT5: ABB_EKIP_DIP_G_XT2_XT6,
+            XT6: ABB_EKIP_DIP_G_XT2_XT6,
+            XT7: ABB_EKIP_DIP_G_LSIG_XT7,
+          },
+          time: {
+            XT2: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT4: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT5: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT6: ABB_EKIP_DIP_T4_XT2_XT6,
+            XT7: ABB_EKIP_DIP_T4_XT7,
+          },
+          sourceNote:
+            "ABB SACE Tmax XT IEC catalog 08/2024, page 3/25: Ekip Dip LSIG I4/t4 physical DIP settings; I4 OFF is selectable.",
+        },
+        sourceNote:
+          "ABB SACE Tmax XT IEC catalog 08/2024, pages 3/23 and 3/25: Ekip Dip LSIG; physical DIP settings I1, I2 and I3 use their documented type-specific tables.",
       },
       {
         name: "Ekip Touch",
@@ -2473,6 +2679,12 @@ let st = {
   irChoiceSignature: "",
   trChoice: "",
   tsdChoice: "",
+  siMode: "",
+  i2Choice: "",
+  i3Choice: "",
+  gChoice: "",
+  tgChoice: "",
+  documentationIssues: [],
   backupComponent: "all",
   rcdEnabled: false,
   rcdDevice: 0,
@@ -2879,6 +3091,176 @@ function renderTsdRow(cfg, selected, label = "tsd") {
     output: `${label}: ${value}`,
   };
 }
+function renderSiModeControls(r) {
+  const panel = document.getElementById("siModePanel"),
+    select = document.getElementById("siModeChoice"),
+    info = document.getElementById("siModeInfo"),
+    active = !!r.shortCircuitSelector;
+  if (!panel || !select) return "";
+  panel.classList.toggle("hidden", !active);
+  if (!active) {
+    st.siMode = "";
+    select.innerHTML = "";
+    if (info) info.textContent = "";
+    return "";
+  }
+  if (!["S", "I"].includes(st.siMode)) st.siMode = "";
+  select.innerHTML = [
+    '<option value="">Vælg S eller I</option>',
+    '<option value="S">S - selektiv kortslutning (I2/t2)</option>',
+    '<option value="I">I - øjeblikkelig kortslutning (I3)</option>',
+  ].join("");
+  select.value = st.siMode;
+  if (info)
+    info.textContent =
+      "Fysisk S/I DIP-switch: ABB tillader kun én af funktionerne ad gangen.";
+  return st.siMode;
+}
+function renderEarthFaultControls(cfg, f, inA, lbl) {
+  const panel = document.getElementById("gPanel"),
+    select = document.getElementById("gChoice"),
+    info = document.getElementById("gInfo"),
+    timePanel = document.getElementById("tgPanel"),
+    timeSelect = document.getElementById("tgChoice"),
+    timeInfo = document.getElementById("tgInfo"),
+    factors = cfg ? settingValues(cfg.factors, f, inA) : [];
+  if (!panel || !select || !timePanel || !timeSelect) return null;
+  panel.classList.toggle("hidden", !factors.length);
+  if (!factors.length) {
+    st.gChoice = "";
+    st.tgChoice = "";
+    select.innerHTML = "";
+    timeSelect.innerHTML = "";
+    timePanel.classList.add("hidden");
+    if (info) info.textContent = "";
+    if (timeInfo) timeInfo.textContent = "";
+    return null;
+  }
+  const validChoices = ["OFF", ...factors.map(String)];
+  if (!validChoices.includes(st.gChoice)) st.gChoice = "";
+  select.innerHTML = [
+    `<option value="">Vælg ${lbl.earth}</option>`,
+    '<option value="OFF">OFF</option>',
+    ...factors.map(
+      (factor) =>
+        `<option value="${factor}">${fmt(factor)} × In = ${fmtA(factor * inA)}</option>`,
+    ),
+  ].join("");
+  select.value = st.gChoice;
+  if (info)
+    info.textContent = `${cfg.method}; G er indbygget jordfejlsbeskyttelse, ikke RCD.`;
+  const timeCfg = cfg && tsdSetting(cfg.time, f, inA);
+  const options = timeCfg && Array.isArray(timeCfg.options) ? timeCfg.options : [];
+  const enabled = st.gChoice !== "" && st.gChoice !== "OFF" && options.length;
+  timePanel.classList.toggle("hidden", !enabled);
+  if (!enabled) {
+    st.tgChoice = "";
+    timeSelect.innerHTML = "";
+    if (timeInfo) timeInfo.textContent = "";
+    return {
+      factors,
+      choice: st.gChoice,
+      timeCfg,
+      selectedTime: null,
+    };
+  }
+  if (!options.some((option) => option.value === st.tgChoice)) st.tgChoice = "";
+  timeSelect.innerHTML = [
+    `<option value="">Vælg ${lbl.earthTime}</option>`,
+    ...options.map(
+      (option) =>
+        `<option value="${option.value}">${option.label}</option>`,
+    ),
+  ].join("");
+  timeSelect.value = st.tgChoice;
+  if (timeInfo) timeInfo.textContent = timeCfg.summary || "";
+  return {
+    factors,
+    choice: st.gChoice,
+    timeCfg,
+    selectedTime: options.find((option) => option.value === st.tgChoice) || null,
+  };
+}
+function renderDipThresholdControl(
+  panelId,
+  selectId,
+  infoId,
+  stateKey,
+  label,
+  values,
+  base,
+  limit,
+  automatic,
+  active,
+) {
+  const panel = document.getElementById(panelId),
+    select = document.getElementById(selectId),
+    info = document.getElementById(infoId),
+    numeric = active && values && values.every(isN) ? values : [];
+  if (!panel || !select) return null;
+  panel.classList.toggle("hidden", !numeric.length);
+  if (!numeric.length) {
+    st[stateKey] = "";
+    select.innerHTML = "";
+    if (info) info.textContent = "";
+    return null;
+  }
+  const permitted = numeric.filter((factor) => factor * base <= limit);
+  const valid = ["AUTO", "OFF", ...permitted.map(String)];
+  if (!valid.includes(st[stateKey])) st[stateKey] = "AUTO";
+  const automaticLabel =
+    automatic && !automatic.error && !automatic.verify
+      ? `Automatisk beregnet: ${fmt(automatic.factor)} × In = ${fmtA(automatic.value)}`
+      : "Automatisk beregnet";
+  select.innerHTML = [
+    `<option value="AUTO">${automaticLabel}</option>`,
+    '<option value="OFF">OFF</option>',
+    ...permitted.map(
+      (factor) =>
+        `<option value="${factor}">${fmt(factor)} × In = ${fmtA(factor * base)}</option>`,
+    ),
+  ].join("");
+  select.value = st[stateKey];
+  if (info)
+    info.textContent =
+      "Fysisk DIP-switch. Kun trin inden for den beregnede Ik-grænse kan vælges manuelt.";
+  return {
+    choice: st[stateKey],
+    factor: st[stateKey] === "AUTO" || st[stateKey] === "OFF" ? null : Number(st[stateKey]),
+  };
+}
+function resetDipSelections() {
+  st.siMode = "";
+  st.i2Choice = "";
+  st.i3Choice = "";
+  st.gChoice = "";
+  st.tgChoice = "";
+}
+function documentationMissingForCurrentSelection() {
+  const r = R();
+  const missing = [...(st.documentationIssues || [])];
+  if (r.shortCircuitSelector && !st.siMode)
+    missing.push("Vælg S eller I med S/I DIP-switchen.");
+  if (r.earthFault && !st.gChoice) missing.push("Vælg I4 eller OFF.");
+  if (r.earthFault && st.gChoice && st.gChoice !== "OFF" && !st.tgChoice)
+    missing.push("Vælg t4 for den aktive I4-indstilling.");
+  return missing;
+}
+function renderDocumentationStatus() {
+  const warning = document.getElementById("documentationWarning"),
+    copy = document.getElementById("copy"),
+    missing = documentationMissingForCurrentSelection(),
+    complete = !missing.length;
+  if (warning) {
+    warning.classList.toggle("hidden", complete);
+    warning.textContent = complete ? "" : `Dokumentation kan ikke kopieres: ${missing.join(" ")}`;
+  }
+  if (copy) {
+    copy.disabled = !complete;
+    copy.title = complete ? "Kopiér dokumentation" : missing.join(" ");
+  }
+  return complete;
+}
 function resetResidual() {
   st.rcdEnabled = false;
   st.rcdDevice = 0;
@@ -2990,6 +3372,8 @@ function labelsFor(s) {
       shortTime: "t2",
       instant: "I3",
       magnetic: "I3",
+      earth: "I4",
+      earthTime: "t4",
     };
   return {
     overload: "Ir",
@@ -2998,7 +3382,75 @@ function labelsFor(s) {
     shortTime: "tsd",
     instant: "Ii",
     magnetic: "Ii",
+    earth: "Ig",
+    earthTime: "tg",
   };
+}
+function relaySupportsSelection(relay, f, inA, poles) {
+  const supportedRatings = relay.ratingsByFrame && relay.ratingsByFrame[f.frame];
+  return (
+    (!relay.frames || relay.frames.includes(f.frame)) &&
+    (!supportedRatings || supportedRatings.includes(inA)) &&
+    (!relay.poles || relay.poles.includes(poles))
+  );
+}
+function hasRequiredFunctions(candidate, selected) {
+  const required = selected.functions || [];
+  const available = candidate.functions || [];
+  return required.every((fn) => available.includes(fn));
+}
+function ekipDipAlternativeSuggestion(s, f, r, inA, poles, desired, current) {
+  if (
+    s.brand !== "ABB" ||
+    s.series !== "Tmax XT" ||
+    !r.suggestionGroup ||
+    !isN(desired) ||
+    !current ||
+    current.error ||
+    current.verify ||
+    !isN(current.value) ||
+    Math.abs(current.value - desired) < 0.000001
+  )
+    return "";
+  const candidates = relays().filter(
+    (candidate) =>
+      candidate.name !== r.name &&
+      candidate.suggestionGroup === r.suggestionGroup &&
+      relaySupportsSelection(candidate, f, inA, poles) &&
+      hasRequiredFunctions(candidate, r),
+  );
+  let better = null;
+  for (const candidate of candidates) {
+    const factors = settingValues(candidate.ir, f, inA, []);
+    const alternative = best([inA], factors, desired);
+    if (
+      alternative.error ||
+      alternative.verify ||
+      !isN(alternative.value) ||
+      alternative.value <= current.value + 0.000001
+    )
+      continue;
+    if (
+      !better ||
+      alternative.value > better.result.value + 0.000001 ||
+      (Math.abs(alternative.value - better.result.value) < 0.000001 &&
+        candidate.name < better.relay.name)
+    )
+      better = { relay: candidate, result: alternative };
+  }
+  if (!better) return "";
+  const alternativeText =
+    Math.abs(better.result.value - desired) < 0.000001
+      ? `kan indstilles til præcis ${fmtA(desired)}`
+      : `kan indstilles til ${fmtA(better.result.value)}`;
+  return `Forslag: ${better.relay.name} ${alternativeText}. Det valgte ${r.name}-relæ kan kun indstilles til ${fmtA(current.value)}.`;
+}
+function renderRelaySuggestion(s, f, r, inA, poles, desired, current) {
+  const el = document.getElementById("relaySuggestion");
+  if (!el) return;
+  const message = ekipDipAlternativeSuggestion(s, f, r, inA, poles, desired, current);
+  el.classList.toggle("hidden", !message);
+  el.textContent = message;
 }
 function deviceLabel(s) {
   return (s.brand === "Schneider Electric" && s.series === "MasterPact MTZ") ||
@@ -6016,6 +6468,11 @@ const usageStats = (() => {
       inc: st.inc,
       method: st.method,
       irSetting: st.irSetting,
+      siMode: st.siMode,
+      i2Choice: st.i2Choice,
+      i3Choice: st.i3Choice,
+      gChoice: st.gChoice,
+      tgChoice: st.tgChoice,
       backupComponent: st.backupComponent,
       rcdDevice: st.rcdDevice,
       rcdSensitivity: st.rcdSensitivity,
@@ -6027,7 +6484,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.26-test",
+      version: "v6.44",
       anonymousId: anonymousId(),
       selection: selection(),
     });
@@ -6114,8 +6571,16 @@ function render() {
       ? ioFactors.map((x) => settingAmpValue(x * inA))
       : [inA];
   const trValues = settingValues(r.tr, f, inA);
-  const isdValues = settingValues(r.isd, f, inA);
-  const tsdCfg = tsdSetting(r.tsd, f, inA);
+  const siMode = renderSiModeControls(r);
+  const shortFunctionPending = r.shortCircuitSelector && siMode === "";
+  const isdValues =
+    shortFunctionPending || siMode === "I"
+      ? []
+      : settingValues(r.isd, f, inA);
+  const tsdCfg =
+    shortFunctionPending || siMode === "I"
+      ? null
+      : tsdSetting(r.tsd, f, inA);
   const selectedTr = renderNumericChoiceControls(
     "trPanel",
     "trChoice",
@@ -6125,8 +6590,12 @@ function render() {
     secondsFmt,
     `Dokumenterede ${lbl.time}-trin`,
   );
-  const selectedTsd = renderTsdControls(tsdCfg);
-  const iiValues = settingValues(r.ii, f, inA);
+  let selectedTsd = renderTsdControls(tsdCfg);
+  const iiValues =
+    shortFunctionPending || siMode === "S"
+      ? []
+      : settingValues(r.ii, f, inA);
+  const earthFault = renderEarthFaultControls(r.earthFault, f, inA, lbl);
   const tmLSteps = namedStepsByRating(r.lStepsByRating, f, inA, ABB_TM_L_FACTORS);
   let irFactors = settingValues(r.ir, f, inA, [1]) || [1];
   const fineIrCfg = fineIrConfig(r.irFine, f.frame, inA);
@@ -6173,6 +6642,70 @@ function render() {
       ir = best(bases, irFactors, desired);
     }
   }
+  renderRelaySuggestion(s, f, r, inA, p, desired, ir);
+  const overloadOk = ir && !ir.verify && !ir.error;
+  const shortBaseName = r.isdBase === "In" ? "In" : lbl.overload;
+  const shortBaseValue = r.isdBase === "In" ? inA : ir && ir.value;
+  const autoI2 =
+    overloadOk && isdValues && isdValues.length && isdValues.every(isN)
+      ? under(isdValues, shortBaseValue, ikmin * 1000 * 0.8)
+      : null;
+  const i2Dip = renderDipThresholdControl(
+    "i2Panel",
+    "i2Choice",
+    "i2Info",
+    "i2Choice",
+    lbl.short,
+    isdValues,
+    shortBaseValue,
+    ikmin * 1000 * 0.8,
+    autoI2,
+    !!r.physicalDipThresholds && overloadOk,
+  );
+  if (i2Dip && i2Dip.choice === "OFF") selectedTsd = renderTsdControls(null);
+  const i2Off = i2Dip && i2Dip.choice === "OFF";
+  const iiLimit =
+    isdValues && isdValues.length && !i2Off
+      ? ikmax * 1000 * 0.8
+      : ikmin * 1000 * 0.8;
+  // Keep documented textual I3 data on the existing verification path; only
+  // the Ekip Dip control itself requires numeric, physically selectable steps.
+  const autoI3 = under(iiValues, inA, iiLimit);
+  const i3Dip = renderDipThresholdControl(
+    "i3Panel",
+    "i3Choice",
+    "i3Info",
+    "i3Choice",
+    lbl.instant,
+    iiValues,
+    inA,
+    iiLimit,
+    autoI3,
+    !!r.physicalDipThresholds,
+  );
+  const i3Off = i3Dip && i3Dip.choice === "OFF";
+  const hasActiveShortProtection =
+    (isdValues && isdValues.length && !i2Off) ||
+    (iiValues && iiValues.length && !i3Off);
+  const noActiveShortProtection =
+    !!r.physicalDipThresholds && !shortFunctionPending && !hasActiveShortProtection;
+  st.documentationIssues = [];
+  const addCalculationError = (label, calculation) => {
+    if (!calculation || !calculation.error) return;
+    const issue = `Ugyldig ${label}-indstilling.`;
+    if (!st.documentationIssues.includes(issue)) st.documentationIssues.push(issue);
+  };
+  addCalculationError(lbl.overload, ir);
+  if (i2Dip && i2Dip.choice === "AUTO") addCalculationError(lbl.short, autoI2);
+  if (i3Dip && i3Dip.choice === "AUTO") addCalculationError(lbl.instant, autoI3);
+  if (noActiveShortProtection)
+    st.documentationIssues.push("Ingen aktiv kortslutningsbeskyttelse: I2 og I3 er OFF eller inaktive.");
+  $("shortProtectionWarning").classList.toggle("hidden", !noActiveShortProtection);
+  $("shortProtectionWarning").textContent = noActiveShortProtection
+    ? "ADVARSEL: Ingen aktiv kortslutningsbeskyttelse. I2 og I3 er OFF eller inaktive."
+    : "";
+  if (noActiveShortProtection)
+    out.push("ADVARSEL: Ingen aktiv kortslutningsbeskyttelse (I2/I3 er OFF eller inaktive).");
   out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
   if (irSettingMethod && !ir.fine) {
     rows.push(
@@ -6241,7 +6774,6 @@ function render() {
     }
     if (msg) out.push("Bemærk: " + msg);
   }
-  const overloadOk = ir && !ir.verify && !ir.error;
   if (r.trFixed) {
     rows.push(`<tr><td>${lbl.time}</td><td>Fast</td><td>${r.trFixed}</td></tr>`);
     out.push(lbl.time + ": " + r.trFixed);
@@ -6258,20 +6790,37 @@ function render() {
       out.push(lbl.time + ": " + secondsFmt(tr));
     }
   }
+  if (r.shortCircuitSelector) {
+    const modeText =
+      siMode === "S"
+        ? "S aktiv: I2/t2"
+        : siMode === "I"
+          ? "I aktiv: I3"
+          : "Vælg S eller I";
+    rows.push(
+      `<tr><td>S/I</td><td>${r.shortCircuitSelector}</td><td>${modeText}</td></tr>`,
+    );
+    out.push(`S/I DIP-switch: ${modeText}`);
+  }
   if (isdValues && isdValues.length) {
     if (!isdValues.every(isN)) {
       const status = statusText(isdValues);
       rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
       out.push(lbl.short + ": " + status);
     } else if (overloadOk) {
-      const shortBaseName = r.isdBase === "In" ? "In" : lbl.overload;
-      const shortBaseValue = r.isdBase === "In" ? inA : ir.value;
-      const isd = under(isdValues, shortBaseValue, ikmin * 1000 * 0.8);
-      if (isd.verify) {
+      const isd = autoI2;
+      const off = i2Off;
+      if (off) {
+        rows.push(
+          `<tr><td>${lbl.short}</td><td>OFF / ${range(isdValues, isdValues[0], fmt)}</td><td>OFF</td></tr>`,
+        );
+        out.push(`${lbl.short}: OFF`);
+      } else if (isd.verify) {
         const status = isd.status || V;
         rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
         out.push(lbl.short + ": " + status);
       } else if (isd.error) {
+        addCalculationError(lbl.short, isd);
         rows.push(
           `<tr><td>${lbl.short}</td><td class="statusError">FEJL</td><td class="statusError">Laveste ${lbl.short} ${fmtA(isd.value)} er højere end grænse ${fmtA(isd.limit)}</td></tr>`,
         );
@@ -6279,33 +6828,47 @@ function render() {
           `${lbl.short}: FEJL - laveste ${lbl.short} er højere end Ik min-grænse`,
         );
       } else {
+        const factor = i2Dip && i2Dip.factor !== null ? i2Dip.factor : isd.factor;
+        const available = r.physicalDipThresholds
+          ? `OFF / ${range(isdValues, factor, fmt)}`
+          : range(isdValues, factor, fmt);
         rows.push(
-          `<tr><td>${lbl.short}</td><td>${range(isdValues, isd.factor, fmt)}</td><td>${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}</td></tr>`,
+          `<tr><td>${lbl.short}</td><td>${available}</td><td>${off ? "OFF" : `${fmt(factor)} × ${shortBaseName} = ${fmtA(factor * shortBaseValue)}`}</td></tr>`,
         );
         out.push(
-          `${lbl.short}: ${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}`,
+          off
+            ? `${lbl.short}: OFF`
+            : `${lbl.short}: ${fmt(factor)} × ${shortBaseName} = ${fmtA(factor * shortBaseValue)}`,
         );
       }
     }
   }
-  const tsdRow = renderTsdRow(tsdCfg, selectedTsd, lbl.shortTime);
+  const tsdRow =
+    i2Dip && i2Dip.choice === "OFF"
+      ? null
+      : renderTsdRow(tsdCfg, selectedTsd, lbl.shortTime);
   if (tsdRow) {
     rows.push(tsdRow.row);
     out.push(tsdRow.output);
   }
   let instantWritten = false;
   if (iiValues && iiValues.length) {
-    const lim =
-        isdValues && isdValues.length
-          ? ikmax * 1000 * 0.8
-          : ikmin * 1000 * 0.8,
-      ii = under(iiValues, inA, lim);
-    if (ii.verify) {
+    const lim = iiLimit,
+      ii = autoI3;
+    const off = i3Off;
+    if (off) {
+      rows.push(
+        `<tr><td>${lbl.instant}</td><td>OFF / ${range(iiValues, iiValues[0], fmt)}</td><td>OFF</td></tr>`,
+      );
+      out.push(`${lbl.instant}: OFF`);
+      instantWritten = true;
+    } else if (ii.verify) {
       const status = ii.status || V;
       rows.push(`<tr><td>${lbl.instant}</td><td>${status}</td><td>${status}</td></tr>`);
       out.push(lbl.instant + ": " + status);
       instantWritten = true;
     } else if (ii.error) {
+      addCalculationError(lbl.instant, ii);
       rows.push(
         `<tr><td>${lbl.instant}</td><td class="statusError">FEJL</td><td class="statusError">Laveste ${lbl.instant} ${fmtA(ii.value)} er højere end grænse ${fmtA(ii.limit)}</td></tr>`,
       );
@@ -6314,10 +6877,18 @@ function render() {
       );
       instantWritten = true;
     } else {
+      const factor = i3Dip && i3Dip.factor !== null ? i3Dip.factor : ii.factor;
+      const available = r.physicalDipThresholds
+        ? `OFF / ${range(iiValues, factor, fmt)}`
+        : range(iiValues, factor, fmt);
       rows.push(
-        `<tr><td>${lbl.instant}</td><td>${range(iiValues, ii.factor, fmt)}</td><td>${fmt(ii.factor)} × In = ${fmtA(ii.value)}</td></tr>`,
+        `<tr><td>${lbl.instant}</td><td>${available}</td><td>${off ? "OFF" : `${fmt(factor)} × In = ${fmtA(factor * inA)}`}</td></tr>`,
       );
-      out.push(`${lbl.instant}: ${fmt(ii.factor)} × In = ${fmtA(ii.value)}`);
+      out.push(
+        off
+          ? `${lbl.instant}: OFF`
+          : `${lbl.instant}: ${fmt(factor)} × In = ${fmtA(factor * inA)}`,
+      );
       instantWritten = true;
     }
   }
@@ -6336,6 +6907,7 @@ function render() {
     if (steps) {
       const selected = namedStepSelectionByLimit(steps, ikmin * 1000 * 0.8);
       if (selected && selected.error) {
+        addCalculationError(lbl.magnetic, selected);
         rows.push(
           `<tr><td>${lbl.magnetic}</td><td>${namedStepsHtml(steps)}</td><td class="statusError">Laveste ${lbl.magnetic} ${fmtAUnit(selected.step.value)} er højere end grænse ${fmtAUnit(selected.limit)}</td></tr>`,
         );
@@ -6369,6 +6941,39 @@ function render() {
       );
       out.push(lbl.magnetic + ": " + txt);
       instantWritten = true;
+    }
+  }
+  if (earthFault) {
+    const { factors, choice, timeCfg, selectedTime } = earthFault;
+    const available = `OFF / ${factors.map((factor) => fmt(factor)).join("/")} × In`;
+    rows.push(
+      `<tr><td>G</td><td>Indbygget jordfejl</td><td>${r.earthFault.method}; I4/t4, ikke RCD</td></tr>`,
+    );
+    out.push(`G: Indbygget jordfejlsbeskyttelse via ${r.earthFault.method}; ikke RCD`);
+    if (choice === "OFF") {
+      rows.push(`<tr><td>${lbl.earth}</td><td>${available}</td><td>OFF</td></tr>`);
+      out.push(`${lbl.earth}: OFF`);
+    } else if (choice) {
+      const factor = Number(choice);
+      rows.push(
+        `<tr><td>${lbl.earth}</td><td>${available}</td><td>${fmt(factor)} × In = ${fmtA(factor * inA)}</td></tr>`,
+      );
+      out.push(`${lbl.earth}: ${fmt(factor)} × In = ${fmtA(factor * inA)}`);
+      if (timeCfg) {
+        const timeDetail = `${timeCfg.summary || "Dokumenterede producentvalg"}${
+          timeCfg.reference ? `; ref. ${timeCfg.reference}` : ""
+        }`;
+        const value = selectedTime ? selectedTime.label : `Vælg ${lbl.earthTime}`;
+        rows.push(
+          `<tr><td>${lbl.earthTime}</td><td>${timeDetail}</td><td>${value}</td></tr>`,
+        );
+        out.push(`${lbl.earthTime}: ${value}`);
+      }
+    } else {
+      rows.push(
+        `<tr><td>${lbl.earth}</td><td>${available}</td><td>Vælg ${lbl.earth}</td></tr>`,
+      );
+      out.push(`${lbl.earth}: Vælg ${lbl.earth}`);
     }
   }
   if (residual) {
@@ -6405,6 +7010,7 @@ function render() {
     .join("");
   $("output").textContent = out.join("\n");
   renderBackup415V(s, f, c, inA);
+  renderDocumentationStatus();
   usageStats.trackCalculation();
 }
 function reset(prevPole) {
@@ -6412,6 +7018,7 @@ function reset(prevPole) {
   st.cls = 0;
   st.relay = "";
   st.rating = 0;
+  resetDipSelections();
   const idx = F().poles.indexOf(prevPole);
   st.poles = idx >= 0 ? idx : 0;
   resetResidual();
@@ -6442,6 +7049,7 @@ function bind() {
     st.cls = 0;
     st.relay = "";
     st.rating = 0;
+    resetDipSelections();
     resetResidual();
     const idx = F().poles.indexOf(oldPole);
     st.poles = idx >= 0 ? idx : 0;
@@ -6454,11 +7062,13 @@ function bind() {
   $("relay").onchange = (e) => {
     st.relay = e.target.value;
     st.rating = 0;
+    resetDipSelections();
     resetResidual();
     render();
   };
   $("rating").onchange = (e) => {
     st.rating = +e.target.value;
+    resetDipSelections();
     render();
   };
   $("poles").onchange = (e) => {
@@ -6483,6 +7093,36 @@ function bind() {
   if (tsdChoice)
     tsdChoice.onchange = (e) => {
       st.tsdChoice = e.target.value;
+      render();
+    };
+  const siModeChoice = document.getElementById("siModeChoice");
+  if (siModeChoice)
+    siModeChoice.onchange = (e) => {
+      st.siMode = e.target.value;
+      render();
+    };
+  const i2Choice = document.getElementById("i2Choice");
+  if (i2Choice)
+    i2Choice.onchange = (e) => {
+      st.i2Choice = e.target.value;
+      render();
+    };
+  const gChoice = document.getElementById("gChoice");
+  if (gChoice)
+    gChoice.onchange = (e) => {
+      st.gChoice = e.target.value;
+      render();
+    };
+  const tgChoice = document.getElementById("tgChoice");
+  if (tgChoice)
+    tgChoice.onchange = (e) => {
+      st.tgChoice = e.target.value;
+      render();
+    };
+  const i3Choice = document.getElementById("i3Choice");
+  if (i3Choice)
+    i3Choice.onchange = (e) => {
+      st.i3Choice = e.target.value;
       render();
     };
   const bc = document.getElementById("backupComponent");
@@ -6534,6 +7174,7 @@ function bind() {
       };
   });
   $("copy").onclick = async () => {
+    if (!renderDocumentationStatus()) return;
     await navigator.clipboard.writeText($("output").textContent);
     usageStats.trackDocumentation();
     $("copy").textContent = "Kopieret";

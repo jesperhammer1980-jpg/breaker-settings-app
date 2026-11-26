@@ -36,11 +36,48 @@
     <!--
       Versionshistorik
 
+      v6.44
+      2026-11-26
+      - Kopiér-validering bruger nu fælles, strukturerede beregningsfejl for Ir, Isd, Ii/I3 og ABBs MIN/MED/MAX-I3 på alle relætyper
+      - Faste producentkarakteristikker og gyldige OFF-valg bevares som komplette dokumentationsvalg
+      - app.js cache-busting opdateret til v6.44
+
+      v6.43
+      2026-11-26
+      - Ekip Dip I3 anvender nu Ik min x 0,8, når I2 fysisk er sat til OFF; I2 aktiv og I3 aktiv anvender fortsat Ik max x 0,8 for I3
+      - OFF vises som faktisk I2/I3-resultat, også når AUTO ikke kan finde et gyldigt aktivt trin
+      - Kopiér er spærret ved ugyldige aktive AUTO-indstillinger og når ingen kortslutningsbeskyttelse er aktiv
+      - app.js cache-busting opdateret til v6.43
+
+      v6.42
+      2026-11-26
+      - ABB Ekip Dip I2 og I3 har nu dokumenterede OFF-DIP-valg, hvor producenten angiver dem
+      - Kopiér er spærret, indtil LS/I og G-indstillinger er komplet valgte; DIP-valg nulstilles ved frame-, relæ- og ratingskift
+      - app.js cache-busting opdateret til v6.42
+
+      v6.41
+      2026-11-26
+      - Ekip Dip LS/I kræver nu fysisk valg af enten S (I2/t2) eller I (I3); funktionerne dokumenteres aldrig samtidig
+      - Ekip Dip LIG og LSIG har verificerede, manuelle I4/t4 DIP-indstillinger inkl. OFF, tydeligt adskilt fra RCD
+      - app.js cache-busting opdateret til v6.41
+
+      v6.40
+      2026-11-26
+      - ABB Tmax XT Ekip Dip er opdelt i LS/I, LSI, LIG og LSIG med type-specifikke, dokumenterede DIP-trin
+      - I2 for Ekip Dip beregnes mod In, og LS/I kan foreslå kompatibel LSI uden automatisk relæskift
+      - app.js cache-busting opdateret til v6.40
+
       v6.39
       2026-11-13
-      - Beregningsvejledning og automatisk In-standard for ønsket strøm og INC tilføjet
-      - MicroLogic 2.2/2.3 tsd fjernet fra tabel, resultat og Kopiér-output; 20/80 ms bevares kun som teknisk karakteristik i vejledningen
+      - MicroLogic 2.2/2.3 tekniske korttidskarakteristik er fjernet fra tsd-indstilling, resultat og Kopiér-output
+      - Fast 20/80 ms-korttidsadfærd beskrives kun som ikke-justerbar teknisk karakteristik i beregningsvejledningen
       - app.js cache-busting opdateret til v6.39
+
+      v6.38
+      2026-11-13
+      - Beregningsvejledning tilføjet i LIVE med de faktiske udvælgelsesregler, producentbegrænsninger og regneeksempler
+      - Ønsket indstillingsstrøm og INC initialiseres nu til relæets reelle In og nulstilles kun, når In ændres
+      - app.js cache-busting opdateret til v6.38
 
       v6.37
       2026-10-14
@@ -84,7 +121,7 @@
 
       v6.31
       2026-08-06
-      - Isd/S standardvalg rettet tilbage til beregnet vaerdi efter Ik min x 0,8
+      - Isd/S standardvalg er rettet tilbage til beregnet vaerdi efter Ik min x 0,8
       - Isd/S bruger igen den eksisterende korttidsberegningslogik i stedet for minimum
       - tr og tsd forudvaelger fortsat laveste dokumenterede trin og bevarer gyldige manuelle valg
       - app.js cache-busting opdateret til v6.31
@@ -113,7 +150,7 @@
       - Datadrevet tsd tilfoejet for relaeer med dokumenterede producenttrin eller -intervaller hos Schneider, ABB og Siemens
       - Justerbar tsd vises som brugerens valg blandt dokumenterede muligheder; faste/ikke-dokumenterede tsd-vaerdier skjules efter producentdata
       - tsd vises i indstillingstabellen og dokumentationsoutputtet uden at vaelge en vilkaarlig standard
-      - Separat history.html oprettet med fuld versionshistorik og link tilbage til BreakerSettings
+      - Separat history.html oprettet med fuld LIVE-versionshistorik og link tilbage til BreakerSettings
       - app.js cache-busting opdateret til v6.27
 
       v6.26
@@ -159,14 +196,14 @@
 
       v6.20
       2026-06-22
-      - Anonym brugsstatistik tilfoejet via /api/stats
+      - Anonym brugsstatistik tilfoejet i LIVE via /api/stats
       - Skjult statistikside tilfoejet paa /admin-stats
       - Besoeg, anonymt brugerestimat, beregninger, dokumentationskopieringer og mest brugte tekniske valg registreres uden persondata
       - app.js cache-busting opdateret til v6.20
 
       v6.19
       2026-06-22
-      - Siemens 3WA tilfoejet som luftafbryder/ACB-serie
+      - Siemens 3WA tilfoejet som luftafbryder/ACB-serie i LIVE
       - 3WA11, 3WA12 og 3WA13 frames, Icu/Ics-klasser og option-plug In-vaerdier indlaest fra officiel Siemens 3WA1 equipment manual
       - ETU300 LSI/LSIG og ETU600 LSI/LSIG/LSIG Hi-Z Ir, tr, Isd og Ii rotary-switch settings verificeret mod Siemens-manualen
       - 3WA backup-/cascadingdata ikke indlaest, da ingen producentverificeret 415V backup-/cascadingtabel er fundet i de gennemgaaede 3WA-kilder
@@ -175,7 +212,7 @@
       v6.18
       2026-06-16
       - Indstillingsstroem-regel rettet saa appen aldrig foreslaar en vaerdi over oensket stroem
-      - Fejlstroemsbeskyttelse tilfoejet for dokumenterede Schneider, ABB og Siemens kombinationer
+      - Fejlstroemsbeskyttelse tilfoejet i LIVE for dokumenterede Schneider, ABB og Siemens kombinationer
       - Backup-/cascading ingen-data tekst rettet til aftalt formulering
       - app.js cache-busting opdateret til v6.18
 
@@ -216,7 +253,7 @@
       - Schneider NSXm TM-D/TM-G Ir-range, tr og faste Ii-vaerdier synkroniseret med officiel Schneider-kilde
       - Schneider NSXm 20A markeret "Ikke dokumenteret af producent", da den ikke fremgaar af den officielle NSXm TM-D-tabel
       - Schneider NSX Selectivity Enhanced by Cascading status flyttet fra aaben status til kildeafklaring
-      - Konsistenskontrol for ETU76B mellem auditstatus, app.js og live-visning
+      - Konsistenskontrol for ETU76B mellem auditstatus, app.js og LIVE-visning
 
       v6.12
       2026-06-12
@@ -254,15 +291,15 @@
         font: 700 12px Arial;
       "
     >
-      LIVEVERSION v6.39
+      LIVEVERSION v6.44
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          v6.39 - beregningsvejledning, In-standard og MicroLogic 2
+          v6.44 - Generel Kopiér-validering
         </p>
-        <div class="liveBanner"></div>
+        <div class="testBanner">LIVESIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
         ><select id="brand"></select
         ><label>Serie</label
@@ -300,6 +337,26 @@
         ><div id="tsdPanel" class="statsBox hidden">
           <label id="tsdChoiceLabel" for="tsdChoice">tsd</label><select id="tsdChoice"></select>
           <div id="tsdInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="siModePanel" class="statsBox hidden">
+          <label for="siModeChoice">S/I DIP-switch</label><select id="siModeChoice"></select>
+          <div id="siModeInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="i2Panel" class="statsBox hidden">
+          <label for="i2Choice">I2 (S-beskyttelse)</label><select id="i2Choice"></select>
+          <div id="i2Info" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="gPanel" class="statsBox hidden">
+          <label for="gChoice">I4 (G-beskyttelse)</label><select id="gChoice"></select>
+          <div id="gInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="tgPanel" class="statsBox hidden">
+          <label for="tgChoice">t4 (G-beskyttelse)</label><select id="tgChoice"></select>
+          <div id="tgInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="i3Panel" class="statsBox hidden">
+          <label for="i3Choice">I3 (I-beskyttelse)</label><select id="i3Choice"></select>
+          <div id="i3Info" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
         </div
         ><div id="irSettingWrap" class="statsBox hidden">
           <h3 id="irSettingTitle">Ir setting method</h3>
@@ -343,6 +400,9 @@
         </div>
         <div id="warning" class="warning hidden"></div>
         <div id="requestWarning" class="warning hidden"></div>
+        <div id="relaySuggestion" class="warning hidden"></div>
+        <div id="shortProtectionWarning" class="warning hidden"></div>
+        <div id="documentationWarning" class="warning hidden"></div>
         <h3>Beregnede indstillinger</h3>
         <table>
           <thead>
@@ -377,7 +437,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app.js?v=6.39"></script>
+    <script src="app.js?v=6.44"></script>
     <div
       style="
         position: fixed;
@@ -393,7 +453,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      LIVEVERSION v6.39
+      LIVEVERSION v6.44
     </div>
   </body>
 </html>
