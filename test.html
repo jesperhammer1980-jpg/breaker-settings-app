@@ -36,6 +36,12 @@
     <!--
       Versionshistorik
 
+      v6.44
+      2026-11-26
+      - Kopiér-validering bruger nu fælles, strukturerede beregningsfejl for Ir, Isd, Ii/I3 og ABBs MIN/MED/MAX-I3 på alle relætyper
+      - Faste producentkarakteristikker og gyldige OFF-valg bevares som komplette dokumentationsvalg
+      - app-test.js cache-busting opdateret til v6.44
+
       v6.43
       2026-11-26
       - Ekip Dip I3 anvender nu Ik min x 0,8, når I2 fysisk er sat til OFF; I2 aktiv og I3 aktiv anvender fortsat Ik max x 0,8 for I3
@@ -285,13 +291,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.43
+      TEST v6.44
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.43 - ABB Ekip Dip I2/I3 OFF-validering
+          TEST v6.44 - Generel Kopiér-validering
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -431,7 +437,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.43"></script>
+    <script src="app-test.js?v=6.44"></script>
     <div
       style="
         position: fixed;
@@ -447,7 +453,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.43 - live ikke opdateret
+      TEST v6.44 - live ikke opdateret
     </div>
   </body>
 </html>

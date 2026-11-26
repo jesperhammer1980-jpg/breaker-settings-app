@@ -6484,7 +6484,7 @@ const usageStats = (() => {
   function post(type) {
     const payload = JSON.stringify({
       type,
-      version: "v6.43-test",
+      version: "v6.44-test",
       anonymousId: anonymousId(),
       selection: selection(),
     });
@@ -6690,11 +6690,14 @@ function render() {
   const noActiveShortProtection =
     !!r.physicalDipThresholds && !shortFunctionPending && !hasActiveShortProtection;
   st.documentationIssues = [];
-  if (ir && ir.error) st.documentationIssues.push("Overbelastningsindstillingen er ugyldig.");
-  if (i2Dip && i2Dip.choice === "AUTO" && autoI2 && (autoI2.error || autoI2.verify))
-    st.documentationIssues.push("Den aktive I2 AUTO-indstilling er ugyldig.");
-  if (i3Dip && i3Dip.choice === "AUTO" && autoI3 && (autoI3.error || autoI3.verify))
-    st.documentationIssues.push("Den aktive I3 AUTO-indstilling er ugyldig.");
+  const addCalculationError = (label, calculation) => {
+    if (!calculation || !calculation.error) return;
+    const issue = `Ugyldig ${label}-indstilling.`;
+    if (!st.documentationIssues.includes(issue)) st.documentationIssues.push(issue);
+  };
+  addCalculationError(lbl.overload, ir);
+  if (i2Dip && i2Dip.choice === "AUTO") addCalculationError(lbl.short, autoI2);
+  if (i3Dip && i3Dip.choice === "AUTO") addCalculationError(lbl.instant, autoI3);
   if (noActiveShortProtection)
     st.documentationIssues.push("Ingen aktiv kortslutningsbeskyttelse: I2 og I3 er OFF eller inaktive.");
   $("shortProtectionWarning").classList.toggle("hidden", !noActiveShortProtection);
@@ -6817,6 +6820,7 @@ function render() {
         rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
         out.push(lbl.short + ": " + status);
       } else if (isd.error) {
+        addCalculationError(lbl.short, isd);
         rows.push(
           `<tr><td>${lbl.short}</td><td class="statusError">FEJL</td><td class="statusError">Laveste ${lbl.short} ${fmtA(isd.value)} er højere end grænse ${fmtA(isd.limit)}</td></tr>`,
         );
@@ -6864,6 +6868,7 @@ function render() {
       out.push(lbl.instant + ": " + status);
       instantWritten = true;
     } else if (ii.error) {
+      addCalculationError(lbl.instant, ii);
       rows.push(
         `<tr><td>${lbl.instant}</td><td class="statusError">FEJL</td><td class="statusError">Laveste ${lbl.instant} ${fmtA(ii.value)} er højere end grænse ${fmtA(ii.limit)}</td></tr>`,
       );
@@ -6902,6 +6907,7 @@ function render() {
     if (steps) {
       const selected = namedStepSelectionByLimit(steps, ikmin * 1000 * 0.8);
       if (selected && selected.error) {
+        addCalculationError(lbl.magnetic, selected);
         rows.push(
           `<tr><td>${lbl.magnetic}</td><td>${namedStepsHtml(steps)}</td><td class="statusError">Laveste ${lbl.magnetic} ${fmtAUnit(selected.step.value)} er højere end grænse ${fmtAUnit(selected.limit)}</td></tr>`,
         );
