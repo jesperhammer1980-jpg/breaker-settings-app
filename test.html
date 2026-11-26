@@ -36,6 +36,12 @@
     <!--
       Versionshistorik
 
+      v6.42
+      2026-11-26
+      - ABB Ekip Dip I2 og I3 har nu dokumenterede OFF-DIP-valg, hvor producenten angiver dem
+      - Kopiér er spærret, indtil LS/I og G-indstillinger er komplet valgte; DIP-valg nulstilles ved frame-, relæ- og ratingskift
+      - app-test.js cache-busting opdateret til v6.42
+
       v6.41
       2026-11-26
       - Ekip Dip LS/I kræver nu fysisk valg af enten S (I2/t2) eller I (I3); funktionerne dokumenteres aldrig samtidig
@@ -272,13 +278,13 @@
         font: 700 12px Arial;
       "
     >
-      TEST v6.41
+      TEST v6.42
     </div>
     <main class="app">
       <aside class="panel left">
         <h1>Breaker<span>Settings</span></h1>
         <p class="subtitle">
-          TEST v6.41 - ABB Ekip Dip S/I og G
+          TEST v6.42 - ABB Ekip Dip OFF og dokumentationskontrol
         </p>
         <div class="testBanner">TESTSIDE - live er ikke overskrevet</div>
         <label>Fabrikat</label
@@ -323,6 +329,10 @@
           <label for="siModeChoice">S/I DIP-switch</label><select id="siModeChoice"></select>
           <div id="siModeInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
         </div
+        ><div id="i2Panel" class="statsBox hidden">
+          <label for="i2Choice">I2 (S-beskyttelse)</label><select id="i2Choice"></select>
+          <div id="i2Info" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
         ><div id="gPanel" class="statsBox hidden">
           <label for="gChoice">I4 (G-beskyttelse)</label><select id="gChoice"></select>
           <div id="gInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
@@ -330,6 +340,10 @@
         ><div id="tgPanel" class="statsBox hidden">
           <label for="tgChoice">t4 (G-beskyttelse)</label><select id="tgChoice"></select>
           <div id="tgInfo" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
+        </div
+        ><div id="i3Panel" class="statsBox hidden">
+          <label for="i3Choice">I3 (I-beskyttelse)</label><select id="i3Choice"></select>
+          <div id="i3Info" style="font-size: 12px; opacity: 0.75; margin-top: 6px"></div>
         </div
         ><div id="irSettingWrap" class="statsBox hidden">
           <h3 id="irSettingTitle">Ir setting method</h3>
@@ -374,6 +388,7 @@
         <div id="warning" class="warning hidden"></div>
         <div id="requestWarning" class="warning hidden"></div>
         <div id="relaySuggestion" class="warning hidden"></div>
+        <div id="documentationWarning" class="warning hidden"></div>
         <h3>Beregnede indstillinger</h3>
         <table>
           <thead>
@@ -408,7 +423,7 @@
         <pre id="output" class="output"></pre>
       </aside>
     </main>
-    <script src="app-test.js?v=6.41"></script>
+    <script src="app-test.js?v=6.42"></script>
     <div
       style="
         position: fixed;
@@ -424,7 +439,7 @@
         box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
       "
     >
-      TEST v6.41 - live ikke opdateret
+      TEST v6.42 - live ikke opdateret
     </div>
   </body>
 </html>

@@ -1743,6 +1743,7 @@ const DATA = [
         functions: ["L", "S", "I"],
         suggestionGroup: "abb-ekip-dip-power-lsi",
         shortCircuitSelector: "S/I DIP-switch",
+        physicalDipThresholds: true,
         ir: ABB_EKIP_DIP_LS_I_L,
         tr: {
           XT2: [12, 36],
@@ -1777,6 +1778,7 @@ const DATA = [
         poles: ["3P", "4P"],
         functions: ["L", "S", "I"],
         suggestionGroup: "abb-ekip-dip-power-lsi",
+        physicalDipThresholds: true,
         ir: {
           XT2: ABB_EKIP_DIP_LSI_L_XT2_XT6,
           XT4: ABB_EKIP_DIP_LSI_L_XT2_XT6,
@@ -1830,6 +1832,7 @@ const DATA = [
         },
         poles: ["3P", "4P"],
         functions: ["L", "I", "G"],
+        physicalDipThresholds: true,
         ir: ABB_EKIP_DIP_LS_I_L,
         tr: {
           XT2: [12, 36],
@@ -1873,6 +1876,7 @@ const DATA = [
         },
         poles: ["3P", "4P"],
         functions: ["L", "S", "I", "G"],
+        physicalDipThresholds: true,
         ir: {
           XT2: ABB_EKIP_DIP_LSI_L_XT2_XT6,
           XT4: ABB_EKIP_DIP_LSI_L_XT2_XT6,
@@ -2676,6 +2680,8 @@ let st = {
   trChoice: "",
   tsdChoice: "",
   siMode: "",
+  i2Choice: "",
+  i3Choice: "",
   gChoice: "",
   tgChoice: "",
   backupComponent: "all",
@@ -3173,6 +3179,86 @@ function renderEarthFaultControls(cfg, f, inA, lbl) {
     timeCfg,
     selectedTime: options.find((option) => option.value === st.tgChoice) || null,
   };
+}
+function renderDipThresholdControl(
+  panelId,
+  selectId,
+  infoId,
+  stateKey,
+  label,
+  values,
+  base,
+  limit,
+  automatic,
+  active,
+) {
+  const panel = document.getElementById(panelId),
+    select = document.getElementById(selectId),
+    info = document.getElementById(infoId),
+    numeric = active && values && values.every(isN) ? values : [];
+  if (!panel || !select) return null;
+  panel.classList.toggle("hidden", !numeric.length);
+  if (!numeric.length) {
+    st[stateKey] = "";
+    select.innerHTML = "";
+    if (info) info.textContent = "";
+    return null;
+  }
+  const permitted = numeric.filter((factor) => factor * base <= limit);
+  const valid = ["AUTO", "OFF", ...permitted.map(String)];
+  if (!valid.includes(st[stateKey])) st[stateKey] = "AUTO";
+  const automaticLabel =
+    automatic && !automatic.error && !automatic.verify
+      ? `Automatisk beregnet: ${fmt(automatic.factor)} × In = ${fmtA(automatic.value)}`
+      : "Automatisk beregnet";
+  select.innerHTML = [
+    `<option value="AUTO">${automaticLabel}</option>`,
+    '<option value="OFF">OFF</option>',
+    ...permitted.map(
+      (factor) =>
+        `<option value="${factor}">${fmt(factor)} × In = ${fmtA(factor * base)}</option>`,
+    ),
+  ].join("");
+  select.value = st[stateKey];
+  if (info)
+    info.textContent =
+      "Fysisk DIP-switch. Kun trin inden for den beregnede Ik-grænse kan vælges manuelt.";
+  return {
+    choice: st[stateKey],
+    factor: st[stateKey] === "AUTO" || st[stateKey] === "OFF" ? null : Number(st[stateKey]),
+  };
+}
+function resetDipSelections() {
+  st.siMode = "";
+  st.i2Choice = "";
+  st.i3Choice = "";
+  st.gChoice = "";
+  st.tgChoice = "";
+}
+function documentationMissingForCurrentSelection() {
+  const r = R();
+  const missing = [];
+  if (r.shortCircuitSelector && !st.siMode)
+    missing.push("Vælg S eller I med S/I DIP-switchen.");
+  if (r.earthFault && !st.gChoice) missing.push("Vælg I4 eller OFF.");
+  if (r.earthFault && st.gChoice && st.gChoice !== "OFF" && !st.tgChoice)
+    missing.push("Vælg t4 for den aktive I4-indstilling.");
+  return missing;
+}
+function renderDocumentationStatus() {
+  const warning = document.getElementById("documentationWarning"),
+    copy = document.getElementById("copy"),
+    missing = documentationMissingForCurrentSelection(),
+    complete = !missing.length;
+  if (warning) {
+    warning.classList.toggle("hidden", complete);
+    warning.textContent = complete ? "" : `Dokumentation kan ikke kopieres: ${missing.join(" ")}`;
+  }
+  if (copy) {
+    copy.disabled = !complete;
+    copy.title = complete ? "Kopiér dokumentation" : missing.join(" ");
+  }
+  return complete;
 }
 function resetResidual() {
   st.rcdEnabled = false;
@@ -6382,6 +6468,8 @@ const usageStats = (() => {
       method: st.method,
       irSetting: st.irSetting,
       siMode: st.siMode,
+      i2Choice: st.i2Choice,
+      i3Choice: st.i3Choice,
       gChoice: st.gChoice,
       tgChoice: st.tgChoice,
       backupComponent: st.backupComponent,
@@ -6501,7 +6589,7 @@ function render() {
     secondsFmt,
     `Dokumenterede ${lbl.time}-trin`,
   );
-  const selectedTsd = renderTsdControls(tsdCfg);
+  let selectedTsd = renderTsdControls(tsdCfg);
   const iiValues =
     shortFunctionPending || siMode === "S"
       ? []
@@ -6554,6 +6642,43 @@ function render() {
     }
   }
   renderRelaySuggestion(s, f, r, inA, p, desired, ir);
+  const overloadOk = ir && !ir.verify && !ir.error;
+  const shortBaseName = r.isdBase === "In" ? "In" : lbl.overload;
+  const shortBaseValue = r.isdBase === "In" ? inA : ir && ir.value;
+  const autoI2 =
+    overloadOk && isdValues && isdValues.length && isdValues.every(isN)
+      ? under(isdValues, shortBaseValue, ikmin * 1000 * 0.8)
+      : null;
+  const i2Dip = renderDipThresholdControl(
+    "i2Panel",
+    "i2Choice",
+    "i2Info",
+    "i2Choice",
+    lbl.short,
+    isdValues,
+    shortBaseValue,
+    ikmin * 1000 * 0.8,
+    autoI2,
+    !!r.physicalDipThresholds && overloadOk,
+  );
+  if (i2Dip && i2Dip.choice === "OFF") selectedTsd = renderTsdControls(null);
+  const iiLimit =
+    isdValues && isdValues.length ? ikmax * 1000 * 0.8 : ikmin * 1000 * 0.8;
+  // Keep documented textual I3 data on the existing verification path; only
+  // the Ekip Dip control itself requires numeric, physically selectable steps.
+  const autoI3 = under(iiValues, inA, iiLimit);
+  const i3Dip = renderDipThresholdControl(
+    "i3Panel",
+    "i3Choice",
+    "i3Info",
+    "i3Choice",
+    lbl.instant,
+    iiValues,
+    inA,
+    iiLimit,
+    autoI3,
+    !!r.physicalDipThresholds,
+  );
   out[4] = `Relæ: ${r.name} ${fmtA(inA)}${relayPlugLabel ? ` - ${relayPlugLabel}` : ""}`;
   if (irSettingMethod && !ir.fine) {
     rows.push(
@@ -6622,7 +6747,6 @@ function render() {
     }
     if (msg) out.push("Bemærk: " + msg);
   }
-  const overloadOk = ir && !ir.verify && !ir.error;
   if (r.trFixed) {
     rows.push(`<tr><td>${lbl.time}</td><td>Fast</td><td>${r.trFixed}</td></tr>`);
     out.push(lbl.time + ": " + r.trFixed);
@@ -6657,9 +6781,7 @@ function render() {
       rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
       out.push(lbl.short + ": " + status);
     } else if (overloadOk) {
-      const shortBaseName = r.isdBase === "In" ? "In" : lbl.overload;
-      const shortBaseValue = r.isdBase === "In" ? inA : ir.value;
-      const isd = under(isdValues, shortBaseValue, ikmin * 1000 * 0.8);
+      const isd = autoI2;
       if (isd.verify) {
         const status = isd.status || V;
         rows.push(`<tr><td>${lbl.short}</td><td>${status}</td><td>${status}</td></tr>`);
@@ -6672,27 +6794,34 @@ function render() {
           `${lbl.short}: FEJL - laveste ${lbl.short} er højere end Ik min-grænse`,
         );
       } else {
+        const off = i2Dip && i2Dip.choice === "OFF";
+        const factor = i2Dip && i2Dip.factor !== null ? i2Dip.factor : isd.factor;
+        const available = r.physicalDipThresholds
+          ? `OFF / ${range(isdValues, factor, fmt)}`
+          : range(isdValues, factor, fmt);
         rows.push(
-          `<tr><td>${lbl.short}</td><td>${range(isdValues, isd.factor, fmt)}</td><td>${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}</td></tr>`,
+          `<tr><td>${lbl.short}</td><td>${available}</td><td>${off ? "OFF" : `${fmt(factor)} × ${shortBaseName} = ${fmtA(factor * shortBaseValue)}`}</td></tr>`,
         );
         out.push(
-          `${lbl.short}: ${fmt(isd.factor)} × ${shortBaseName} = ${fmtA(isd.value)}`,
+          off
+            ? `${lbl.short}: OFF`
+            : `${lbl.short}: ${fmt(factor)} × ${shortBaseName} = ${fmtA(factor * shortBaseValue)}`,
         );
       }
     }
   }
-  const tsdRow = renderTsdRow(tsdCfg, selectedTsd, lbl.shortTime);
+  const tsdRow =
+    i2Dip && i2Dip.choice === "OFF"
+      ? null
+      : renderTsdRow(tsdCfg, selectedTsd, lbl.shortTime);
   if (tsdRow) {
     rows.push(tsdRow.row);
     out.push(tsdRow.output);
   }
   let instantWritten = false;
   if (iiValues && iiValues.length) {
-    const lim =
-        isdValues && isdValues.length
-          ? ikmax * 1000 * 0.8
-          : ikmin * 1000 * 0.8,
-      ii = under(iiValues, inA, lim);
+    const lim = iiLimit,
+      ii = autoI3;
     if (ii.verify) {
       const status = ii.status || V;
       rows.push(`<tr><td>${lbl.instant}</td><td>${status}</td><td>${status}</td></tr>`);
@@ -6707,10 +6836,19 @@ function render() {
       );
       instantWritten = true;
     } else {
+      const off = i3Dip && i3Dip.choice === "OFF";
+      const factor = i3Dip && i3Dip.factor !== null ? i3Dip.factor : ii.factor;
+      const available = r.physicalDipThresholds
+        ? `OFF / ${range(iiValues, factor, fmt)}`
+        : range(iiValues, factor, fmt);
       rows.push(
-        `<tr><td>${lbl.instant}</td><td>${range(iiValues, ii.factor, fmt)}</td><td>${fmt(ii.factor)} × In = ${fmtA(ii.value)}</td></tr>`,
+        `<tr><td>${lbl.instant}</td><td>${available}</td><td>${off ? "OFF" : `${fmt(factor)} × In = ${fmtA(factor * inA)}`}</td></tr>`,
       );
-      out.push(`${lbl.instant}: ${fmt(ii.factor)} × In = ${fmtA(ii.value)}`);
+      out.push(
+        off
+          ? `${lbl.instant}: OFF`
+          : `${lbl.instant}: ${fmt(factor)} × In = ${fmtA(factor * inA)}`,
+      );
       instantWritten = true;
     }
   }
@@ -6831,6 +6969,7 @@ function render() {
     .join("");
   $("output").textContent = out.join("\n");
   renderBackup415V(s, f, c, inA);
+  renderDocumentationStatus();
   usageStats.trackCalculation();
 }
 function reset(prevPole) {
@@ -6838,9 +6977,7 @@ function reset(prevPole) {
   st.cls = 0;
   st.relay = "";
   st.rating = 0;
-  st.siMode = "";
-  st.gChoice = "";
-  st.tgChoice = "";
+  resetDipSelections();
   const idx = F().poles.indexOf(prevPole);
   st.poles = idx >= 0 ? idx : 0;
   resetResidual();
@@ -6871,6 +7008,7 @@ function bind() {
     st.cls = 0;
     st.relay = "";
     st.rating = 0;
+    resetDipSelections();
     resetResidual();
     const idx = F().poles.indexOf(oldPole);
     st.poles = idx >= 0 ? idx : 0;
@@ -6883,11 +7021,13 @@ function bind() {
   $("relay").onchange = (e) => {
     st.relay = e.target.value;
     st.rating = 0;
+    resetDipSelections();
     resetResidual();
     render();
   };
   $("rating").onchange = (e) => {
     st.rating = +e.target.value;
+    resetDipSelections();
     render();
   };
   $("poles").onchange = (e) => {
@@ -6920,6 +7060,12 @@ function bind() {
       st.siMode = e.target.value;
       render();
     };
+  const i2Choice = document.getElementById("i2Choice");
+  if (i2Choice)
+    i2Choice.onchange = (e) => {
+      st.i2Choice = e.target.value;
+      render();
+    };
   const gChoice = document.getElementById("gChoice");
   if (gChoice)
     gChoice.onchange = (e) => {
@@ -6930,6 +7076,12 @@ function bind() {
   if (tgChoice)
     tgChoice.onchange = (e) => {
       st.tgChoice = e.target.value;
+      render();
+    };
+  const i3Choice = document.getElementById("i3Choice");
+  if (i3Choice)
+    i3Choice.onchange = (e) => {
+      st.i3Choice = e.target.value;
       render();
     };
   const bc = document.getElementById("backupComponent");
@@ -6981,6 +7133,7 @@ function bind() {
       };
   });
   $("copy").onclick = async () => {
+    if (!renderDocumentationStatus()) return;
     await navigator.clipboard.writeText($("output").textContent);
     usageStats.trackDocumentation();
     $("copy").textContent = "Kopieret";

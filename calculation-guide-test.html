@@ -73,6 +73,8 @@
           <p>Når valgt LS/I ikke kan ramme ønsket strøm præcist, viser appen kun et forslag til LSI, hvis samme frame, In, poltal og L/S/I-beskyttelse er dokumenteret kompatible. Forslaget ændrer aldrig det valgte relæ.</p>
           <p>På Ekip Dip LS/I vælges fysisk enten S eller I med en DIP-switch. Appen kræver dette valg og viser kun I2/t2 for S eller I3 for I; de dokumenteres aldrig som samtidige. Ekip Dip LIG og LSIG har indbygget G-jordfejlsbeskyttelse. I4 og t4 vælges manuelt med DIP-switches, herunder OFF for I4; G er ikke RCD.</p>
           <span class="formula">LIG/LSIG, XT2-XT6: I4 = OFF/0,20/0,25/0,45/0,55/0,75/0,80/1,00 &times; In; t4 = 0,1/0,2/0,4/0,8 s. XT7 har type-specifikke I4-trin.</span>
+          <p>I2 og I3 viser også ABBs dokumenterede OFF-DIP-position, hvor den findes. Ved en aktiv funktion er den automatiske Ik-baserede værdi fortsat standarden; manuelle numeriske valg begrænses til dokumenterede trin inden for samme Ik-grænse. I2 OFF skjuler t2.</p>
+          <p>Kopiér er kun aktiv, når den fysiske konfiguration er færdig: LS/I kræver S eller I, LIG/LSIG kræver I4 eller OFF, og en aktiv I4 kræver t4. Disse DIP-valg nulstilles ved skift af frame, relætype eller In.</p>
         </article>
         <article class="guide-section">
           <h2>Hvad resultatet betyder</h2>
